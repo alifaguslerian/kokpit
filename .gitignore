@@ -3,9 +3,12 @@ dist/
 dist-worker/
 .wrangler/
 .dev.vars
+.dev.vars.*
 .env
 .env.*
 !.env.example
 .d1/
 Thumbs.db
 .DS_Store
+coverage/
+*.tsbuildinfo
