@@ -32,7 +32,7 @@ Product:
 V1 specification frozen
 
 Implementation:
-Not started / implementation-ready
+Phase 1.1–1.3 complete; frontend scaffold only
 
 Access model:
 Private single-user
@@ -879,23 +879,34 @@ Do not ask one agent to implement every phase at once.
 
 # Local Development
 
-Implementation has not started yet, so exact scripts may evolve during Phase 1.
+The current scaffold covers Phase 1.1–1.3 only. It renders a minimal React page without final styling or Kokpit features. Cloudflare runtime integration starts in Phase 1.4; this build is not yet deployable as the complete Cloudflare application.
 
-Expected commands:
+Install dependencies and start the frontend:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Expected validation:
+Use Node.js 20.19+ on the 20.x line or 22.12+ on newer lines, as required by [Vite](https://vite.dev/guide/). The package is private and uses npm. Commit `package-lock.json` with dependency changes and use `npm ci` to reproduce the locked installation.
+
+Current validation and build commands:
 
 ```bash
-npm run lint
 npm run typecheck
-npm test
 npm run build
+npm run preview
 ```
+
+`build` runs strict TypeScript checking before bundling the React frontend. `preview` serves that production build locally. Linting is scheduled for Phase 1.7; no lint script or test framework is configured in this scaffold.
+
+`tsconfig.json` includes `src/`, `worker/`, `shared/`, `tests/`, and `vite.config.ts`. Worker files will be checked when introduced; Cloudflare runtime and binding types belong to the later Cloudflare setup. The only TypeScript aliases are `@/*` for `src/*` and `@worker/*` for `worker/*`. Vite resolves the frontend `@` alias; frontend code must not import Worker-only code.
+
+Phase 1.1 creates `worker/`, `shared/`, `tests/`, and `drizzle/migrations/` locally. They contain no implementation yet, so Git does not track these empty directories. Create their files when the relevant phase starts; no placeholder files are required.
+
+Phase 1.1–1.3 validation on 2026-10-06 passed dependency installation, strict typecheck, production build, and browser smoke checks of both dev and production-preview rendering. The minimal page rendered at desktop (1366px) and mobile (390px) widths without horizontal overflow, and the browser reported no warnings or errors. This checks the scaffold only; feature states and interactions do not exist yet.
+
+The next documented step is Phase 1.4, Configure Cloudflare Vite Integration. It has not started.
 
 Expected Cloudflare commands:
 
