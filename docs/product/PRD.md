@@ -1,809 +1,278 @@
-# Kokpit — Product Requirements Document
+# Kokpit — Product Requirements
 
-**Version:** 0.1 — V1 Draft  
-**Status:** Pre-Implementation  
-**Product:** Kokpit  
-**Type:** Personal Web Workspace  
-**Primary User:** Single user / owner  
-**Deployment Target:** Cloudflare  
-**Source of Truth:** This document defines the product scope for Kokpit V1.
+**Version:** 0.2 — V1 scope preserved
+**Status:** V1 product specification
+**Owner:** Single user / workspace owner
+**Last updated:** 2026-10-07
 
----
+This document defines what Kokpit is and what V1 must do.
+Implementation, storage, content pipelines, and visual tokens belong to the linked specifications.
 
-# 1. Product Overview
+## Product vision
 
-**Kokpit** is a personal web workspace designed to become the user's primary digital space for everyday activity.
+Kokpit is a private personal web workspace: a **personal digital room** the owner wants
+to open at the start of a computer session and keep open throughout the day.
+It brings college materials, music, news, ideas, and frequently used websites together
+without replacing every specialized application.
 
-It is intended to be opened frequently throughout the day while studying, building projects, browsing, listening to music, reading news, collecting ideas, or simply spending time at the computer.
-
-Kokpit is not intended to behave like a traditional productivity dashboard.
-
-It should feel more like a **personal digital room**: calm, lightweight, familiar, useful, and pleasant enough to remain open for long periods.
-
-The product should help bring together several parts of the user's digital life without attempting to replace every specialized application.
-
----
-
-# 2. Product Vision
-
-Kokpit should become the default browser destination when the user starts using their computer.
-
-Instead of repeatedly opening separate bookmarks, folders, news sites, music players, college material directories, and temporary notes, Kokpit provides a single personal environment where these things can be accessed naturally.
-
-The product should feel:
-
-- calm
-- personal
-- lightweight
-- flexible
-- fast
-- useful without demanding attention
-- expandable over time
-
-The guiding principle is:
+The problem is recurring friction: reopening websites, remembering where materials were
+stored, checking scattered news sources, and losing spontaneous ideas.
+Kokpit reduces that friction without adding deadlines, metrics, or a management system.
 
 > Kokpit should not make the user feel managed. It should make the user want to stay.
 
----
+### Target usage
 
-# 3. Problem
+V1 serves one owner who studies university material, builds software, follows technology
+and AI developments, browses the web, listens to music, and collects ideas.
+Optimize for the owner's habits rather than a general SaaS audience.
 
-The user's digital activity is currently distributed across many disconnected places.
+Desktop and laptop browsers are primary. Mobile should support useful lightweight actions,
+especially quick idea capture. Mobile need not reproduce the desktop layout exactly.
 
-Common examples include:
+### Product principles
 
-- frequently visited websites
-- college materials
-- music
-- technology news
-- project resources
-- random ideas
-- files and links
+| Principle | Requirement |
+| --- | --- |
+| Calm by default | Avoid unnecessary counters, alerts, streaks, and competing content. |
+| Low friction | Save ideas immediately, open shortcuts in one click, access playback easily. |
+| Personal before universal | Support the owner's usage without accommodating every workflow. |
+| Lightweight | More functionality must not automatically create more visible interface. |
+| Modular | Keep College, Music, News, Ideas, and Library independent enough to evolve. |
+| Intentional scope | Add a feature only through an explicit product decision. |
 
-This creates small but repeated friction.
+## Frozen V1 scope
 
-The user may need to remember where something was stored, reopen the same websites repeatedly, search for previously downloaded materials, or lose an idea because there was no frictionless place to save it.
+| Area | Product responsibility |
+| --- | --- |
+| Home | Local clock, date, atmosphere, quote, persistent music access, restrained previews. |
+| Quotes | Dynamic short thoughts on Home; not a separate primary navigation destination. |
+| Music | Personal audio library, playlists, controls, persistent playback. |
+| News | Curated technology and world information relevant to the owner. |
+| College | Semester → Course → Week → Material organization. |
+| Library / Quick Links | One-click launchpad for frequently visited websites. |
+| Ideas | Fast freeform capture, retrieval, editing, and search. |
 
-Traditional productivity tools often solve this by introducing more management:
+These are seven product areas and six primary navigation destinations.
+Quotes are part of Home rather than an additional module page.
 
-tasks, dashboards, deadlines, metrics, kanban boards, productivity scores, and complex organization systems.
+## Home
 
-Kokpit intentionally takes a different approach.
+Home establishes atmosphere and provides immediate access to selected information.
+It is a highlight surface, not the complete implementation of every module.
 
-It reduces friction without turning everyday activity into another productivity system.
+### Clock and date
 
----
 
-# 4. Target User
+- Show current local time and update it automatically in real time.
+- Make the clock a major visual element; date information stays secondary.
+- Preserve readability when atmospheric imagery is used.
 
-Kokpit V1 is designed primarily for **one person: its owner**.
+### Quote
 
-The user regularly:
 
-- studies university material
-- builds software projects
-- follows technology and AI developments
-- browses the web
-- listens to music while working
-- collects ideas spontaneously
-- repeatedly visits the same online tools and websites
+- Display a short dynamic thought rather than relying exclusively on a small frontend array.
+- Support motivation, reflection, life, ambition, uncertainty, struggle, sadness, loneliness,
+  calmness, technology, creativity, and relatable everyday thoughts.
+- Avoid generic motivational phrases; quiet or reflective hours are valid.
+- The primary quote changes at each local clock-hour boundary and normally stays stable
+  across refreshes during that hour.
+- English is primary (~90%); Indonesian represents ~10% over time.
+- Provide the visually secondary **another thought** action in V1. Using it is optional;
+  it displays an alternate without changing the scheduled hourly selection.
+- Do not fabricate authors or send private owner content into quote generation.
 
-Kokpit does not need to optimize for a general public audience in V1.
+Generation, quality filters, caching, fallback, and language selection are defined in
+[Content Sources](../features/CONTENT_SOURCES.md).
+Hourly behavior and the secondary action reflect approved DEC-048 in [Decisions](DECISIONS.md).
 
-Product decisions should prioritize the owner's actual usage rather than generic SaaS conventions.
+### Music access and previews
 
----
 
-# 5. Product Principles
+- Expose at least play, pause, previous, next, track information, and volume on Home.
+- Playback continues while navigating between Kokpit sections.
+- Small previews may show useful news, college context, ideas, or quick links.
+- Keep previews secondary; use dedicated pages for deeper functionality.
+- A future feature does not automatically earn a Home card. Surface it only if the owner
+  benefits from seeing or accessing it almost every time Kokpit opens.
 
-## 5.1 Calm by Default
+Home hierarchy and preview patterns belong in the [Design System](../design/DESIGN_SYSTEM.md).
 
-The interface should avoid visual pressure.
+## Music
 
-Kokpit should not display unnecessary counters, alerts, progress indicators, streaks, productivity scores, or attention-grabbing elements.
+Music is a personal audio library that can stay active while the owner uses other modules.
+Core functionality must not depend on a paid music subscription.
 
-Information should appear when useful without competing aggressively for attention.
+### Required capabilities
 
----
 
-## 5.2 Low Friction
+- Maintain a personal library and manage stored music.
+- Import files the owner owns or has permission to store.
+- Play and pause tracks; skip forward and backward.
+- Control volume and view track information.
+- Create playlists, add tracks, remove tracks, and reorder playlist contents.
+- Continue playback across route navigation.
 
-Frequently performed actions should require as few interactions as reasonably possible.
+External media links may be supported through compatible providers or import mechanisms
+where technically and legally supported. They do not replace the core owned-file flow.
+V1 must not depend on unofficial scraping or downloading from restricted platforms.
+Platform-specific integrations remain optional later adapters.
 
-Examples:
+Playback lifetime and private streaming are specified in [Architecture](../engineering/ARCHITECTURE.md).
 
-Saving an idea should be almost immediate.
+## News
 
-Opening a frequently used website should require one click.
+News offers useful awareness without becoming a general news portal.
+Prioritize signal over volume and minimize duplicate coverage of the same event.
+The owner's interests may evolve later without requiring all articles to be displayed.
 
-Playing music should not require navigating through several pages.
+### Interest coverage
 
-Returning to college material should be straightforward.
+| Area | Coverage |
+| --- | --- |
+| Technology | AI, software engineering, developer tools, cybersecurity, computing. |
+| Industry | NVIDIA, major tech companies, social platforms, notable technology leaders. |
+| Discovery | Research, emerging products, emerging technologies. |
+| World awareness | Major global events, geopolitical developments, meaningful conflicts. |
 
----
+### Reading experience
 
-## 5.3 Personal Before Universal
 
-Kokpit does not need to accommodate every possible user workflow.
+- Each item should ideally show a headline, source, publication time, short summary,
+  and original article link.
+- Where feasible, explain briefly **why the story matters**.
+- Preserve source transparency and a readable, curated feed.
+- Ingestion, news listing, original links, and basic relevance continue without AI enrichment.
+- If refresh fails, cached news remains useful and other modules keep working.
 
-Features may intentionally reflect the owner's habits, interests, and preferred way of organizing information.
+Source lists, refresh schedules, scoring, summaries, and fallback are canonical in
+[Content Sources](../features/CONTENT_SOURCES.md).
 
----
+## College
 
-## 5.4 Lightweight
+College organizes academic material more clearly than a folder while staying simpler than an LMS.
 
-The product should remain responsive and visually simple even as features grow.
+```text
+Semester → Course → Week → Material
+```
 
-Adding functionality must not automatically mean adding more visible interface.
+### Required capabilities
 
----
+| Level | Owner actions and constraints |
+| --- | --- |
+| Semester | Create, rename, archive or remove, and enter its workspace. |
+| Course | Create, rename, organize, remove, and access materials within a semester. |
+| Week | Organize weekly sections within each course; do not artificially fix the week count. |
+| Material | Add, view, download, rename, move, and remove where appropriate. |
 
-## 5.5 Modular and Expandable
+Materials include PDFs, PowerPoint and Word documents, images, text files, code files,
+links, and other useful academic files. File handling follows documented validation;
+this list does not bypass security checks or imply every format has an embedded preview.
 
-V1 is only the foundation.
+Optional course icons or identifying colors may be considered later where appropriate;
+they are not a required V1 expansion.
+Storage fields and deletion behavior belong in [Data Model](../engineering/DATA_MODEL.md).
 
-Future features should be addable without redesigning the entire product.
+## Library / Quick Links
 
-Individual areas such as College, Music, News, Ideas, and Library should remain sufficiently independent from one another.
+Quick Links is the owner's personal internet launchpad.
+It should feel integrated into Kokpit and remove repeated navigation friction.
 
----
+### Required capabilities
 
-## 5.6 No Feature for Feature's Sake
 
-A feature should exist because it improves the owner's real usage of Kokpit.
+- Create a shortcut with a name and URL.
+- Optionally assign an icon.
+- Edit, delete, and reorder shortcuts.
+- Open a shortcut quickly, normally in one click.
 
-Kokpit should not add features merely because they are common in productivity apps.
+Links may point to online tools, documentation, university systems, media, or project resources.
+Examples in specifications are illustrative, not production seed records.
+Visual grouping is optional for V1; see the [Design System](../design/DESIGN_SYSTEM.md).
 
----
+## Ideas
 
-# 6. Kokpit V1 Scope
+Ideas captures spontaneous thoughts before they disappear.
+**Speed of capture is the most important requirement.**
 
-Kokpit V1 consists of seven primary product areas:
+### Required capabilities
 
-**Home, Quotes, Music, News, College Space, Quick Links, and Idea Space.**
 
-These define the frozen V1 product scope.
+- Quickly create an idea using freeform text.
+- Optionally add a title; record creation time automatically.
+- Edit and delete existing ideas.
+- Browse saved ideas and search their content.
+- Support optional lightweight tags without requiring categorization before saving.
 
----
+Tags may express topics such as project, college, random, design, or minecraft.
+These are examples, not mandatory taxonomy or fake owner data.
+Avoid complex forms, organization workflows, and a full Notion-style editor.
 
-# 7. Home
+## Navigation and search
 
-## Purpose
+Provide direct access to Home, College, Music, News, Ideas, and Library / Quick Links.
+Avoid deeply nested global navigation; hierarchy belongs inside modules such as College.
+Navigation patterns belong in the [Design System](../design/DESIGN_SYSTEM.md).
 
-Home is the central atmosphere of Kokpit.
+Ideas search is required. Other modules may offer relevant local search;
+College should make locating material easy as implementation progresses.
+Universal search, global semantic search, and a command palette are outside initial V1.
 
-It should be useful immediately after opening the application without becoming a crowded dashboard.
+## Shared product requirements
 
-Home should communicate time, atmosphere, and selected useful information.
+| Concern | Requirement | Canonical detail |
+| --- | --- | --- |
+| Privacy | V1 is private and single-user; personal data and files must not be public by default. | [Architecture](../engineering/ARCHITECTURE.md) |
+| Ownership | Keep practical owner control over ideas, settings, links, playlists, academic material, and files. | [Data Model](../engineering/DATA_MODEL.md) |
+| Resilience | Retain cached news / previous quote or show a subtle unavailable state; isolate provider failures. | [Content Sources](../features/CONTENT_SOURCES.md) |
+| Performance | Avoid blocking requests, cache external content, prevent unrelated modules from slowing down. | [Architecture](../engineering/ARCHITECTURE.md) |
+| Deployment | Cloudflare-compatible, inexpensive or free for normal personal usage. | [Deployment](../engineering/DEPLOYMENT.md) |
+| Visual experience | Quiet, spacious, warm, personal, intentional, unobtrusive; comfortable for long sessions. | [Design System](../design/DESIGN_SYSTEM.md) |
 
-## Core Elements
+Avoid unnecessary proprietary dependencies when a simpler self-controlled solution exists.
+Visual effects must not significantly degrade responsiveness.
 
-Home must include:
+## Non-goals
 
-### Real-Time Clock
+Do not implement these in V1 without an explicit specification revision:
 
-The current local time should update automatically in real time.
 
-Date information may accompany the clock but should remain visually secondary.
+- Task management, kanban, project management, calendar management, time tracking.
+- Habit tracking, Pomodoro, focus timers, productivity scores, streaks, XP, gamification.
+- Email clients, chat, messaging, embedded AI chatbots, AI assistant panels, automatic coding agents.
+- Public signup or accounts, account switching, public profiles or feeds, multi-user workspaces,
+  team collaboration, social features.
+- Complex analytics dashboards, a full note-taking application, universal command palettes,
+  global semantic search, native mobile applications.
 
-The clock is a major visual element of Home.
+Do not reshape Kokpit into enterprise software, an admin panel, analytics or cryptocurrency
+dashboard, generic AI SaaS, or a collection of visually competing cards.
+Future reconsideration does not authorize adding any of these now.
 
----
+## V1 success criteria
 
-### Dynamic Quote
+V1 succeeds when the owner can use Kokpit repeatedly as an everyday workspace:
 
-Home displays a short piece of text that changes periodically.
 
-The content must not rely exclusively on a small static array hardcoded inside the frontend.
+- Open it and immediately see local time and dynamic content.
+- Play and manage personal music without interruption during navigation.
+- See relevant current news and follow original sources.
+- Organize and access university material through the college hierarchy.
+- Launch frequently visited websites with low friction.
+- Capture an idea immediately and retrieve it later.
+- Use every core section without a crowded or heavy interface.
+- Access the deployed workspace securely from the web.
+- Extend the codebase later without rebuilding its foundation.
 
-Quotes may include different emotional and thematic tones, including:
-
-- motivation
-- reflection
-- life
-- ambition
-- uncertainty
-- struggle
-- sadness
-- loneliness
-- calmness
-- technology
-- creativity
-- relatable everyday thoughts
-
-The system should avoid repeatedly producing generic motivational phrases.
-
-Quote delivery should eventually support dynamic sourcing, generation, caching, or a combination of these mechanisms.
-
-The exact content pipeline will be defined separately in `CONTENT_SOURCES.md`.
-
----
-
-### Music Mini Player
-
-The currently playing track should be accessible from Home.
-
-At minimum, the mini player should expose:
-
-- play
-- pause
-- previous
-- next
-- track information
-- volume
-
-Music playback should be able to continue while navigating between Kokpit sections.
-
----
-
-### Lightweight Content Preview
-
-Home may surface small previews from other Kokpit modules when useful.
-
-Examples include recent ideas, selected news, or recently accessed content.
-
-These previews must remain secondary.
-
-Home must never become a dense widget dashboard.
-
----
-
-# 8. Music
-
-## Purpose
-
-Music provides a personal audio library that can remain active while the user uses other parts of Kokpit.
-
-The feature should not depend on a paid music subscription.
-
-## Required Capabilities
-
-The user must be able to:
-
-- maintain a personal music library
-- play and pause tracks
-- skip forward or backward
-- control volume
-- view track information
-- create playlists
-- add tracks to playlists
-- remove tracks
-- reorder playlist contents
-- manage stored music
-- continue playback while navigating through Kokpit
-
-Music files that the user owns or has permission to store should be directly importable.
-
-Support for external media links may be implemented through compatible providers or import mechanisms where technically and legally supported.
-
-Kokpit V1 must **not depend on unofficial scraping or downloading from restricted platforms** for its core music functionality.
-
-Platform-specific integrations can be added later as optional adapters.
-
----
-
-# 9. News
-
-## Purpose
-
-News gives the user a lightweight way to stay aware of developments that are likely to be relevant or intellectually useful.
-
-It should not behave like a general news portal.
-
-## Primary Interests
-
-Content should prioritize areas such as:
-
-- artificial intelligence
-- software engineering
-- technology
-- developer tools
-- cybersecurity
-- computing
-- NVIDIA
-- major technology companies
-- social platforms
-- notable technology leaders
-- research
-- major global events
-- geopolitical developments
-- conflicts with meaningful global impact
-- emerging products and technologies
-
-The system should allow these interests to evolve later.
-
-## News Experience
-
-Each item should ideally provide:
-
-- headline
-- source
-- publication time
-- short summary
-- original article link
-
-Where feasible, Kokpit may additionally provide a short explanation of **why the story matters**.
-
-The interface should prioritize signal over volume.
-
-Kokpit should not attempt to display every available article.
-
-Duplicate coverage of the same event should be minimized where possible.
-
-The exact source aggregation strategy will be defined in `CONTENT_SOURCES.md`.
-
----
-
-# 10. College Space
-
-## Purpose
-
-College Space organizes academic material by semester, course, and week.
-
-It should feel simpler than a full learning management system while being more structured than a normal file folder.
-
-## Core Hierarchy
-
-The expected conceptual structure is:
-
-`Semester → Course → Week → Material`
-
-Example:
-
-`Semester 5 → Web Programming → Week 04 → REST API.pdf`
-
-## Semester
-
-The user must be able to:
-
-- create a semester
-- rename a semester
-- archive or remove a semester
-- enter a semester workspace
-
----
-
-## Course
-
-Within a semester, the user must be able to:
-
-- create courses
-- rename courses
-- organize courses
-- remove courses
-- access course material
-
-Optional visual metadata such as an icon or simple identifying color may be supported later if appropriate.
-
----
-
-## Week
-
-Each course may contain weekly sections such as:
-
-- Week 01
-- Week 02
-- Week 03
-- and onward
-
-The number of weeks must not be artificially fixed.
-
----
-
-## Materials
-
-Each week should support relevant learning materials.
-
-Examples include:
-
-- PDF
-- PowerPoint
-- Word documents
-- images
-- text files
-- code files
-- links
-- other useful academic files
-
-Users should be able to add, view, download, rename, move, and remove materials where appropriate.
-
----
-
-# 11. Quick Links
-
-## Purpose
-
-Quick Links acts as the user's personal internet launchpad.
-
-It replaces repeatedly searching for or manually opening frequently used websites.
-
-## Required Capabilities
-
-The user must be able to:
-
-- create a shortcut
-- provide a name
-- provide a URL
-- optionally assign an icon
-- edit shortcuts
-- delete shortcuts
-- reorder shortcuts
-- open a shortcut quickly
-
-Potential examples include:
-
-GitHub, ChatGPT, YouTube, Google Drive, Gmail, Vercel, Figma, WhatsApp Web, documentation, university systems, or project-specific websites.
-
-Quick Links should feel more intentional and visually integrated than ordinary browser bookmarks.
-
----
-
-# 12. Idea Space
-
-## Purpose
-
-Idea Space exists so spontaneous ideas can be captured before they disappear.
-
-The most important requirement is **speed of capture**.
-
-Creating an idea should not require navigating through complex forms or organizational systems.
-
-## Required Capabilities
-
-The user must be able to:
-
-- quickly create an idea
-- write freeform text
-- optionally add a title
-- automatically record creation time
-- edit an existing idea
-- delete an idea
-- browse previously saved ideas
-- search ideas
-
-Optional lightweight tags may be supported.
-
-Examples could include:
-
-`project`
-
-`college`
-
-`random`
-
-`design`
-
-`minecraft`
-
-Tags must remain optional.
-
-A user should still be able to save an idea immediately without categorizing it first.
-
----
-
-# 13. Navigation
-
-Navigation must remain simple even as Kokpit grows.
-
-V1 needs direct access to:
-
-- Home
-- College
-- Music
-- News
-- Ideas
-- Library / Quick Links
-
-The navigation design itself will be defined in `DESIGN_SYSTEM.md`.
-
-Kokpit should avoid deeply nested global navigation.
-
-Hierarchy should exist primarily inside feature areas such as College.
-
----
-
-# 14. Search
-
-A universal search system is **not required for the initial V1 release**.
-
-Individual modules may provide their own relevant search capability.
-
-Idea Space should support searching ideas.
-
-College Space should eventually make locating materials easy.
-
-A global command palette or universal search may be considered after V1.
-
----
-
-# 15. Data Ownership
-
-Kokpit contains personal information and files.
-
-The user should maintain practical control over stored data.
-
-The system architecture should avoid unnecessary dependency on proprietary services when a simpler self-controlled solution is available.
-
-Stored data may include:
-
-- ideas
-- settings
-- shortcuts
-- playlists
-- music metadata
-- academic structure
-- uploaded academic files
-- cached quotes
-- cached news metadata
-
-Storage implementation will be defined in engineering documentation.
-
----
-
-# 16. External Content Resilience
-
-Features such as Quotes and News may rely on external sources.
-
-Failure of an external source must not make Kokpit unusable.
-
-If a provider becomes unavailable, Kokpit should degrade gracefully.
-
-Examples include:
-
-- using cached news
-- retaining the previous quote
-- displaying a subtle unavailable state
-- allowing unrelated features to continue operating normally
-
-External integrations must remain isolated enough that one failing source does not break the entire application.
-
----
-
-# 17. Privacy
-
-Kokpit is a personal workspace.
-
-Private data should not be publicly accessible by default.
-
-The deployment architecture must eventually include a reasonable mechanism for preventing unauthorized users from accessing private workspace data.
-
-The exact authentication/access-control solution will be decided in `ARCHITECTURE.md`.
-
-Kokpit V1 does not require:
-
-- public user registration
-- social profiles
-- public content feeds
-- multi-user collaboration
-
----
-
-# 18. Deployment
-
-The intended production environment is **Cloudflare**.
-
-Architecture decisions must therefore consider Cloudflare compatibility from the beginning.
-
-However, this PRD intentionally does not prescribe specific Cloudflare products.
-
-Those decisions belong in `ARCHITECTURE.md` and `DEPLOYMENT.md`.
-
-The preferred infrastructure should remain inexpensive or free for normal personal usage.
-
----
-
-# 19. Responsive Usage
-
-Kokpit is primarily expected to be used from a laptop or desktop browser.
-
-Desktop usability therefore has priority.
-
-However, important lightweight actions should remain usable from mobile devices where practical.
-
-A key mobile use case is quickly capturing an idea.
-
-The mobile interface does not need feature parity with the desktop layout if forcing parity would harm usability.
-
----
-
-# 20. Performance Expectations
-
-Kokpit should feel fast.
-
-Pages should avoid unnecessary blocking requests.
-
-Large modules should not make unrelated areas slower.
-
-External content such as news should be cached where appropriate.
-
-Visual effects should never significantly degrade responsiveness.
-
-The experience should remain comfortable when Kokpit stays open for long periods.
-
----
-
-# 21. Visual Experience Requirements
-
-Detailed visual rules belong in `DESIGN_SYSTEM.md`.
-
-At the product level, Kokpit should feel:
-
-- quiet
-- spacious
-- modern
-- warm or neutral
-- personal
-- intentional
-- unobtrusive
-
-Kokpit should avoid feeling like:
-
-- enterprise software
-- analytics software
-- admin dashboards
-- cryptocurrency dashboards
-- generic AI-generated SaaS products
-- productivity gamification apps
-
-The application should not become a collection of visually competing cards.
-
----
-
-# 22. Explicitly Out of Scope for V1
-
-The following features should **not** be implemented during V1 unless this PRD is intentionally revised:
-
-Task management.
-
-Kanban boards.
-
-Habit tracking.
-
-Pomodoro timers.
-
-Calendar management.
-
-Email client functionality.
-
-Chat or messaging.
-
-AI chatbot embedded inside Kokpit.
-
-AI assistant panel.
-
-Productivity scoring.
-
-Streak systems.
-
-Gamification.
-
-Time tracking.
-
-Team collaboration.
-
-Public accounts.
-
-Multi-user workspaces.
-
-Social features.
-
-Complex analytics dashboards.
-
-Project management systems.
-
-Automatic coding agents.
-
-Full note-taking application functionality.
-
-Universal command palette.
-
-Global semantic search.
-
-Mobile native applications.
-
-These ideas may be reconsidered later.
-
-They must not silently enter V1 simply because an AI agent considers them useful.
-
----
-
-# 23. V1 Success Criteria
-
-Kokpit V1 is considered successful when the owner can realistically use it as a recurring everyday workspace.
-
-The core experience should allow the user to:
-
-open Kokpit and immediately see the current time and dynamic content;
-
-play and manage personal music;
-
-quickly see relevant current news;
-
-organize and access current university materials;
-
-launch frequently visited websites;
-
-capture an idea immediately before forgetting it;
-
-use all core sections without the interface feeling crowded or heavy;
-
-access the deployed workspace securely from the web;
-
-and continue extending the codebase later without rebuilding its foundation.
-
----
-
-# 24. Product Boundary
-
-Whenever a new feature is proposed, it should be evaluated against the following question:
+## Product boundary and execution
 
 > Does this make Kokpit a better personal digital space, or does it merely make Kokpit larger?
 
-If the feature primarily adds complexity, management overhead, visual noise, or maintenance burden without substantially improving everyday use, it should not be added.
+A proposal that mainly adds complexity, management overhead, visual noise, or maintenance
+burden requires an explicit scope decision. Agents implement the documented task and stop
+at its boundary; they must not independently redefine the product.
 
----
-
-# 25. V1 Feature Freeze
-
-The official Kokpit V1 product scope is:
-
-**Home**
-
-Real-time clock, date, dynamic quote, lightweight content presence, and persistent music access.
-
-**Music**
-
-Personal music library, playlists, playback controls, and persistent playback.
-
-**News**
-
-Curated technology and world information relevant to the user's interests.
-
-**College**
-
-Semester → Course → Week → Material organization.
-
-**Quick Links**
-
-One-click access to frequently used websites and services.
-
-**Ideas**
-
-Fast capture and retrieval of spontaneous ideas.
-
-Anything beyond these modules requires an explicit scope decision before implementation.
-
----
-
-# 26. Related Documentation
-
-This PRD defines **what Kokpit is and what it must do**.
-
-Other documents define how those decisions will be executed.
-
-`DESIGN_SYSTEM.md`  
-Defines visual language and interaction principles.
-
-`ARCHITECTURE.md`  
-Defines the technical architecture.
-
-`DATA_MODEL.md`  
-Defines persisted entities and relationships.
-
-`CONTENT_SOURCES.md`  
-Defines external quote, news, and content strategies.
-
-`FILE_STRUCTURE.md`  
-Defines the final codebase organization.
-
-`IMPLEMENTATION_PLAN.md`  
-Defines implementation phases and order.
-
-`DEPLOYMENT.md`  
-Defines Cloudflare deployment and operational setup.
-
-`DECISIONS.md`  
-Records important architectural and product decisions.
-
-`AGENTS.md`  
-Defines rules that AI coding agents must follow when working on Kokpit.
+See [AGENTS](../../AGENTS.md) for working rules,
+[Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) for phased delivery,
+[File Structure](../engineering/FILE_STRUCTURE.md) for placement, and
+[Decisions](DECISIONS.md) for approved reasoning and historical resolutions.
