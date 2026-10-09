@@ -1,0 +1,7 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/utilities.css' layer(utilities) source('../');
+
+/* Phase 3.1–3.3 adds Kokpit tokens, fonts, and base styles; omit Tailwind's default theme and reset here. */
+@theme {
+  --spacing: 4px;
+}
