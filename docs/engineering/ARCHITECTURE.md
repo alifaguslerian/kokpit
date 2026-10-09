@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.2 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-07
+**Version:** 0.2 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-09
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -34,8 +34,8 @@ This document owns system boundaries; it does not redefine product or visual req
 | Content AI | Workers AI; cached/batched, optional to basic functionality |
 | Deployment | Workers + Static Assets through Cloudflare Vite integration |
 
-Cloudflare Vite integration starts at Phase 1.4. The Phase 1.3 scaffold alone does not
-provide a Worker, remote resources or deployment readiness.
+Cloudflare Vite integration is configured through Phase 1.4, with a minimal Worker
+entrypoint and static frontend. Hono, feature APIs and remote resources are pending.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
