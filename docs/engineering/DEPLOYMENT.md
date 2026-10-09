@@ -1,14 +1,14 @@
 # Kokpit — Deployment
 
-**Version:** 0.2 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-07
+**Version:** 0.2 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-09
 
 Operational runbook for one Cloudflare Worker + Static Assets, private Access gate,
 D1 metadata, private R2 files, Cron jobs and Workers AI content.
 [Architecture](ARCHITECTURE.md) owns system choices; [Data Model](DATA_MODEL.md) owns schema;
 [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) controls when this runbook is implemented.
 
-> Current boundary: Phase 1.1–1.3 provides only the React/TypeScript/Vite scaffold.
-> Cloudflare integration starts in Phase 1.4. Remote resources, migrations, Access and
+> Current boundary: Phase 1.1–1.4 includes local React/TypeScript/Vite + Workers integration.
+> Hono and feature APIs are pending. Remote resources, migrations, Access and
 > deployment steps below are planned procedures, not claims that infrastructure already exists.
 
 ## 1. Environments and prerequisites
@@ -35,13 +35,18 @@ npm run build
 npm run preview
 ```
 
-After integration, `dev` should provide React HMR, Worker API, local D1/R2 and typed bindings.
-Build should prepare client, Worker and Static Assets as one deployment unit.
+`dev` currently provides React HMR and a minimal Worker on the same origin;
+`/api/*` returns structured 404 until Hono is configured in Phase 1.5.
+`build` prepares `dist/client/` and `dist/kokpit/` as one deployment unit.
+Local D1/R2 and their typed bindings remain later phases.
 Preview must exercise SPA routes, API routing, assets and changed UI; it does not replace production smoke tests.
 
 ## 2. Configuration and secrets
 
-Use one `wrangler.jsonc`, not mixed Wrangler formats. The example below is a structural future template;
+Use one `wrangler.jsonc`, not mixed Wrangler formats. The current config uses
+`worker/index.ts`, tested compatibility date `2026-10-09`, SPA fallback and
+`assets.run_worker_first = ["/api/*"]`; no remote data bindings or secrets.
+The example below is a structural future template;
 the actual config must match the Cloudflare Vite plugin and tested project setup.
 Never assume this date or binding declaration has been validated by the current scaffold.
 
