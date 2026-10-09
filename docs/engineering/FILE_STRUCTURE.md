@@ -8,11 +8,11 @@ persisted entities remain in [PRD](../product/PRD.md),
 
 ## Current scaffold and growth
 
-Phase 1.1–1.4 is complete: package manifest/lockfile, strict TypeScript,
+Phase 1.1–1.5 is complete: package manifest/lockfile, strict TypeScript,
 Vite configuration, `index.html`, `src/main.tsx`, `src/app/App.tsx`, and
-`src/vite-env.d.ts`, Cloudflare Vite integration, `wrangler.jsonc`, and a minimal
-`worker/index.ts` returning structured 404 responses. Hono, feature APIs, routing,
-styles, and feature implementations are pending.
+`src/vite-env.d.ts`, Cloudflare Vite integration, `wrangler.jsonc`, and Hono routing
+in `worker/index.ts` with `worker/api/system.routes.ts` for the health endpoint.
+Feature APIs, frontend routing, styles, and feature implementations are pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their subphase needs them; do not pre-create empty modules.
 

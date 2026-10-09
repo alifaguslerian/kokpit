@@ -34,8 +34,9 @@ This document owns system boundaries; it does not redefine product or visual req
 | Content AI | Workers AI; cached/batched, optional to basic functionality |
 | Deployment | Workers + Static Assets through Cloudflare Vite integration |
 
-Cloudflare Vite integration is configured through Phase 1.4, with a minimal Worker
-entrypoint and static frontend. Hono, feature APIs and remote resources are pending.
+Cloudflare Vite integration is configured through Phase 1.4. Phase 1.5 adds Hono
+routing and `GET /api/system/health` alongside the static frontend.
+Feature APIs and remote resources are pending.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
