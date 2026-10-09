@@ -32,11 +32,11 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Phase 1.1–1.4 is complete:** npm package, strict TypeScript, Vite + React, and Cloudflare Vite integration.
+**Phase 1.1–1.5 is complete:** npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, and Hono routing.
 The app currently renders a minimal scaffold page.
-The next documented step is **Phase 1.5: Configure Hono**.
+The next documented step is **Phase 1.6: Configure Tailwind CSS**.
 
-The Worker entrypoint currently returns structured 404 responses; Hono and feature APIs are pending.
+The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}` and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
 Install, typecheck, client/Worker build, and local dev/preview smoke checks passed on 2026-10-09.
 See the [implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) for the remaining work.
@@ -78,7 +78,8 @@ The dev server normally opens at `http://localhost:5173`.
 Use `npm install` when intentionally updating dependencies and keep the lockfile with those changes.
 Linting is scheduled for Phase 1.7; a test framework is not configured yet.
 `npm run dev` runs React HMR and the Worker locally on the same origin.
-SPA navigation falls back to `index.html`; `/api/*` reaches the Worker and currently returns 404.
+SPA navigation falls back to `index.html`; `/api/*` reaches the Hono Worker.
+Open `http://localhost:5173/api/system/health` to check the local health response.
 Build output lives in `dist/client/` and `dist/kokpit/`; Vite generates the output Wrangler configuration.
 No production resources or data bindings are configured yet.
 Local Cloudflare setup and deployment belong in the [deployment runbook](docs/engineering/DEPLOYMENT.md).
