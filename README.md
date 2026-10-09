@@ -32,12 +32,13 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Phase 1.1–1.3 is complete:** npm package, strict TypeScript, and Vite + React.
+**Phase 1.1–1.4 is complete:** npm package, strict TypeScript, Vite + React, and Cloudflare Vite integration.
 The app currently renders a minimal scaffold page.
-The next documented step is **Phase 1.4: Cloudflare Vite Integration**.
+The next documented step is **Phase 1.5: Configure Hono**.
 
-Backend, database, final UI, and production deployment are not implemented.
-The scaffold passed install, typecheck, build, and browser smoke checks on 2026-10-06.
+The Worker entrypoint currently returns structured 404 responses; Hono and feature APIs are pending.
+Database, final UI, and production deployment are not implemented.
+Install, typecheck, client/Worker build, and local dev/preview smoke checks passed on 2026-10-09.
 See the [implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) for the remaining work.
 
 ## Tech stack
@@ -59,7 +60,7 @@ See [Architecture](docs/engineering/ARCHITECTURE.md) for system boundaries.
 
 ## Local development
 
-Prerequisites: Git, npm, and Node.js `^20.19.0 || >=22.12.0`.
+Prerequisites: Git, npm, and Node.js `>=22.12.0` (Wrangler requires Node 22+).
 
 ```bash
 npm ci
@@ -70,13 +71,16 @@ The dev server normally opens at `http://localhost:5173`.
 
 | Command | Current behavior |
 | --- | --- |
-| `npm run typecheck` | Strict TypeScript checking |
-| `npm run build` | Typecheck, then production frontend build |
-| `npm run preview` | Serve the production build locally |
+| `npm run typecheck` | Strict source checking; declaration checking exception per [DEC-049](docs/product/DECISIONS.md#dec-049--owner-approved-declaration-checking-exception) |
+| `npm run build` | Typecheck, then client and Worker build |
+| `npm run preview` | Serve the production build in the local Workers runtime |
 
 Use `npm install` when intentionally updating dependencies and keep the lockfile with those changes.
 Linting is scheduled for Phase 1.7; a test framework is not configured yet.
-This frontend scaffold does not run a Worker or connect to production data.
+`npm run dev` runs React HMR and the Worker locally on the same origin.
+SPA navigation falls back to `index.html`; `/api/*` reaches the Worker and currently returns 404.
+Build output lives in `dist/client/` and `dist/kokpit/`; Vite generates the output Wrangler configuration.
+No production resources or data bindings are configured yet.
 Local Cloudflare setup and deployment belong in the [deployment runbook](docs/engineering/DEPLOYMENT.md).
 
 ## Documentation
