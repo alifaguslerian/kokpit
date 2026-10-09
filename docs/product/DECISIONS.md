@@ -3,7 +3,7 @@
 **Version:** 1.1
 **Status:** Active V1 Decision Log
 **Product:** Kokpit · **Type:** Product + Architecture ADRs
-**Last Updated:** 2026-10-07
+**Last Updated:** 2026-10-09
 
 This log preserves decisions and their reasons, not minor implementation changes. Status vocabulary: Accepted, Superseded, Deprecated, Under Review. Each record retains its original date; shortening the record does not reopen or replace it.
 
@@ -336,3 +336,17 @@ Canonical contracts: [PRD](PRD.md), [Design System](../design/DESIGN_SYSTEM.md),
 **Reason/impact:** Remove ambiguity while preserving approved product/stack. Data Model, Design System, Content Sources, Implementation Plan, README, and DEC-022 wording were aligned; DEC-047 retained as history. Language was specification-only at approval, with no existing data/schema to migrate; initial Drizzle schema/migration must include it in Phase 2.3–2.4.
 
 **Historical authorization:** That instruction authorized documentation only and required waiting for separate implementation instruction. The decision alone did not authorize scaffold, Git initialization, dependencies, schema/migration, backend, or UI. Later owner instruction separately authorized Phase 1.1–1.3; the old wait is not a current scaffold blocker. The visual reference is still needed before Phase 4.5 comparison and never blocked minimal scaffold.
+
+### DEC-049 — Owner-approved declaration checking exception
+
+**Accepted · 2026-10-09**
+
+**Decision:** Enable TypeScript `skipLibCheck` during Phase 1.4 with explicit owner approval.
+**Reason:** Cloudflare Vite/Wrangler/Miniflare published declarations reference missing
+internal modules and contain incompatible declarations. An earlier compatible pair
+also failed declaration checking and introduced npm audit findings; retain the current
+pair `@cloudflare/vite-plugin@1.63.1` and `wrangler@4.149.0` instead.
+**Impact:** Skip internal checking of `.d.ts` files; all Kokpit `.ts`/`.tsx` source and
+usage of imported types remain checked with strict mode and the existing safeguards.
+`npm run typecheck` remains mandatory and remains part of `npm run build`.
+This exception does not authorize disabling source checks or hiding application errors.
