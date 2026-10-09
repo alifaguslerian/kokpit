@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.2 | **Status:** V1 implementation plan | **Updated:** 2026-10-07
+**Version:** 0.2 | **Status:** V1 implementation plan | **Updated:** 2026-10-09
 
 Implement the documented V1 in small, reviewable steps. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,9 +11,8 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Phase 0.1–0.2 and Phase 1.1–1.3 are complete. Phase 1 as a whole is not complete.
-The next implementation step is **1.4 Configure Cloudflare Vite Integration**.
-This documentation cleanup does not authorize implementing that step.
+Phase 0.1–0.2 and Phase 1.1–1.4 are complete. Phase 1 as a whole is not complete.
+The next implementation step is **1.5 Configure Hono**, requiring a new owner instruction.
 
 - Work on the requested scope only, usually 1–3 subphases per session. Understand,
   implement, validate, report, then stop; do not implement future phases early.
