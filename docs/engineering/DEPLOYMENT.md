@@ -7,8 +7,8 @@ D1 metadata, private R2 files, Cron jobs and Workers AI content.
 [Architecture](ARCHITECTURE.md) owns system choices; [Data Model](DATA_MODEL.md) owns schema;
 [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) controls when this runbook is implemented.
 
-> Current boundary: Phase 1.1–1.4 includes local React/TypeScript/Vite + Workers integration.
-> Hono and feature APIs are pending. Remote resources, migrations, Access and
+> Current boundary: Phase 1.1–1.5 includes local React/TypeScript/Vite + Workers integration and Hono health routing.
+> Feature APIs are pending. Remote resources, migrations, Access and
 > deployment steps below are planned procedures, not claims that infrastructure already exists.
 
 ## 1. Environments and prerequisites
@@ -35,8 +35,9 @@ npm run build
 npm run preview
 ```
 
-`dev` currently provides React HMR and a minimal Worker on the same origin;
-`/api/*` returns structured 404 until Hono is configured in Phase 1.5.
+`dev` currently provides React HMR and the Hono Worker on the same origin.
+`GET /api/system/health` returns `200 {"status":"ok"}`; unknown API routes return structured 404 responses.
+This health endpoint checks HTTP routing only; it does not probe D1, R2, or AI.
 `build` prepares `dist/client/` and `dist/kokpit/` as one deployment unit.
 Local D1/R2 and their typed bindings remain later phases.
 Preview must exercise SPA routes, API routing, assets and changed UI; it does not replace production smoke tests.
