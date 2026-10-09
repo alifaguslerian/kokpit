@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.2 | **Status:** V1 structure reference | **Updated:** 2026-10-07
+**Version:** 0.2 | **Status:** V1 structure reference | **Updated:** 2026-10-09
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -8,9 +8,11 @@ persisted entities remain in [PRD](../product/PRD.md),
 
 ## Current scaffold and growth
 
-Phase 1.1–1.3 is complete: package manifest/lockfile, strict TypeScript,
+Phase 1.1–1.4 is complete: package manifest/lockfile, strict TypeScript,
 Vite configuration, `index.html`, `src/main.tsx`, `src/app/App.tsx`, and
-`src/vite-env.d.ts`. Backend, routing, styles, and feature implementations are pending.
+`src/vite-env.d.ts`, Cloudflare Vite integration, `wrangler.jsonc`, and a minimal
+`worker/index.ts` returning structured 404 responses. Hono, feature APIs, routing,
+styles, and feature implementations are pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their subphase needs them; do not pre-create empty modules.
 
