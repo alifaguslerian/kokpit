@@ -12,7 +12,7 @@ Kokpit should feel like a room to return to, without the pressure of a productiv
 ## Preview
 
 > Main screenshot will be added when the Kokpit interface is implemented.
-> The current app is an unstyled React scaffold, not the final design.
+> The current app is a minimal React scaffold with utility padding, not the final design.
 
 <!-- Replace this preview note with a real screenshot when one is available. -->
 
@@ -32,9 +32,9 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Phase 1.1–1.5 is complete:** npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, and Hono routing.
+**Phase 1.1–1.6 is complete:** npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, and Tailwind utilities.
 The app currently renders a minimal scaffold page.
-The next documented step is **Phase 1.6: Configure Tailwind CSS**.
+The next documented step is **Phase 1.7: Configure Linting and Formatting**.
 
 The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}` and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
@@ -78,6 +78,9 @@ The dev server normally opens at `http://localhost:5173`.
 Use `npm install` when intentionally updating dependencies and keep the lockfile with those changes.
 Linting is scheduled for Phase 1.7; a test framework is not configured yet.
 `npm run dev` runs React HMR and the Worker locally on the same origin.
+Tailwind uses the official Vite plugin and `src/styles/globals.css`, scanning `src/`.
+The scaffold's `p-4` utility adds 16px padding using the documented 4px spacing unit.
+Default Tailwind theme and Preflight are omitted; Kokpit tokens, fonts, and base styles belong to Phase 3.1–3.3.
 SPA navigation falls back to `index.html`; `/api/*` reaches the Hono Worker.
 Open `http://localhost:5173/api/system/health` to check the local health response.
 Build output lives in `dist/client/` and `dist/kokpit/`; Vite generates the output Wrangler configuration.
