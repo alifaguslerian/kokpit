@@ -11,8 +11,8 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Phase 0.1–0.2 and Phase 1.1–1.5 are complete. Phase 1 as a whole is not complete.
-The next implementation step is **1.6 Configure Tailwind CSS**, requiring a new owner instruction.
+Phase 0.1–0.2 and Phase 1.1–1.6 are complete. Phase 1 as a whole is not complete.
+The next implementation step is **1.7 Configure Linting and Formatting**, requiring a new owner instruction.
 
 - Work on the requested scope only, usually 1–3 subphases per session. Understand,
   implement, validate, report, then stop; do not implement future phases early.
