@@ -36,6 +36,8 @@ This document owns system boundaries; it does not redefine product or visual req
 
 Cloudflare Vite integration is configured through Phase 1.4. Phase 1.5 adds Hono
 routing and `GET /api/system/health` alongside the static frontend.
+Phase 1.6 adds the Tailwind Vite plugin and frontend utility stylesheet, without
+the default Tailwind theme or Preflight. Kokpit tokens, fonts, and base styles follow in Phase 3.1–3.3.
 Feature APIs and remote resources are pending.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
