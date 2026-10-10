@@ -32,9 +32,9 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Phase 1.1–1.6 is complete:** npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, and Tailwind utilities.
+**Milestone 1 is in progress; packages 1.1–1.3 are complete:** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, and Tailwind utilities.
 The app currently renders a minimal scaffold page.
-The next documented step is **Phase 1.7: Configure Linting and Formatting**.
+The next documented package is **1.4: Linting, Formatting & Foundation Verification**.
 
 The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}` and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
@@ -76,11 +76,11 @@ The dev server normally opens at `http://localhost:5173`.
 | `npm run preview` | Serve the production build in the local Workers runtime |
 
 Use `npm install` when intentionally updating dependencies and keep the lockfile with those changes.
-Linting is scheduled for Phase 1.7; a test framework is not configured yet.
+Linting is scheduled for package 1.4; a test framework is not configured yet.
 `npm run dev` runs React HMR and the Worker locally on the same origin.
 Tailwind uses the official Vite plugin and `src/styles/globals.css`, scanning `src/`.
 The scaffold's `p-4` utility adds 16px padding using the documented 4px spacing unit.
-Default Tailwind theme and Preflight are omitted; Kokpit tokens, fonts, and base styles belong to Phase 3.1–3.3.
+Default Tailwind theme and Preflight are omitted; Kokpit tokens, fonts, and base styles belong to package 2.1 (Visual Foundation).
 SPA navigation falls back to `index.html`; `/api/*` reaches the Hono Worker.
 Open `http://localhost:5173/api/system/health` to check the local health response.
 Build output lives in `dist/client/` and `dist/kokpit/`; Vite generates the output Wrangler configuration.
@@ -97,7 +97,7 @@ Local Cloudflare setup and deployment belong in the [deployment runbook](docs/en
 | [Data model](docs/engineering/DATA_MODEL.md) | Tables, constraints, relationships, and lifecycle |
 | [Content sources](docs/features/CONTENT_SOURCES.md) | Quotes, news sources, ranking, and refresh behavior |
 | [File structure](docs/engineering/FILE_STRUCTURE.md) | Code placement and naming |
-| [Implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) | Phase-by-phase execution checklist |
+| [Implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) | Milestones, work packages, and acceptance checklists |
 | [Decisions](docs/product/DECISIONS.md) | Accepted decisions and their reasoning |
 | [Deployment](docs/engineering/DEPLOYMENT.md) | Local setup, release steps, and recovery |
 | [Agent rules](AGENTS.md) | Required behavior for coding agents |
