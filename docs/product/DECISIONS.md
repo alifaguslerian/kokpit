@@ -1,9 +1,9 @@
 # Kokpit — Decisions
 
-**Version:** 1.2
+**Version:** 1.3
 **Status:** Active V1 Decision Log
 **Product:** Kokpit · **Type:** Product + Architecture ADRs
-**Last Updated:** 2026-10-09
+**Last Updated:** 2026-10-10
 
 This log preserves decisions and their reasons, not minor implementation changes. Status vocabulary: Accepted, Superseded, Deprecated, Under Review. Each record retains its original date; shortening the record does not reopen or replace it.
 
@@ -335,7 +335,7 @@ Canonical contracts: [PRD](PRD.md), [Design System](../design/DESIGN_SYSTEM.md),
 
 **Reason/impact:** Remove ambiguity while preserving approved product/stack. Data Model, Design System, Content Sources, Implementation Plan, README, and DEC-022 wording were aligned; DEC-047 retained as history. Language was specification-only at approval, with no existing data/schema to migrate; initial Drizzle schema/migration must include it in Phase 2.3–2.4.
 
-**Historical authorization:** That instruction authorized documentation only and required waiting for separate implementation instruction. The decision alone did not authorize scaffold, Git initialization, dependencies, schema/migration, backend, or UI. Later owner instruction separately authorized Phase 1.1–1.3; the old wait is not a current scaffold blocker. The visual reference is still needed before Phase 4.5 comparison and never blocked minimal scaffold.
+**Historical authorization:** That instruction authorized documentation only and required waiting for separate implementation instruction. The decision alone did not authorize scaffold, Git initialization, dependencies, schema/migration, backend, or UI. Later owner instruction separately authorized Phase 1.1–1.3; the old wait is not a current scaffold blocker. The visual reference was still needed at that time and never blocked minimal scaffold; DEC-051 records its later receipt for package 2.3 (legacy Phase 4.5) comparison.
 
 ### DEC-049 — Owner-approved declaration checking exception
 
@@ -376,3 +376,35 @@ to the owner's previously approved commit preference.
 
 **Authorization:** This instruction authorizes documentation restructuring only.
 Implementation of the next package requires a separate owner instruction.
+
+### DEC-051 — Stitch visual references and refined V1 layouts
+
+**Accepted · 2026-10-10**
+
+**Decision:** The owner supplied Home, College, Ideas, Library, Music, and News screens,
+then authorized documentation for a similar UI with cleaner execution. Retain the original
+PNGs in `docs/design/references/` and interpret them through
+[UI References](../design/UI_REFERENCES.md) and [Design System](../design/DESIGN_SYSTEM.md).
+The dark Home screen is the primary atmosphere; the alternate's bright placeholder is not
+the target image treatment.
+
+**Reason:** A shared, persistent visual reference makes future implementation review concrete
+without redesigning each page or relying on temporary attachment paths.
+
+**Impact:** Refine large-desktop sidebar width to 280px, page padding to 40px / 32px,
+content/section gaps to 24px, and the clock baseline to 112px with responsive scaling.
+Keep constrained-desktop geometry documented. Home uses Music/Ideas in its left column
+and College/News/Quick Links in its right column. Dedicated pages retain the supplied
+player, capture, portal-grid, resource-organizer, and editorial-feed character.
+Color tokens and Cormorant Garamond + Inter remain unchanged; functional content uses Inter.
+
+**Scope interpretation:** The screens guide appearance. PRD, Data Model, Architecture,
+and Content Sources continue to define feature behavior and capabilities. The reference
+mapping explicitly separates existing V1 behavior from calendar/progress workflows,
+notebooks/reading trackers, encryption/sync claims, DSP/mixing, stream grabbing,
+and extra News persistence/settings. Those reference-only elements do not become requirements
+through a screenshot. The UI must still expose required V1 controls absent from the mockups.
+
+**Authorization:** Documentation and reference preservation only. No application code,
+schema, provider integration, deployment, or work-package completion is authorized by this
+decision. Historical missing-reference findings remain recorded, with the asset gap now resolved.

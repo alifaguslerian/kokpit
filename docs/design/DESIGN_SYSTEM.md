@@ -1,14 +1,21 @@
 # Kokpit — Design System
 
-**Version:** 1.1 — editorial cleanup; token values unchanged
+**Version:** 1.2 — Stitch references and refined page compositions
 **Status:** V1 design direction locked
 **Theme:** Dark Cozy Editorial Workspace
 **Primary platform:** Desktop web
-**Reference:** Approved Kokpit dark visual concept
-**Last updated:** 2026-10-07
+**Reference:** Owner-supplied Stitch screens; [reference gallery and interpretation](UI_REFERENCES.md)
+**Last updated:** 2026-10-10
 
 This is the source of truth for UI appearance and interaction.
 Product scope belongs in [PRD](../product/PRD.md); execution rules belong in [AGENTS](../../AGENTS.md).
+
+The owner approved using the supplied screens as the visual direction, with cleaner,
+more consistent implementation. Follow their warm atmosphere, shell, hierarchy, and
+page composition through the specifications below. Screenshot labels, example content,
+and extra controls do not independently define product behavior or persisted entities.
+The reference gallery records how each screen maps to V1; DEC-051 in
+[Decisions](../product/DECISIONS.md) records this documentation revision.
 
 ## Visual direction
 
@@ -37,7 +44,8 @@ Kokpit Workspace Pro, or Kokpit Dashboard without a product revision.
 ## Tokens
 
 Consume semantic tokens rather than arbitrary colors in feature code.
-Each value below preserves the approved V1 specification.
+Color and font-family values preserve the approved V1 specification. Geometry and clock
+sizing below refine the desktop composition around the supplied screens.
 
 ### Color reference
 
@@ -91,7 +99,7 @@ Keep families behind their tokens; do not introduce additional families.
 | --- | --- |
 | `--font-display` | `"Cormorant Garamond", Georgia, serif` |
 | `--font-ui` | `"Inter", system-ui, sans-serif` |
-| `--text-clock` | `88px` |
+| `--text-clock` | `112px` |
 | `--text-display-xl` | `48px` |
 | `--text-display-lg` | `34px` |
 | `--text-display-md` | `28px` |
@@ -114,7 +122,8 @@ The expanded interface fallback stack may use `system-ui, -apple-system, BlinkMa
 | Card heading | UI sans | 600. |
 | Body | UI sans | 400; line height 1.5–1.65. |
 
-Desktop clock may scale from 72px to 96px with the viewport.
+Desktop clock may scale from 88px to 128px with the viewport; use 56–80px on narrow screens.
+It remains the strongest Home element without clipping or obscuring the date and quote.
 Display serif may also serve large greetings and occasional expressive headings.
 Use UI sans for navigation, cards, buttons, inputs, metadata, body, menus, lists, and settings.
 Never use display serif for dense functional UI.
@@ -139,11 +148,11 @@ Never use display serif for dense functional UI.
 | `--space-10` | `40px` |
 | `--space-12` | `48px` |
 | `--space-16` | `64px` |
-| `--sidebar-width` | `220px` |
-| `--page-padding-x` | `24px` |
-| `--page-padding-y` | `22px` |
-| `--content-gap` | `16px` |
-| `--section-gap` | `20px` |
+| `--sidebar-width` | `280px` |
+| `--page-padding-x` | `40px` |
+| `--page-padding-y` | `32px` |
+| `--content-gap` | `24px` |
+| `--section-gap` | `24px` |
 | `--shadow-soft` | `0 4px 16px rgba(0,0,0,0.18)` |
 | `--shadow-card` | `0 8px 28px rgba(0,0,0,0.26)` |
 | `--shadow-float` | `0 12px 36px rgba(0,0,0,0.30)` |
@@ -155,15 +164,23 @@ Never use display serif for dense functional UI.
 Base spacing unit is 4px; avoid arbitrary spacing where the scale fits.
 Recommended radii: input 12–14px, button 12px, small card 14px, main card 18px,
 hero surface 22px, chips pill. Do not use dramatic floating shadows.
+The shell values above target large desktop screens (≥1440px). On constrained desktops,
+override sidebar width to 220px, page padding to 24px horizontally / 22px vertically,
+content gap to 16px, and section gap to 20px. Reduce columns before text becomes cramped.
 
 ## Layout and navigation
 
 Desktop is primary; target 1366px–1920px while remaining usable on smaller laptops.
 The app shell is a sidebar beside main content. Very large screens may use a comfortable
 maximum readable content width rather than stretching text indefinitely.
+Use a subtle sidebar separator and generous space around the main content. The browser
+tabs, address bar, window controls, and browser avatar in the references are outside the app.
 
 Sidebar order: Kokpit name/logo → short tagline → Home, College, Music, News, Ideas,
 Library → optional atmospheric visual near the bottom. Do not add destinations outside V1.
+The bottom visual is quiet decoration, not a session indicator or another quote system.
+Use the existing font families and avoid reproducing the reference's handwritten lettering
+or glowing dot. Keep navigation reachable when the viewport is short.
 Dedicated-page paths are conceptually `/home`, `/college`, `/music`, `/news`, `/ideas`,
 and `/library`; actual routing belongs in [Architecture](../engineering/ARCHITECTURE.md).
 
@@ -186,20 +203,27 @@ Hero: Clock + Date + Context line + Quote + optional atmospheric visual
 Highlights: Music · College · Ideas · News · Quick Links
 ```
 
-Recommended desktop arrangement, not a pixel-perfect requirement:
+Reference-led desktop arrangement, adapted to actual content rather than fixed card heights:
 
-| Row | Left | Right |
-| --- | --- | --- |
-| Hero | Clock / quote | Atmospheric image when present |
-| Highlights | Music | College |
-| Highlights | Ideas | News |
-| Launchpad | Quick Links across available width | |
+| Region | Composition |
+| --- | --- |
+| Hero across main content | Clock, date, context, quote on the left; optional subdued room imagery on the right. |
+| Left highlight column | Now Playing, then compact Ideas capture. |
+| Right highlight column | College context, News preview, then Quick Links. |
+
+Use two balanced columns with independent content heights, as in the Home reference;
+do not force Ideas to align vertically with News or stretch cards to fill empty space.
+On narrow screens, use one column with a coherent reading and keyboard order:
+hero → music → college → ideas → news → quick links. Layout changes must preserve
+labels, usable controls, and the same product hierarchy.
 
 Hierarchy: **Clock → Quote / atmosphere → Current music → Relevant current context
 → Feature previews → Navigation**. Do not make News more prominent than the clock.
 The hero may merge into a room image; its content is context/greeting, time, date, quote,
 and a source only when one genuinely exists. Quote attribution follows
 [Content Sources](../features/CONTENT_SOURCES.md).
+Use the dark Home reference as the primary atmosphere; the alternate's bright placeholder
+is not an approved image treatment. Reserve a visually secondary **another thought** action.
 
 A new feature does not automatically deserve a Home widget. Ask whether it warrants
 attention every time Kokpit opens; otherwise keep it on its own page.
@@ -238,6 +262,12 @@ Ideas / Open Ideas; Quick Links / View Library.
 | Ideas | Immediate text capture and Open Ideas action. Optional quick tags: Idea, Question, Random, Project, College. Never require a tag before saving. |
 | Quick Links | Brand icon and label; a tile may represent Add. No excessively colorful backgrounds; recognizable brand colors may remain in icons. |
 
+Home's audio preview includes an accessible volume control even though it is absent from
+the supplied screen. Use playback progress and real track metadata; do not copy EQ, warmth,
+vinyl hardware, or lossless labels as capabilities without corresponding supported behavior.
+Decorative audio bars are optional, must not pretend to measure sound, and must remain quiet.
+Use current College material context rather than inventing a timetable or completion score.
+
 Music cover: 96–112px square, radius 12–14px.
 Primary play button: 48px square, pill radius 999px, accent background, inverse text.
 Progress track: `rgba(255,255,255,0.10)`; filled progress: accent.
@@ -261,7 +291,7 @@ where relevant; implementing only the default state is insufficient.
 | Primary button | Accent background; inverse text; 12px radius. | Accent-hover background; pressed scale(0.98); background 150ms ease, transform 120ms ease. |
 | Secondary button | Surface-2; 1px default border; primary text. | Complete focus, active, disabled, loading states. |
 | Ghost button | Transparent; secondary text. | Hover `rgba(255,255,255,0.04)` background and primary text. |
-| Input | Height 44px; surface-2; 1px default border; radius 12px; primary text; padding 0 14px. | Soft-text placeholder; focus accent-muted border and `0 0 0 3px` accent-bg shadow. |
+| Input | Height 44px; surface-2; 1px default border; radius 12px; primary text; padding 0 14px. | Muted-text placeholder plus a persistent label; focus accent-muted border and `0 0 0 3px` accent-bg shadow. |
 | Chip / tag | Height 30px; padding 0 12px; radius 999px; surface-2; 1px default border. | Selected accent-bg background and accent-hover text. |
 
 Minimize nested cards: use space, type, and subtle dividers instead of card-inside-card layers.
@@ -283,15 +313,24 @@ Avoid large slides, glow explosions, and unnecessary animation.
 
 ## Dedicated pages
 
-| Page | Design focus |
-| --- | --- |
-| Music | Library, playlists, queue, search, controls, import, track management where scoped. Calm and music-focused; do not visually copy Spotify. |
-| College | Semester → Course → Week → Materials; prioritize navigation and organization without LMS complexity. |
-| News | Readable curated feed, source transparency, useful category filters, article opening; avoid sensational presentation. |
-| Ideas | Capture, browse, search, edit, delete; no full Notion-style editor. |
-| Library | Visually organized quick links; grouping optional for V1. Possible later groups: Daily, Development, College, Media, Tools, Other. |
+Keep a shared shell and restrained page header, with an optional short editorial heading.
+Page-specific composition follows the reference, while controls expose the approved V1
+behavior. Let real content determine card height; avoid clipped text, tiny metadata,
+large statistic panels, and repeated card-inside-card borders.
 
-This table describes design patterns, not permission to expand a phase's feature scope.
+| Page | Reference-led V1 composition |
+| --- | --- |
+| College | Semester selector and clear Semester → Course → Week → Material navigation. A course grid leads into a selected course's weekly material list; an optional side panel shows selected material details/actions. Include create, rename, archive, move, download, and delete at their documented level. Keep the resource focus of the reference without schedules, deadlines, office-hours panels, or progress scoring. |
+| Ideas | A prominent, low-friction composer above a saved-idea list; optional title and quick tags never block capture. Show readable previews, dates, lightweight tags, and pinned ideas using the documented model. Search is visible; edit and delete are discoverable. An optional compact tag/filter area can occupy the right side when useful; do not create notebooks to fill that column. |
+| Library | A prominent shortcut grid with recognizable icon, name, and an Add shortcut tile. Expose editing, deletion, ordering, and Home favorites. Optional groups use the documented quick-link grouping. Search, if included, searches shortcuts locally; a right panel is unnecessary without useful shortcut content. Preserve the portal-grid character without a reading tracker or book vault. |
+| Music | A large player with artwork, track/artist, transport, seek/time, and volume above a playlist/library area. The vinyl motif may be restrained static artwork; it does not imply a codec or DSP engine. Provide file import and track/playlist management within the package scope. Optional queue/search remain secondary; playback stays mounted above route pages. The reference's mixer/grabber areas do not belong to this V1 composition. |
+| News | A restrained lead article may precede a readable feed with useful local category filters. Show headline, source, time, short summary, and original article link. Supporting cards may use two or three columns only when readable. Images come from appropriate source metadata with a neutral fallback; do not attach unrelated atmospheric imagery as documentary evidence. Coverage and AI fallback follow Content Sources. |
+
+Use Inter for functional page titles, controls, metadata, and article/idea previews;
+reserve Cormorant Garamond for occasional expressive headings. Example text, source names,
+counts, course names, tracks, and link destinations in the references are not production seeds.
+An unsupported control must be omitted rather than displayed as a non-functional promise.
+This table describes design patterns, not permission to expand a work package's feature scope.
 
 ## Loading, empty, and error states
 
@@ -313,6 +352,9 @@ Breakpoints are conceptual guidance, not mandatory framework values.
 | Large desktop: ≥1440px | Comfortable readable content width and generous space. |
 
 Do not force mobile to reproduce desktop exactly.
+Collapse side panels below their associated content, reduce playlist/shortcut grids, and allow
+filter chips to wrap without splitting individual labels. Avoid masonry libraries or fixed
+screenshot-sized canvases. Navigation must still provide all six destinations accessibly.
 
 ## Accessibility and validation
 
@@ -320,6 +362,12 @@ Minimum requirements: keyboard navigation, visible focus, semantic controls, acc
 reasonable text contrast, non-color-only states, heading hierarchy, and reduced-motion support.
 Choose text tokens for the actual background and text role; having a token does not replace
 contrast verification.
+Normal readable text needs at least 4.5:1 contrast; large text needs at least 3:1.
+The current soft-text token is approximately 3.75:1 on surface-1 and 3.52:1 on surface-2;
+reserve it for non-essential decoration or qualifying large text. Muted text is approximately
+5.99:1 on surface-1. Use muted or stronger text for small labels, timestamps, and placeholders.
+These ratios cover flat token pairs, not image backgrounds, opacity, or interactive states;
+verify the final rendered combinations. See [WCAG contrast guidance](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html).
 
 Preserve the documented reduced-motion duration treatment:
 
@@ -333,8 +381,11 @@ Preserve the documented reduced-motion duration treatment:
 
 Verify desktop, basic responsive behavior, keyboard focus, loading, empty, and applicable error
 states. Visual completion cannot be established by TypeScript compilation alone.
-Compare against the approved visual concept at the documented validation step;
-its missing reference asset must be reported rather than replaced with a new design.
+Compare against the repository [reference gallery](UI_REFERENCES.md) and the normalized
+compositions in this document at the relevant UI validation step. Record a rendered capture
+at a comparable desktop viewport, then check narrower layouts and interaction states.
+Judge atmosphere, hierarchy, typography roles, geometry, and clarity; do not reproduce
+browser chrome, broken assets, fabricated data, or reference-only feature controls.
 
 ## Semantic implementation mapping
 
