@@ -13,7 +13,7 @@ This document owns system boundaries; it does not redefine product or visual req
 | [Content Sources](../features/CONTENT_SOURCES.md) | Quotes, news and provider strategy |
 | [File Structure](FILE_STRUCTURE.md) | Directory responsibilities |
 | [Deployment](DEPLOYMENT.md) | Environments, bindings, migrations and operations |
-| [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) | Authorized phase boundaries |
+| [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) | Authorized milestone/work package boundaries |
 | [AGENTS.md](../../AGENTS.md) | Mandatory workflow and source precedence |
 
 ## Locked stack
@@ -34,10 +34,10 @@ This document owns system boundaries; it does not redefine product or visual req
 | Content AI | Workers AI; cached/batched, optional to basic functionality |
 | Deployment | Workers + Static Assets through Cloudflare Vite integration |
 
-Cloudflare Vite integration is configured through Phase 1.4. Phase 1.5 adds Hono
-routing and `GET /api/system/health` alongside the static frontend.
-Phase 1.6 adds the Tailwind Vite plugin and frontend utility stylesheet, without
-the default Tailwind theme or Preflight. Kokpit tokens, fonts, and base styles follow in Phase 3.1–3.3.
+Package 1.3 is complete: Cloudflare Vite integration, Hono routing and
+`GET /api/system/health` alongside the static frontend, plus Tailwind's Vite plugin
+and frontend utility stylesheet without the default theme or Preflight.
+Kokpit tokens, fonts, and base styles follow in package 2.1 (Visual Foundation).
 Feature APIs and remote resources are pending.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.

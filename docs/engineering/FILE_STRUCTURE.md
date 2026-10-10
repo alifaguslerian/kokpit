@@ -8,7 +8,7 @@ persisted entities remain in [PRD](../product/PRD.md),
 
 ## Current scaffold and growth
 
-Phase 1.1–1.6 is complete: package manifest/lockfile, strict TypeScript,
+Packages 1.2–1.3 are complete: package manifest/lockfile, strict TypeScript,
 Vite configuration, `index.html`, `src/main.tsx`, `src/app/App.tsx`, and
 `src/vite-env.d.ts`, Cloudflare Vite integration, `wrangler.jsonc`, and Hono routing
 in `worker/index.ts` with `worker/api/system.routes.ts` for the health endpoint.
@@ -16,7 +16,7 @@ Tailwind's Vite plugin builds utilities from `src/` via `src/styles/globals.css`
 imported by `src/main.tsx`. The scaffold uses `p-4` for 16px padding.
 Feature APIs, frontend routing, Kokpit tokens/fonts/base styles, and feature implementations are pending.
 The following tree is a target reference, not an inventory of implemented files.
-Create folders and files as their subphase needs them; do not pre-create empty modules.
+Create folders and files as their work package needs them; do not pre-create empty modules.
 
 ## Target repository
 
@@ -98,7 +98,7 @@ kokpit/
 | `README.md` / `AGENTS.md` | Human entry point / mandatory agent workflow |
 
 Current scripts are documented in [README](../../README.md). Later lint, test,
-database, and deployment scripts are added at their documented phase, not assumed available.
+database, and deployment scripts are added at their documented package, not assumed available.
 
 ## Frontend ownership
 
@@ -191,5 +191,5 @@ service <300, route <200; split by responsibility rather than line count.
   Do not hand-edit build output. Follow [Deployment](DEPLOYMENT.md) for environments.
 
 Read this reference before restructuring. Add only files required by the current
-phase, preserve runtime/feature boundaries, and update this document for material
+work package, preserve runtime/feature boundaries, and update this document for material
 structure changes. Keep primary reasoning in `docs/`; no per-folder README explosion.
