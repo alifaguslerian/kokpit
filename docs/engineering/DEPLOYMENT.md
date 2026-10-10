@@ -7,7 +7,7 @@ D1 metadata, private R2 files, Cron jobs and Workers AI content.
 [Architecture](ARCHITECTURE.md) owns system choices; [Data Model](DATA_MODEL.md) owns schema;
 [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) controls when this runbook is implemented.
 
-> Current boundary: Phase 1.1–1.6 includes local React/TypeScript/Vite + Workers integration, Hono health routing, and Tailwind utilities.
+> Current boundary: packages 1.2–1.3 include local React/TypeScript/Vite + Workers integration, Hono health routing, and Tailwind utilities.
 > Feature APIs are pending. Remote resources, migrations, Access and
 > deployment steps below are planned procedures, not claims that infrastructure already exists.
 
@@ -20,7 +20,7 @@ D1 metadata, private R2 files, Cron jobs and Workers AI content.
 | Preview/staging | Optional later; separate resources such as `kokpit-db-preview` and `kokpit-files-preview` |
 
 Use Node.js, npm and Git plus project-local Vite/Wrangler/Cloudflare Vite tooling and Drizzle/Drizzle Kit
-when their documented phases arrive. Do not depend on global Wrangler.
+when their documented packages arrive. Do not depend on global Wrangler.
 Keep names lowercase and consistent. Local development must not use production bindings as a convenience.
 Workers AI inference is remote even when called from local development; use mocks/cached fixtures and
 manual job invocation to avoid unnecessary inference.
@@ -40,7 +40,7 @@ npm run preview
 This health endpoint checks HTTP routing only; it does not probe D1, R2, or AI.
 `build` prepares `dist/client/` and `dist/kokpit/` as one deployment unit.
 Tailwind compiles frontend utilities into the client CSS assets; preview must serve them with the SPA.
-Local D1/R2 and their typed bindings remain later phases.
+Local D1/R2 and their typed bindings remain later packages.
 Preview must exercise SPA routes, API routing, assets and changed UI; it does not replace production smoke tests.
 
 ## 2. Configuration and secrets
@@ -104,7 +104,7 @@ Owner email is configured rather than baked into code; D1 owner and Access polic
 Do not expose API tokens, R2 credentials, Access secrets or production values in Git/source/README/examples.
 Workers AI binding does not require a frontend AI key.
 
-## 3. First resource setup — only in the authorized deployment phase
+## 3. First resource setup: only within authorized Milestone 8 work
 
 Authenticate and confirm account before creating remote resources:
 
