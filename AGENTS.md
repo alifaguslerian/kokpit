@@ -1,6 +1,6 @@
 # Kokpit agent rules
 
-**Version:** 1.1 | **Status:** Active V1 Agent Rules | **Updated:** 2026-10-07
+**Version:** 1.2 | **Status:** Active V1 Agent Rules | **Updated:** 2026-10-09
 
 Applies to all AI coding agents working in this repository.
 
@@ -40,8 +40,13 @@ Do not guess new workflows, auth, public behavior, infrastructure, providers, en
 
 ## Task scope
 
-- The requested phase/subphase is the boundary; do not implement adjacent phases early.
-- Prefer 1–3 small subphases per session.
+- The requested milestone/work package is the boundary; do not implement adjacent work early.
+- Use the work packages in Implementation plan as execution units. The owner may authorize
+  one package, a package range, or a whole milestone. Complete the included checklist and
+  validation without asking for a new instruction after each internal item.
+- Stop at the authorized boundary or a required review gate. Do not start the next package
+  merely because it is listed next. Legacy Phase references in historical decisions and
+  source comments use the mapping in Implementation plan.
 - Check before each meaningful change: is it required by the current task, and does it preserve the specification?
 - If either answer is unclear, review the docs before proceeding.
 - Refactor only when meaningful duplication, unclear responsibility, or a task blocker justifies it.
@@ -108,7 +113,7 @@ Use small focused components; avoid giant multipurpose containers.
 Feature code stays local until a second genuine use justifies shared extraction.
 No giant `utils.ts`/`helpers.ts`/`common.ts`/`misc.ts` dumping grounds.
 Comments explain non-obvious security, provider quirks, Cloudflare constraints, or complex algorithms, not obvious code.
-Deferred TODOs must reference a phase/issue and state why.
+Deferred TODOs must reference a milestone/package or issue and state why.
 Do not hand-edit generated build/coverage/temporary Worker output; generated migration SQL must still be reviewed.
 
 ## Data, files, and privacy
@@ -204,6 +209,7 @@ Keep it concise and stop at the authorized boundary.
 
 The owner stages, commits, and pushes manually.
 Do not run `git add`, `git commit`, or `git push`.
-After each edit/subphase/phase, supply manual commands for every changed file.
-Use a separate commit per file with a concrete English message; avoid unrelated bundled commits.
+After each edit/work package/milestone, supply manual commands covering every changed file.
+Use concrete English messages. Group related files that serve the same change; keep unrelated
+work separate and avoid bundling the whole session into one commit.
 Read-only Git inspection is allowed.
