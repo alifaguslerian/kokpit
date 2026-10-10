@@ -16,6 +16,11 @@ Kokpit should feel like a room to return to, without the pressure of a productiv
 
 <!-- Replace this preview note with a real screenshot when one is available. -->
 
+The owner-supplied Stitch concepts for all six pages are saved in the
+[UI reference gallery](docs/design/UI_REFERENCES.md). They guide the planned interface;
+the [Design System](docs/design/DESIGN_SYSTEM.md) specifies its refined V1 layouts.
+These concepts are separate from the implemented-app preview above.
+
 ## Core features
 
 | Area | V1 experience |
@@ -93,6 +98,7 @@ Local Cloudflare setup and deployment belong in the [deployment runbook](docs/en
 | --- | --- |
 | [PRD](docs/product/PRD.md) | Product vision, requirements, and V1 boundaries |
 | [Design system](docs/design/DESIGN_SYSTEM.md) | Tokens, typography, layout, and interaction rules |
+| [UI references](docs/design/UI_REFERENCES.md) | Original Stitch screens, visual analysis, and their mapping to V1 |
 | [Architecture](docs/engineering/ARCHITECTURE.md) | Runtime, services, security, and failure boundaries |
 | [Data model](docs/engineering/DATA_MODEL.md) | Tables, constraints, relationships, and lifecycle |
 | [Content sources](docs/features/CONTENT_SOURCES.md) | Quotes, news sources, ranking, and refresh behavior |

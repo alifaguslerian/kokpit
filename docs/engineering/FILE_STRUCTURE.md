@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.2 | **Status:** V1 structure reference | **Updated:** 2026-10-09
+**Version:** 0.3 | **Status:** V1 structure reference | **Updated:** 2026-10-10
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -35,7 +35,7 @@ kokpit/
 ├── .env.example
 ├── docs/
 │   ├── product/                 # PRD.md, DECISIONS.md
-│   ├── design/                  # DESIGN_SYSTEM.md
+│   ├── design/                  # DESIGN_SYSTEM.md, UI_REFERENCES.md, references/*.png
 │   ├── engineering/             # architecture, data, structure, deployment
 │   ├── features/                # CONTENT_SOURCES.md
 │   └── planning/                # IMPLEMENTATION_PLAN.md
@@ -189,6 +189,9 @@ service <300, route <200; split by responsibility rather than line count.
 - Review and commit migrations; evolve schema with new migrations, preserving applied history.
 - Ignore `dist/`, `node_modules/`, `coverage/`, `.wrangler/`, local secrets.
   Do not hand-edit build output. Follow [Deployment](DEPLOYMENT.md) for environments.
+- Original Stitch screens live in `docs/design/references/` for documentation and visual
+  comparison, indexed by [UI References](../design/UI_REFERENCES.md). They are not runtime
+  assets; use `public/` only for approved images actually needed by the application.
 
 Read this reference before restructuring. Add only files required by the current
 work package, preserve runtime/feature boundaries, and update this document for material

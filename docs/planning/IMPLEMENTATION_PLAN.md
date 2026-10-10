@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.3 | **Status:** V1 implementation plan | **Updated:** 2026-10-09
+**Version:** 0.4 | **Status:** V1 implementation plan | **Updated:** 2026-10-10
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -36,6 +36,30 @@ have active numbers; the unnumbered checklist sections below are implementation 
 - Update the canonical documents affected by actual changes and report once at the
   authorized boundary. Do not update unrelated documents just to repeat progress.
 - Do not silently add dependencies, expand V1, or change design/architecture.
+
+### UI reference review
+
+Owner-supplied Stitch screens are available in the [reference gallery](../design/UI_REFERENCES.md).
+Use their page composition through the normalized [Design System](../design/DESIGN_SYSTEM.md),
+including its mapping to V1. Raw screenshot controls and example data do not expand a package.
+
+| Packages | Visual review focus |
+| --- | --- |
+| 2.1–2.2 | Shared palette, typography roles, responsive shell geometry, sidebar and primitives. |
+| 2.3 | Primary dark Home hero and two-column preview shells; reserve space for required V1 controls within the package's placeholder scope. |
+| 3.2–3.3 | Ideas composer/search/saved cards and Library shortcut grid. |
+| 4.2, 4.4 | College course/week/material composition without LMS or calendar workflows. |
+| 5.2–5.3 | Music player/library/playlists, persistent native playback, and Home controls including volume. |
+| 6.2 | Real hourly thought, valid attribution, and the secondary another thought action. |
+| 6.5 | News editorial hierarchy, source transparency and approved coverage. |
+| 7.1–7.2 | Responsive layouts, keyboard focus, contrast, loading/empty/error states and reduced motion. |
+
+At each applicable UI verification, compare a rendered desktop capture with the relevant
+reference and documented adjustments within the authorized package scope. UI composition
+does not authorize implementing later playback, quotes, ingestion, or persistence early.
+Fix clipped labels, broken assets, excess nesting,
+and unusable controls; also verify narrower viewports. Supplied screenshots resolve the
+old missing-reference finding; they do not prove implementation or complete any package.
 
 ### Legacy numbering
 
@@ -696,6 +720,10 @@ Build preview shells for:
 #### Home Visual Review
 
 **Goal:** Compare actual Home against approved design concept.
+
+Use the primary [Home reference](../design/references/home.png) and the normalized
+[Home composition](../design/DESIGN_SYSTEM.md#home-composition), including their required
+V1 adjustments. The browser frame and reference-only controls are not acceptance targets.
 
 **Acceptance Criteria**
 Review:
