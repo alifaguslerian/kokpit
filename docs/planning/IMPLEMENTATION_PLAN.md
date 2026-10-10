@@ -1,8 +1,8 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.2 | **Status:** V1 implementation plan | **Updated:** 2026-10-09
+**Version:** 0.3 | **Status:** V1 implementation plan | **Updated:** 2026-10-09
 
-Implement the documented V1 in small, reviewable steps. This plan controls order
+Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
 [PRD](../product/PRD.md), [Design System](../design/DESIGN_SYSTEM.md),
 [Architecture](../engineering/ARCHITECTURE.md), [Data Model](../engineering/DATA_MODEL.md),
@@ -11,46 +11,101 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Phase 0.1–0.2 and Phase 1.1–1.6 are complete. Phase 1 as a whole is not complete.
-The next implementation step is **1.7 Configure Linting and Formatting**, requiring a new owner instruction.
+Milestone 1 is in progress. Packages **1.1, 1.2, and 1.3 are complete**, preserving
+the completed legacy Phase 0.1–0.2 and Phase 1.1–1.6 work.
+The next implementation package is **1.4 Linting, Formatting & Foundation Verification**.
+This documentation revision does not authorize starting it.
 
-- Work on the requested scope only, usually 1–3 subphases per session. Understand,
-  implement, validate, report, then stop; do not implement future phases early.
-- Preserve every applicable goal, task, acceptance criterion, and prohibition below.
-  A missing task-local checklist does not waive the global definition of done.
-- Run relevant lint, typecheck, build, and tests; if a tool is not configured yet,
-  report that limitation rather than claiming it passed.
+Use **milestone → work package → checklist**. Only milestones and work packages
+have active numbers; the unnumbered checklist sections below are implementation details.
+
+- An instruction such as `gas 2.1` authorizes that whole package, including validation.
+  `gas Milestone 2` authorizes packages 2.1–2.3 in dependency order.
+- Continue across checklist items within the authorized scope. Stop when the requested
+  package/milestone is complete or a review gate requires an owner decision; do not ask
+  for a new instruction after every checklist item.
+- Do not enter the next package or milestone unless it is already authorized.
+  A large milestone can span multiple turns; its size does not relax checks or scope.
+- Preserve every goal, task, acceptance criterion, and prohibition. A package is complete
+  only when all its included criteria pass. Test critical behavior during implementation
+  and run the relevant final checks at the package boundary.
+- Run relevant lint, typecheck, build, and tests. If a tool is not configured yet,
+  report the limitation rather than claiming it passed.
 - UI: verify desktop, responsive behavior, keyboard focus, and Design System fit.
   Backend: verify validation, ownership, safe errors, and migration consistency.
+- Update the canonical documents affected by actual changes and report once at the
+  authorized boundary. Do not update unrelated documents just to repeat progress.
 - Do not silently add dependencies, expand V1, or change design/architecture.
-  Update canonical documentation when an approved decision actually changes.
 
-## Phase map
+### Legacy numbering
 
-| Phase | Deliverable |
-| --- | --- |
-| 0 | Preflight & Documentation Check |
-| 1 | Project Foundation |
-| 2 | Backend & Database Foundation |
-| 3 | App Shell & Design System |
-| 4 | Home Core |
-| 5 | Ideas |
-| 6 | Library / Quick Links |
-| 7 | College Structure |
-| 8 | College Materials |
-| 9 | Music Core |
-| 10 | Quote System |
-| 11 | News System |
-| 12 | Responsive, UX & Polish |
-| 13 | Testing & Hardening |
-| 14 | Cloudflare Deployment |
-| 15 | V1 Acceptance & Freeze |
+Each package lists its former Phase identifiers for traceability. References explicitly
+named **Phase** in historical decisions and existing source comments use that old numbering.
+Current instructions use **Milestone** or **package** numbers. Use the legacy labels below
+to interpret old references; do not redo completed work or silently reinterpret its scope.
 
-## Phase 0 — Preflight & Documentation Check
+## Milestone map
 
-**Phase 0 goal:** Ensure the repository has the required documentation and no implementation starts from missing assumptions.
+| Milestone | Deliverable | Packages | Status |
+| --- | --- | --- | --- |
+| 1 | Foundation | 1.1–1.7 | In progress; 1.1–1.3 complete |
+| 2 | App Shell & Home | 2.1–2.3 | Pending |
+| 3 | Ideas & Library | 3.1–3.3 | Pending |
+| 4 | College | 4.1–4.4 | Pending |
+| 5 | Music | 5.1–5.3 | Pending |
+| 6 | Quotes & News | 6.1–6.5 | Pending |
+| 7 | Polish & Hardening | 7.1–7.4 | Pending |
+| 8 | Private Release | 8.1–8.3 | Pending |
 
-### 0.1 Verify Documentation Skeleton
+## Work package map
+
+| Package | Deliverable | Legacy Phase checklist | Status |
+| --- | --- | --- | --- |
+| 1.1 | Preflight & Documentation Check | 0.1–0.2 | Complete |
+| 1.2 | Frontend Scaffold | 1.1–1.3 | Complete |
+| 1.3 | Workers, Hono & Tailwind Integration | 1.4–1.6 | Complete |
+| 1.4 | Linting, Formatting & Foundation Verification | 1.7–1.8 | Pending |
+| 1.5 | D1, Drizzle, Schema & Local Migration | 2.1–2.4 | Pending |
+| 1.6 | Owner Context & API Safety | 2.5–2.8 | Pending |
+| 1.7 | Server State & Backend Foundation Verification | 2.9–2.10 | Pending |
+| 2.1 | Visual Foundation | 3.1–3.3 | Pending |
+| 2.2 | App Shell & Navigation | 3.4–3.8 | Pending |
+| 2.3 | Home Core & Visual Review | 4.1–4.5 | Pending |
+| 3.1 | Ideas Backend | 5.1–5.3 | Pending |
+| 3.2 | Ideas UI, Home Capture & Verification | 5.4–5.7 | Pending |
+| 3.3 | Library & Quick Links | 6.1–6.5 | Pending |
+| 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Pending |
+| 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Pending |
+| 4.3 | Private Storage & Material APIs | 8.1–8.6 | Pending |
+| 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Pending |
+| 5.1 | Tracks, Upload & Private Streaming | 9.1–9.3 | Pending |
+| 5.2 | Persistent Playback & Music Library | 9.4–9.6 | Pending |
+| 5.3 | Playlists, Home Player & Verification | 9.7–9.10 | Pending |
+| 6.1 | Quote Pool, Quality & Batch Generation | 10.1–10.4 | Pending |
+| 6.2 | Hourly Quotes, Home Integration & Verification | 10.5–10.9 | Pending |
+| 6.3 | News Sources & Providers | 11.1–11.4 | Pending |
+| 6.4 | News Normalization, Ranking & Refresh | 11.5–11.9 | Pending |
+| 6.5 | News Delivery & Verification | 11.10–11.15 | Pending |
+| 7.1 | Desktop, Tablet & Mobile Layout | 12.1–12.3 | Pending |
+| 7.2 | UI States, Accessibility & Motion | 12.4–12.8 | Pending |
+| 7.3 | Critical Flows, Ownership & File Security | 13.1–13.5 | Pending |
+| 7.4 | Secrets, Dependencies & Performance | 13.6–13.8 | Pending |
+| 8.1 | Production Resources & Configuration | 14.1–14.5 | Pending |
+| 8.2 | Private Deployment & Production Smoke Test | 14.6–14.8 | Pending |
+| 8.3 | V1 Acceptance, Documentation & Freeze | 15.1–15.7 | Pending |
+
+## Milestone 1: Foundation
+
+**Goal:** Ensure the repository has the required documentation and no implementation starts from missing assumptions. Create a clean, buildable, deployable project skeleton. Establish data persistence, validation, ownership context, and backend conventions.
+
+### 1.1 Preflight & Documentation Check
+
+**Status:** Complete | **Legacy Phase checklist:** 0.1–0.2
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Verify Documentation Skeleton
 
 **Goal:** Confirm all required documentation files exist.
 
@@ -72,7 +127,7 @@ The next implementation step is **1.7 Configure Linting and Formatting**, requir
 
 **Do Not Do:** do not scaffold the application yet; do not invent undocumented features
 
-### 0.2 Cross-Check Documentation Consistency
+#### Cross-Check Documentation Consistency
 
 **Goal:** Ensure product, design, architecture, and data model do not contradict each other.
 
@@ -95,11 +150,16 @@ Check consistency for:
 
 **Do Not Do:** do not silently resolve major contradictions in code
 
-## Phase 1 — Project Foundation
+</details>
 
-**Phase 1 goal:** Create a clean, buildable, deployable project skeleton.
+### 1.2 Frontend Scaffold
 
-### 1.1 Initialize Project
+**Status:** Complete | **Legacy Phase checklist:** 1.1–1.3
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Initialize Project
 
 **Goal:** Create the initial package and source structure.
 
@@ -119,7 +179,7 @@ Check consistency for:
 
 **Do Not Do:** do not implement features; do not add UI libraries yet
 
-### 1.2 Configure TypeScript
+#### Configure TypeScript
 
 **Goal:** Enable strict TypeScript across frontend and Worker code.
 
@@ -134,7 +194,7 @@ Check consistency for:
 
 **Do Not Do:** do not disable strictness to bypass type errors
 
-### 1.3 Configure Vite + React
+#### Configure Vite + React
 
 **Goal:** Get the frontend development environment running.
 
@@ -150,7 +210,16 @@ Check consistency for:
 
 **Do Not Do:** do not build final UI yet
 
-### 1.4 Configure Cloudflare Vite Integration
+</details>
+
+### 1.3 Workers, Hono & Tailwind Integration
+
+**Status:** Complete | **Legacy Phase checklist:** 1.4–1.6
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Configure Cloudflare Vite Integration
 
 **Goal:** Make the project compatible with Cloudflare Workers deployment.
 
@@ -165,7 +234,7 @@ Check consistency for:
 
 **Do Not Do:** do not configure production secrets yet
 
-### 1.5 Configure Hono
+#### Configure Hono
 
 **Goal:** Create the backend routing foundation.
 
@@ -180,7 +249,7 @@ Check consistency for:
 
 **Do Not Do:** do not add business logic
 
-### 1.6 Configure Tailwind CSS
+#### Configure Tailwind CSS
 
 **Goal:** Enable styling foundation.
 
@@ -195,7 +264,16 @@ Check consistency for:
 
 **Do Not Do:** do not install a large UI framework
 
-### 1.7 Configure Linting and Formatting
+</details>
+
+### 1.4 Linting, Formatting & Foundation Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 1.7–1.8
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Configure Linting and Formatting
 
 **Goal:** Make code quality checks deterministic.
 
@@ -210,9 +288,9 @@ Check consistency for:
 
 **Do Not Do:** do not add multiple competing formatters
 
-### 1.8 Foundation Verification
+#### Foundation Verification
 
-**Goal:** Freeze Phase 1 with a clean build.
+**Goal:** Verify the project tooling foundation with a clean build.
 
 **Tasks**
 Run:
@@ -223,11 +301,16 @@ Run:
 
 **Acceptance Criteria:** all checks pass; repository has no feature implementation drift
 
-## Phase 2 — Backend & Database Foundation
+</details>
 
-**Phase 2 goal:** Establish data persistence, validation, ownership context, and backend conventions.
+### 1.5 D1, Drizzle, Schema & Local Migration
 
-### 2.1 Configure D1 Binding
+**Status:** Pending | **Legacy Phase checklist:** 2.1–2.4
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Configure D1 Binding
 
 **Goal:** Connect Cloudflare D1 to the Worker.
 
@@ -241,7 +324,7 @@ Run:
 
 **Do Not Do:** do not connect local development directly to production database
 
-### 2.2 Configure Drizzle
+#### Configure Drizzle
 
 **Goal:** Create typed database access.
 
@@ -254,7 +337,7 @@ Run:
 
 **Acceptance Criteria:** Drizzle config resolves correctly; schema can generate migrations
 
-### 2.3 Implement Initial Database Schema
+#### Implement Initial Database Schema
 
 **Goal:** Translate `DATA_MODEL.md` into Drizzle schema.
 
@@ -283,7 +366,7 @@ Implement tables:
 
 **Do Not Do:** do not simplify away `user_id`; do not add undocumented tables
 
-### 2.4 Generate Initial Migration
+#### Generate Initial Migration
 
 **Goal:** Create the first version-controlled migration.
 
@@ -295,7 +378,16 @@ Implement tables:
 
 **Acceptance Criteria:** local migration succeeds; schema is queryable; migration is committed
 
-### 2.5 Seed Owner User
+</details>
+
+### 1.6 Owner Context & API Safety
+
+**Status:** Pending | **Legacy Phase checklist:** 2.5–2.8
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Seed Owner User
 
 **Goal:** Create the initial Kokpit owner identity.
 
@@ -310,7 +402,7 @@ Implement tables:
 
 **Do Not Do:** do not hardcode private credentials
 
-### 2.6 Implement Owner Context Middleware
+#### Implement Owner Context Middleware
 
 **Goal:** Ensure every user-owned request has explicit owner context.
 
@@ -324,7 +416,7 @@ Implement tables:
 
 **Do Not Do:** do not rely purely on frontend assumptions
 
-### 2.7 Implement Error Handler
+#### Implement Error Handler
 
 **Goal:** Create safe structured API errors.
 
@@ -339,7 +431,7 @@ Errors return predictable JSON.
 
 **Do Not Do:** do not expose SQL or secret details
 
-### 2.8 Configure Zod Validation
+#### Configure Zod Validation
 
 **Goal:** Validate API inputs consistently.
 
@@ -351,7 +443,16 @@ Errors return predictable JSON.
 
 **Acceptance Criteria:** invalid input returns 4xx; services do not receive unvalidated raw payloads
 
-### 2.9 Configure TanStack Query
+</details>
+
+### 1.7 Server State & Backend Foundation Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 2.9–2.10
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Configure TanStack Query
 
 **Goal:** Create consistent frontend server-state behavior.
 
@@ -364,7 +465,7 @@ Errors return predictable JSON.
 
 **Acceptance Criteria:** frontend can fetch health endpoint through query layer
 
-### 2.10 Backend Foundation Verification
+#### Backend Foundation Verification
 
 **Goal:** Freeze backend foundation.
 
@@ -380,11 +481,20 @@ Test:
 
 **Acceptance Criteria:** lint passes; typecheck passes; build passes; basic API integration test passes
 
-## Phase 3 — App Shell & Design System
+</details>
 
-**Phase 3 goal:** Implement the visual foundation before feature pages.
+## Milestone 2: App Shell & Home
 
-### 3.1 Implement Design Tokens
+**Goal:** Implement the visual foundation before feature pages. Build the Home atmosphere and preview layout without complete downstream features.
+
+### 2.1 Visual Foundation
+
+**Status:** Pending | **Legacy Phase checklist:** 3.1–3.3
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Implement Design Tokens
 
 **Goal:** Translate `DESIGN_SYSTEM.md` into actual CSS tokens.
 
@@ -400,7 +510,7 @@ Test:
 
 **Acceptance Criteria:** design tokens match documentation; no raw arbitrary palette becomes primary system
 
-### 3.2 Load Fonts
+#### Load Fonts
 
 **Goal:** Implement the approved typography direction.
 
@@ -413,7 +523,7 @@ Test:
 
 **Acceptance Criteria:** display and UI fonts render correctly; fallback remains readable
 
-### 3.3 Implement Global Styles
+#### Implement Global Styles
 
 **Goal:** Create base Kokpit visual behavior.
 
@@ -428,7 +538,16 @@ Test:
 
 **Acceptance Criteria:** page visually matches dark cozy foundation
 
-### 3.4 Build UI Primitives
+</details>
+
+### 2.2 App Shell & Navigation
+
+**Status:** Pending | **Legacy Phase checklist:** 3.4–3.8
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Build UI Primitives
 
 **Goal:** Create small reusable Kokpit components.
 
@@ -450,7 +569,7 @@ Build:
 
 **Do Not Do:** do not over-abstract; do not mimic generic component library appearance
 
-### 3.5 Build App Shell
+#### Build App Shell
 
 **Goal:** Create persistent app layout.
 
@@ -463,7 +582,7 @@ Build:
 
 **Acceptance Criteria:** route content renders inside shell; shell does not remount on page navigation
 
-### 3.6 Build Sidebar
+#### Build Sidebar
 
 **Goal:** Implement V1 navigation.
 
@@ -485,7 +604,7 @@ Navigation:
 
 **Do Not Do:** do not add Tasks, Calendar, Focus, Notes, or Goals
 
-### 3.7 Configure Routing
+#### Configure Routing
 
 **Goal:** Create V1 routes.
 
@@ -503,15 +622,20 @@ Handle root redirect or Home root behavior.
 
 **Acceptance Criteria:** all routes render; sidebar state follows route
 
-### 3.8 App Shell Verification
+#### App Shell Verification
 
 **Acceptance Criteria:** design tokens consistent; routes work; no layout overflow at common laptop width; lint, typecheck, build pass
 
-## Phase 4 — Home Core
+</details>
 
-**Phase 4 goal:** Build the Home atmosphere and preview layout without complete downstream features.
+### 2.3 Home Core & Visual Review
 
-### 4.1 Build Home Hero
+**Status:** Pending | **Legacy Phase checklist:** 4.1–4.5
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Build Home Hero
 
 **Goal:** Implement the approved visual focal point.
 
@@ -526,7 +650,7 @@ Handle root redirect or Home root behavior.
 
 **Acceptance Criteria:** clock is primary hierarchy; layout resembles approved design direction; Home does not feel like a dense dashboard
 
-### 4.2 Implement Real-Time Clock
+#### Implement Real-Time Clock
 
 **Goal:** Show real local time.
 
@@ -539,7 +663,7 @@ Handle root redirect or Home root behavior.
 
 **Acceptance Criteria:** time updates correctly; seconds display if design keeps seconds; no backend request required for clock
 
-### 4.3 Build Home Feature Card Pattern
+#### Build Home Feature Card Pattern
 
 **Goal:** Create consistent preview cards.
 
@@ -552,7 +676,7 @@ Handle root redirect or Home root behavior.
 
 **Acceptance Criteria:** cards feel like previews; cards do not duplicate full feature pages
 
-### 4.4 Build Home Placeholder Previews
+#### Build Home Placeholder Previews
 
 **Goal:** Create visual structure before feature integration.
 
@@ -569,7 +693,7 @@ Build preview shells for:
 
 **Do Not Do:** do not implement fake production data as permanent logic
 
-### 4.5 Home Visual Review
+#### Home Visual Review
 
 **Goal:** Compare actual Home against approved design concept.
 
@@ -587,11 +711,20 @@ Review:
 
 Do not proceed if Home already feels like a generic SaaS dashboard.
 
-## Phase 5 — Ideas
+</details>
 
-**Phase 5 goal:** Ship the first fully functional user-owned feature.
+## Milestone 3: Ideas & Library
 
-### 5.1 Ideas Repository
+**Goal:** Ship the first fully functional user-owned feature. Implement personal one-click web shortcuts.
+
+### 3.1 Ideas Backend
+
+**Status:** Pending | **Legacy Phase checklist:** 5.1–5.3
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Ideas Repository
 
 **Goal:** Implement data access for ideas.
 
@@ -606,7 +739,7 @@ Do not proceed if Home already feels like a generic SaaS dashboard.
 
 **Acceptance Criteria:** all queries include user ownership
 
-### 5.2 Ideas Service
+#### Ideas Service
 
 **Goal:** Implement idea business logic.
 
@@ -617,7 +750,7 @@ Do not proceed if Home already feels like a generic SaaS dashboard.
 - timestamps
 - tag coordination if used
 
-### 5.3 Ideas API
+#### Ideas API
 
 **Goal:** Expose Ideas endpoints.
 
@@ -630,7 +763,16 @@ Conceptual endpoints:
 
 **Acceptance Criteria:** validation works; ownership works; errors are structured
 
-### 5.4 Idea Composer
+</details>
+
+### 3.2 Ideas UI, Home Capture & Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 5.4–5.7
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Idea Composer
 
 **Goal:** Make idea capture frictionless.
 
@@ -644,7 +786,7 @@ Conceptual endpoints:
 
 **Acceptance Criteria:** user can capture an idea quickly; tags are optional
 
-### 5.5 Ideas Page
+#### Ideas Page
 
 **Goal:** Create full Ideas page.
 
@@ -659,13 +801,13 @@ Conceptual endpoints:
 
 **Acceptance Criteria:** feature is usable without Home
 
-### 5.6 Connect Home Idea Capture
+#### Connect Home Idea Capture
 
 **Goal:** Replace Home placeholder with real idea capture.
 
 **Acceptance Criteria:** idea can be saved directly from Home; Ideas page reflects it immediately
 
-### 5.7 Ideas Tests
+#### Ideas Tests
 
 **Acceptance Criteria**
 Test:
@@ -678,11 +820,16 @@ Test:
 - ownership
 - Home capture
 
-## Phase 6 — Library / Quick Links
+</details>
 
-**Phase 6 goal:** Implement personal one-click web shortcuts.
+### 3.3 Library & Quick Links
 
-### 6.1 Quick Links Repository & Service
+**Status:** Pending | **Legacy Phase checklist:** 6.1–6.5
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Quick Links Repository & Service
 
 **Tasks**
 Implement:
@@ -696,12 +843,12 @@ Implement:
 
 **Acceptance Criteria:** ownership enforced; ordering persists
 
-### 6.2 Quick Links API
+#### Quick Links API
 
 **Acceptance Criteria**
 CRUD and reorder work with validation.
 
-### 6.3 Library Page
+#### Library Page
 
 **Tasks**
 
@@ -715,13 +862,13 @@ CRUD and reorder work with validation.
 
 **Acceptance Criteria:** user can manage links without editing code
 
-### 6.4 Home Quick Links Preview
+#### Home Quick Links Preview
 
 **Goal:** Show favorite or first links on Home.
 
 **Acceptance Criteria:** preview uses real data; CTA opens Library
 
-### 6.5 Library Tests
+#### Library Tests
 
 Test:
 
@@ -732,11 +879,20 @@ Test:
 - favorite
 - ownership
 
-## Phase 7 — College Structure
+</details>
 
-**Phase 7 goal:** Implement Semester → Course → Week hierarchy before file uploads.
+## Milestone 4: College
 
-### 7.1 Semester Repository & API
+**Goal:** Implement Semester → Course → Week hierarchy before file uploads. Add private file and link materials to College.
+
+### 4.1 Semester, Course & Week APIs
+
+**Status:** Pending | **Legacy Phase checklist:** 7.1–7.3
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Semester Repository & API
 
 Implement:
 
@@ -749,7 +905,7 @@ Implement:
 
 **Acceptance Criteria:** one active semester behavior is correct
 
-### 7.2 Course Repository & API
+#### Course Repository & API
 
 Implement:
 
@@ -759,7 +915,7 @@ Implement:
 - delete
 - reorder
 
-### 7.3 Week Repository & API
+#### Week Repository & API
 
 Implement:
 
@@ -770,7 +926,16 @@ Implement:
 
 **Acceptance Criteria:** week number unique per course
 
-### 7.4 College Overview Page
+</details>
+
+### 4.2 College Pages, Home Preview & Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 7.4–7.8
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### College Overview Page
 
 **Tasks**
 
@@ -780,7 +945,7 @@ Implement:
 - create semester
 - create course
 
-### 7.5 Course Page
+#### Course Page
 
 **Tasks**
 
@@ -790,19 +955,19 @@ Implement:
 - add week
 - edit course metadata
 
-### 7.6 Week Page Structure
+#### Week Page Structure
 
 **Goal:** Create week page before material upload is implemented.
 
 **Acceptance Criteria:** page renders empty material state correctly
 
-### 7.7 Home College Preview
+#### Home College Preview
 
 **Goal:** Connect Home to active semester and relevant course/week.
 
 **Acceptance Criteria:** preview uses real College data; no fake course data remains
 
-### 7.8 College Structure Tests
+#### College Structure Tests
 
 Test:
 
@@ -813,17 +978,22 @@ Test:
 - ownership
 - active semester
 
-## Phase 8 — College Materials
+</details>
 
-**Phase 8 goal:** Add private file and link materials to College.
+### 4.3 Private Storage & Material APIs
 
-### 8.1 Configure R2 Binding
+**Status:** Pending | **Legacy Phase checklist:** 8.1–8.6
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Configure R2 Binding
 
 **Goal:** Connect private R2 storage.
 
 **Acceptance Criteria:** Worker can write/read local or development R2 binding; bucket is not exposed publicly
 
-### 8.2 Implement Storage Provider
+#### Implement Storage Provider
 
 **Goal:** Create backend-controlled R2 operations.
 
@@ -836,7 +1006,7 @@ Implement:
 
 **Acceptance Criteria:** object keys are backend-generated
 
-### 8.3 Material Metadata Repository
+#### Material Metadata Repository
 
 **Tasks**
 Implement metadata CRUD.
@@ -846,7 +1016,7 @@ Support:
 - file
 - link
 
-### 8.4 Material Upload API
+#### Material Upload API
 
 **Tasks**
 
@@ -858,13 +1028,13 @@ Support:
 
 **Acceptance Criteria:** uploaded file appears in correct week; invalid upload is rejected
 
-### 8.5 Material Link API
+#### Material Link API
 
 **Goal:** Support URL materials without R2.
 
 **Acceptance Criteria:** valid links save; invalid URLs fail validation
 
-### 8.6 Private File Delivery
+#### Private File Delivery
 
 **Tasks**
 
@@ -875,7 +1045,16 @@ Support:
 
 **Acceptance Criteria:** file cannot be accessed by guessing IDs outside owner context
 
-### 8.7 Material UI
+</details>
+
+### 4.4 Material UI, Deletion & Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 8.7–8.9
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Material UI
 
 **Tasks**
 
@@ -887,13 +1066,13 @@ Support:
 - delete
 - open/download
 
-### 8.8 Material Deletion Workflow
+#### Material Deletion Workflow
 
 **Goal:** Delete both metadata and R2 bytes.
 
 **Acceptance Criteria:** no normal orphan remains after successful deletion
 
-### 8.9 College Materials Tests
+#### College Materials Tests
 
 Test:
 
@@ -907,11 +1086,20 @@ Test:
 - invalid file
 - size limit
 
-## Phase 9 — Music Core
+</details>
 
-**Phase 9 goal:** Build personal music library, playlists, and persistent playback.
+## Milestone 5: Music
 
-### 9.1 Track Repository & API
+**Goal:** Build personal music library, playlists, and persistent playback.
+
+### 5.1 Tracks, Upload & Private Streaming
+
+**Status:** Pending | **Legacy Phase checklist:** 9.1–9.3
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Track Repository & API
 
 Implement:
 
@@ -923,7 +1111,7 @@ Implement:
 - last played
 - play count
 
-### 9.2 Music Upload
+#### Music Upload
 
 **Tasks**
 
@@ -935,7 +1123,7 @@ Implement:
 
 **Acceptance Criteria:** uploaded track appears in library
 
-### 9.3 Track Streaming Endpoint
+#### Track Streaming Endpoint
 
 **Goal:** Support private browser playback with seeking.
 
@@ -948,7 +1136,16 @@ Implement:
 
 **Acceptance Criteria:** audio plays; user can seek; bucket stays private
 
-### 9.4 Music Provider
+</details>
+
+### 5.2 Persistent Playback & Music Library
+
+**Status:** Pending | **Legacy Phase checklist:** 9.4–9.6
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Music Provider
 
 **Goal:** Create global persistent playback state.
 
@@ -964,13 +1161,13 @@ State includes:
 
 **Acceptance Criteria:** provider is mounted above route pages
 
-### 9.5 Mini Player
+#### Mini Player
 
 **Goal:** Create persistent compact player.
 
 **Acceptance Criteria:** remains active while navigating Kokpit; play/pause works; next/previous works; volume works
 
-### 9.6 Music Library Page
+#### Music Library Page
 
 **Tasks**
 
@@ -981,7 +1178,16 @@ State includes:
 - delete
 - search if needed
 
-### 9.7 Playlist Repository & API
+</details>
+
+### 5.3 Playlists, Home Player & Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 9.7–9.10
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Playlist Repository & API
 
 Implement:
 
@@ -992,7 +1198,7 @@ Implement:
 - remove track
 - reorder tracks
 
-### 9.8 Playlist Page
+#### Playlist Page
 
 **Tasks**
 
@@ -1002,13 +1208,13 @@ Implement:
 - play playlist
 - add/remove tracks
 
-### 9.9 Home Music Preview
+#### Home Music Preview
 
 **Goal:** Connect Home Now Playing card to real playback state.
 
 **Acceptance Criteria:** Home player reflects active track; controls affect persistent player
 
-### 9.10 Music Tests
+#### Music Tests
 
 Test:
 
@@ -1022,11 +1228,20 @@ Test:
 - R2 cleanup
 - ownership
 
-## Phase 10 — Quote System
+</details>
 
-**Phase 10 goal:** Implement hourly original quote generation and rotation.
+## Milestone 6: Quotes & News
 
-### 10.1 Quote Repository
+**Goal:** Implement hourly original quote generation and rotation. Build a curated, resilient personal news pipeline.
+
+### 6.1 Quote Pool, Quality & Batch Generation
+
+**Status:** Pending | **Legacy Phase checklist:** 10.1–10.4
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Quote Repository
 
 Implement:
 
@@ -1036,7 +1251,7 @@ Implement:
 - deduplicate by hash
 - count pool
 
-### 10.2 Quote Quality Filter
+#### Quote Quality Filter
 
 **Tasks**
 Implement deterministic checks for:
@@ -1050,7 +1265,7 @@ Implement deterministic checks for:
 
 **Acceptance Criteria:** obvious generic output is rejected
 
-### 10.3 Workers AI Quote Provider
+#### Workers AI Quote Provider
 
 **Goal:** Create provider abstraction.
 
@@ -1067,7 +1282,7 @@ Implement deterministic checks for:
 
 **Do Not Do:** do not call AI from React
 
-### 10.4 Quote Refill Job
+#### Quote Refill Job
 
 **Tasks**
 
@@ -1080,7 +1295,16 @@ Implement deterministic checks for:
 
 **Acceptance Criteria:** job is safe to rerun; no uncontrolled generation
 
-### 10.5 Current Hour Quote Selection
+</details>
+
+### 6.2 Hourly Quotes, Home Integration & Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 10.5–10.9
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Current Hour Quote Selection
 
 **Goal:** Return stable quote per local hour.
 
@@ -1093,24 +1317,24 @@ Implement deterministic checks for:
 
 **Acceptance Criteria:** repeated calls in same hour return same primary quote
 
-### 10.6 "Another Thought"
+#### "Another Thought"
 
 **Goal:** Allow manual alternate quote.
 
 **Acceptance Criteria:** alternate differs from current where pool allows; scheduled hourly quote remains unchanged
 
-### 10.7 Quote API
+#### Quote API
 
 Conceptual:
 
 - GET /api/quotes/current
 - POST /api/quotes/another
 
-### 10.8 Connect Home Quote
+#### Connect Home Quote
 
 **Acceptance Criteria:** Home no longer uses placeholder quote; quote is mostly English; AI failure falls back gracefully
 
-### 10.9 Quote Tests
+#### Quote Tests
 
 Test:
 
@@ -1122,11 +1346,16 @@ Test:
 - another thought
 - AI failure
 
-## Phase 11 — News System
+</details>
 
-**Phase 11 goal:** Build a curated, resilient personal news pipeline.
+### 6.3 News Sources & Providers
 
-### 11.1 News Source Registry
+**Status:** Pending | **Legacy Phase checklist:** 11.1–11.4
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### News Source Registry
 
 **Goal:** Centralize source configuration.
 
@@ -1143,7 +1372,7 @@ Initial sources:
 
 **Acceptance Criteria:** source configuration is not scattered
 
-### 11.2 Generic RSS Provider
+#### Generic RSS Provider
 
 **Goal:** Support standard RSS/Atom sources.
 
@@ -1154,7 +1383,7 @@ Initial sources:
 - normalize
 - handle malformed entries safely
 
-### 11.3 Hacker News Provider
+#### Hacker News Provider
 
 **Goal:** Fetch developer signal.
 
@@ -1164,7 +1393,7 @@ Initial sources:
 - fetch item metadata
 - normalize into Kokpit format
 
-### 11.4 GDELT Provider
+#### GDELT Provider
 
 **Goal:** Provide world-event discovery.
 
@@ -1174,7 +1403,16 @@ Initial sources:
 - normalize results
 - preserve original publisher domain
 
-### 11.5 URL Normalization
+</details>
+
+### 6.4 News Normalization, Ranking & Refresh
+
+**Status:** Pending | **Legacy Phase checklist:** 11.5–11.9
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### URL Normalization
 
 **Goal:** Reduce duplicate articles.
 
@@ -1184,7 +1422,7 @@ Initial sources:
 - normalize trailing slash
 - normalize canonical-like variants where safe
 
-### 11.6 Deduplication Logic
+#### Deduplication Logic
 
 **Tasks**
 
@@ -1193,7 +1431,7 @@ Initial sources:
 - dedup key generation
 - same-source near duplicate handling
 
-### 11.7 Relevance Scoring
+#### Relevance Scoring
 
 **Goal:** Implement deterministic V1 ranking.
 
@@ -1209,7 +1447,7 @@ Initial sources:
 
 **Acceptance Criteria:** AI/NVIDIA/dev-tool stories rank strongly; irrelevant celebrity/lifestyle content ranks low
 
-### 11.8 News Repository
+#### News Repository
 
 Implement:
 
@@ -1219,7 +1457,7 @@ Implement:
 - category query
 - cleanup old articles
 
-### 11.9 News Refresh Job
+#### News Refresh Job
 
 **Tasks**
 
@@ -1233,7 +1471,16 @@ Implement:
 
 **Acceptance Criteria:** one failed source does not fail whole refresh
 
-### 11.10 Optional AI News Enrichment
+</details>
+
+### 6.5 News Delivery & Verification
+
+**Status:** Pending | **Legacy Phase checklist:** 11.10–11.15
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Optional AI News Enrichment
 
 **Goal:** Enrich top relevant items only.
 
@@ -1245,7 +1492,7 @@ Potential output:
 
 **Acceptance Criteria:** non-enriched articles still work normally
 
-### 11.11 News API
+#### News API
 
 Conceptual endpoints:
 
@@ -1258,7 +1505,7 @@ Support:
 - category
 - pagination/cursor if needed
 
-### 11.12 News Page
+#### News Page
 
 **Tasks**
 
@@ -1272,19 +1519,19 @@ Support:
 
 **Acceptance Criteria:** feed feels curated, not noisy
 
-### 11.13 Home News Preview
+#### Home News Preview
 
 **Goal:** Show 2–3 strong diverse items.
 
 **Acceptance Criteria:** avoid same-topic repetition; Home remains lightweight
 
-### 11.14 News Cleanup Job
+#### News Cleanup Job
 
 **Goal:** Delete stale articles after retention window.
 
 **Acceptance Criteria:** default retention roughly 45 days; cleanup does not affect fresh feed
 
-### 11.15 News Tests
+#### News Tests
 
 Test:
 
@@ -1298,11 +1545,20 @@ Test:
 - cached fallback
 - Home selection
 
-## Phase 12 — Responsive, UX & Polish
+</details>
 
-**Phase 12 goal:** Make Kokpit feel complete rather than merely functional.
+## Milestone 7: Polish & Hardening
 
-### 12.1 Desktop Layout Polish
+**Goal:** Make Kokpit feel complete rather than merely functional. Validate critical flows before deployment.
+
+### 7.1 Desktop, Tablet & Mobile Layout
+
+**Status:** Pending | **Legacy Phase checklist:** 12.1–12.3
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Desktop Layout Polish
 
 Review:
 
@@ -1315,7 +1571,7 @@ Review:
 
 **Acceptance Criteria:** approved dark visual direction is preserved
 
-### 12.2 Tablet Layout
+#### Tablet Layout
 
 **Tasks**
 
@@ -1323,7 +1579,7 @@ Review:
 - stack grids
 - preserve player usability
 
-### 12.3 Mobile Layout
+#### Mobile Layout
 
 Prioritize:
 
@@ -1336,7 +1592,16 @@ Prioritize:
 
 **Acceptance Criteria:** no desktop dashboard squeezed onto mobile
 
-### 12.4 Loading States
+</details>
+
+### 7.2 UI States, Accessibility & Motion
+
+**Status:** Pending | **Legacy Phase checklist:** 12.4–12.8
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Loading States
 
 Implement:
 
@@ -1346,7 +1611,7 @@ Implement:
 
 Avoid giant spinners.
 
-### 12.5 Empty States
+#### Empty States
 
 Implement for:
 
@@ -1356,7 +1621,7 @@ Implement for:
 - music
 - news
 
-### 12.6 Error States
+#### Error States
 
 Implement graceful local errors.
 
@@ -1366,7 +1631,7 @@ Examples:
 - music upload failed
 - material unavailable
 
-### 12.7 Accessibility Pass
+#### Accessibility Pass
 
 Verify:
 
@@ -1378,7 +1643,7 @@ Verify:
 - semantic buttons/links
 - heading hierarchy
 
-### 12.8 Motion Polish
+#### Motion Polish
 
 Implement only subtle:
 
@@ -1389,11 +1654,16 @@ Implement only subtle:
 
 **Do Not Do:** no bounce; no huge parallax; no glow-heavy effects
 
-## Phase 13 — Testing & Hardening
+</details>
 
-**Phase 13 goal:** Validate critical flows before deployment.
+### 7.3 Critical Flows, Ownership & File Security
 
-### 13.1 Unit Test Pass
+**Status:** Pending | **Legacy Phase checklist:** 13.1–13.5
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Unit Test Pass
 
 Required areas:
 
@@ -1404,7 +1674,7 @@ Required areas:
 - URL normalization
 - ordering logic
 
-### 13.2 API Integration Test Pass
+#### API Integration Test Pass
 
 Required:
 
@@ -1417,7 +1687,7 @@ Required:
 - news
 - ownership
 
-### 13.3 E2E Smoke Tests
+#### E2E Smoke Tests
 
 Critical flows:
 
@@ -1433,14 +1703,14 @@ Critical flows:
 - load News
 - open external news article
 
-### 13.4 Ownership Security Pass
+#### Ownership Security Pass
 
 Verify every user-owned endpoint checks owner context.
 
 **Acceptance Criteria**
 No resource endpoint relies only on ID.
 
-### 13.5 File Security Pass
+#### File Security Pass
 
 Verify:
 
@@ -1449,7 +1719,16 @@ Verify:
 - music route checks ownership
 - no raw object key trusted from client
 
-### 13.6 Secret Scan
+</details>
+
+### 7.4 Secrets, Dependencies & Performance
+
+**Status:** Pending | **Legacy Phase checklist:** 13.6–13.8
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Secret Scan
 
 Verify:
 
@@ -1457,7 +1736,7 @@ Verify:
 - no production secret in source
 - `.env.example` contains placeholders only
 
-### 13.7 Dependency Review
+#### Dependency Review
 
 Remove:
 
@@ -1465,7 +1744,7 @@ Remove:
 - duplicate utilities
 - unnecessary heavy dependencies
 
-### 13.8 Performance Pass
+#### Performance Pass
 
 Review:
 
@@ -1476,11 +1755,20 @@ Review:
 - music preloading
 - unnecessary rerenders
 
-## Phase 14 — Cloudflare Deployment
+</details>
 
-**Phase 14 goal:** Deploy Kokpit privately and safely.
+## Milestone 8: Private Release
 
-### 14.1 Create Production D1
+**Goal:** Deploy Kokpit privately and safely. Confirm Kokpit V1 matches its product definition.
+
+### 8.1 Production Resources & Configuration
+
+**Status:** Pending | **Legacy Phase checklist:** 14.1–14.5
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Create Production D1
 
 **Tasks**
 
@@ -1489,7 +1777,7 @@ Review:
 - apply migrations
 - seed owner
 
-### 14.2 Create Production R2 Bucket
+#### Create Production R2 Bucket
 
 **Tasks**
 
@@ -1497,7 +1785,7 @@ Review:
 - keep private
 - configure binding
 
-### 14.3 Configure Workers AI
+#### Configure Workers AI
 
 **Tasks**
 
@@ -1505,7 +1793,7 @@ Review:
 - configure model setting
 - verify quote provider
 
-### 14.4 Configure Cron Triggers
+#### Configure Cron Triggers
 
 Jobs:
 
@@ -1515,7 +1803,7 @@ Jobs:
 
 **Acceptance Criteria:** cron schedules deploy correctly
 
-### 14.5 Configure Production Environment
+#### Configure Production Environment
 
 Set:
 
@@ -1524,11 +1812,20 @@ Set:
 - feature limits
 - source configuration
 
-### 14.6 Deploy Worker + Static Assets
+</details>
+
+### 8.2 Private Deployment & Production Smoke Test
+
+**Status:** Pending | **Legacy Phase checklist:** 14.6–14.8
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### Deploy Worker + Static Assets
 
 **Acceptance Criteria:** frontend loads; API works; D1 works; R2 works; routes resolve correctly
 
-### 14.7 Configure Cloudflare Access
+#### Configure Cloudflare Access
 
 **Goal:** Keep Kokpit private.
 
@@ -1540,7 +1837,7 @@ Set:
 
 **Acceptance Criteria:** unauthenticated visitor cannot access Kokpit; owner can access normally
 
-### 14.8 Production Smoke Test
+#### Production Smoke Test
 
 Verify:
 
@@ -1554,11 +1851,16 @@ Verify:
 - News
 - navigation
 
-## Phase 15 — V1 Acceptance & Freeze
+</details>
 
-**Phase 15 goal:** Confirm Kokpit V1 matches its product definition.
+### 8.3 V1 Acceptance, Documentation & Freeze
 
-### 15.1 PRD Acceptance Review
+**Status:** Pending | **Legacy Phase checklist:** 15.1–15.7
+
+<details>
+<summary>Checklist, acceptance criteria, and constraints</summary>
+
+#### PRD Acceptance Review
 
 Check V1 features against `PRD.md`.
 
@@ -1574,7 +1876,7 @@ Must exist:
 - Ideas
 - private access
 
-### 15.2 Design Review
+#### Design Review
 
 Check against `DESIGN_SYSTEM.md`.
 
@@ -1585,7 +1887,7 @@ Reject regressions toward:
 - neon SaaS look
 - unnecessary widgets
 
-### 15.3 Architecture Review
+#### Architecture Review
 
 Check against `ARCHITECTURE.md`.
 
@@ -1600,13 +1902,13 @@ Confirm:
 - Cron
 - optional Workers AI
 
-### 15.4 Data Model Review
+#### Data Model Review
 
 Confirm implementation matches `DATA_MODEL.md`.
 
 Any real schema deviation must be documented.
 
-### 15.5 Remove Temporary Development Content
+#### Remove Temporary Development Content
 
 Remove:
 
@@ -1618,7 +1920,7 @@ Remove:
 - debug UI
 - console noise
 
-### 15.6 Documentation Update
+#### Documentation Update
 
 Update:
 
@@ -1629,7 +1931,7 @@ Update:
 
 where necessary.
 
-### 15.7 V1 Freeze
+#### V1 Freeze
 
 V1 is considered frozen when:
 
@@ -1650,16 +1952,19 @@ They should become:
 - or
 - V2 scope discussion
 
+</details>
+
 ## Session boundaries and manual commits
 
-Do not build the whole application in one session. Prefer 1–3 subphases;
-for larger features, separate repository/service/API, UI, and integration slices.
-Examples: 1.1–1.3, then 1.4–1.6, then 2.1–2.3; split broader App Shell work
-into similarly reviewable scopes. Stop at the scope the owner authorized.
+A work package is the default execution unit. The owner may authorize one package,
+a package range, or a whole milestone. Keep internal implementation and verification
+steps connected; no new instruction is needed between included checklist items.
+Stop at the authorized boundary. Review gates still apply within a package.
 
-The owner stages and commits manually. Agents must not run Git staging, commits,
-or pushes. After edits, provide one concrete English commit command per changed
-file, consistent with the owner's current instruction. Avoid giant unrelated commits.
+The owner stages, commits, and pushes manually. Agents must not run Git staging,
+commits, or pushes. After edits, supply commands covering every changed file with
+concrete English messages. Group related files that serve the same change; keep
+unrelated work separate and avoid bundling the whole session into one commit.
 
 ## Review gates and trade-offs
 
