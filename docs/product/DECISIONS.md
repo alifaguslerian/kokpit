@@ -1,6 +1,6 @@
 # Kokpit — Decisions
 
-**Version:** 1.1
+**Version:** 1.2
 **Status:** Active V1 Decision Log
 **Product:** Kokpit · **Type:** Product + Architecture ADRs
 **Last Updated:** 2026-10-09
@@ -251,7 +251,7 @@ Canonical contracts: [PRD](PRD.md), [Design System](../design/DESIGN_SYSTEM.md),
 
 ### DEC-039 — Granular phased implementation
 
-**Accepted · 2026-10-06**
+**Superseded by DEC-050 for execution granularity · Originally accepted 2026-10-06**
 
 **Decision:** Small phases/subphases with Goal, Tasks, Acceptance Criteria, Do Not Do. **Reason:** Explicit boundaries improve agent work. **Impact:** Ideally 1–3 subphases/session, not the entire product.
 
@@ -350,3 +350,29 @@ pair `@cloudflare/vite-plugin@1.63.1` and `wrangler@4.149.0` instead.
 usage of imported types remain checked with strict mode and the existing safeguards.
 `npm run typecheck` remains mandatory and remains part of `npm run build`.
 This exception does not authorize disabling source checks or hiding application errors.
+
+### DEC-050: Milestones and complete work packages
+
+**Accepted · 2026-10-09 · Supersedes DEC-039 execution granularity**
+
+**Decision:** The owner approved eight milestones with numbered work packages and
+unnumbered technical checklists. A package is the default execution unit; the owner
+may authorize a package range or a whole milestone. Agents continue through included
+checklist items and validation, then stop at the authorized boundary or a review gate.
+
+**Reason:** Stopping after each small setup or implementation step created repeated
+instruction, reporting, documentation, and validation overhead.
+
+**Impact:** Preserve all 127 legacy checklists, goals, acceptance criteria, prohibitions,
+dependency order, and completed work. The new plan has 32 work packages. Completed
+legacy Phase 0.1–0.2 and 1.1–1.6 map to packages 1.1–1.3; next is package 1.4.
+Historical Phase identifiers, including references in existing source comments,
+remain interpretable through each package's legacy labels. Product, stack, design,
+schema, privacy, tests, and deployment requirements remain unchanged.
+
+The owner still stages, commits, and pushes manually. Agents supply concrete English
+commands, grouping related files while keeping unrelated changes separate, according
+to the owner's previously approved commit preference.
+
+**Authorization:** This instruction authorizes documentation restructuring only.
+Implementation of the next package requires a separate owner instruction.
