@@ -11,9 +11,9 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Milestone 1 is in progress. Packages **1.1, 1.2, 1.3, and 1.4 are complete**, preserving
-the completed legacy Phase 0.1–0.2 and Phase 1.1–1.8 work.
-The next implementation package is **1.5 D1, Drizzle, Schema & Local Migration**.
+Milestone 1 is in progress. Packages **1.1, 1.2, 1.3, 1.4, and 1.5 are complete**, preserving
+the completed legacy Phase 0.1–0.2 and Phase 1.1–2.4 work.
+The next implementation package is **1.6 Owner Context & API Safety**.
 
 Use **milestone → work package → checklist**. Only milestones and work packages
 have active numbers; the unnumbered checklist sections below are implementation details.
@@ -88,7 +88,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 1.2 | Frontend Scaffold | 1.1–1.3 | Complete |
 | 1.3 | Workers, Hono & Tailwind Integration | 1.4–1.6 | Complete |
 | 1.4 | Linting, Formatting & Foundation Verification | 1.7–1.8 | Complete |
-| 1.5 | D1, Drizzle, Schema & Local Migration | 2.1–2.4 | Pending |
+| 1.5 | D1, Drizzle, Schema & Local Migration | 2.1–2.4 | Complete |
 | 1.6 | Owner Context & API Safety | 2.5–2.8 | Pending |
 | 1.7 | Server State & Backend Foundation Verification | 2.9–2.10 | Pending |
 | 2.1 | Visual Foundation | 3.1–3.3 | Pending |
@@ -328,7 +328,7 @@ Run:
 
 ### 1.5 D1, Drizzle, Schema & Local Migration
 
-**Status:** Pending | **Legacy Phase checklist:** 2.1–2.4
+**Status:** Complete | **Legacy Phase checklist:** 2.1–2.4
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
