@@ -37,11 +37,11 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestone 1 is in progress; packages 1.1–1.5 are complete:** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, Tailwind utilities, ESLint flat config, Prettier formatting, D1 binding, Drizzle ORM schema (17 tables), and local migration.
-The app currently renders a minimal scaffold page with a local D1 database schema initialized.
-The next documented package is **1.6: Owner Context & API Safety**.
+**Milestone 1 is in progress; packages 1.1–1.6 are complete:** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, Tailwind utilities, ESLint flat config, Prettier formatting, D1 binding, Drizzle ORM schema (17 tables), local migration, owner context middleware, idempotent local seed, standard API error handling, and Zod request validation.
+The app currently renders a minimal scaffold page with a local D1 database schema and owner identity initialized.
+The next documented package is **1.7: Server State & Backend Foundation Verification**.
 
-The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}` and returns structured 404 responses for unknown API routes. Feature APIs are pending.
+The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}`, resolves owner context on `/api/*`, formats validation and application errors cleanly, and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
 Install, typecheck, client/Worker build, and local dev/preview smoke checks passed on 2026-10-09.
 See the [implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) for the remaining work.
@@ -84,6 +84,7 @@ The dev server normally opens at `http://localhost:5173`.
 | `npm run preview` | Serve the production build in the local Workers runtime |
 | `npm run db:generate` | Generate SQL migration from Drizzle schema |
 | `npm run db:migrate:local` | Apply pending migrations to local D1 database |
+| `npm run db:seed:local` | Execute local D1 database seed for owner user and settings |
 
 Use `npm install` when intentionally updating dependencies and keep the lockfile with those changes.
 Linting and formatting are configured via ESLint and Prettier; a test framework is not configured yet.
