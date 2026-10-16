@@ -37,9 +37,9 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestone 1 is in progress; packages 1.1–1.4 are complete:** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, Tailwind utilities, ESLint flat config, and Prettier formatting.
-The app currently renders a minimal scaffold page.
-The next documented package is **1.5: D1, Drizzle, Schema & Local Migration**.
+**Milestone 1 is in progress; packages 1.1–1.5 are complete:** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, Tailwind utilities, ESLint flat config, Prettier formatting, D1 binding, Drizzle ORM schema (17 tables), and local migration.
+The app currently renders a minimal scaffold page with a local D1 database schema initialized.
+The next documented package is **1.6: Owner Context & API Safety**.
 
 The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}` and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
@@ -82,6 +82,8 @@ The dev server normally opens at `http://localhost:5173`.
 | `npm run typecheck` | Strict source checking; declaration checking exception per [DEC-049](docs/product/DECISIONS.md#dec-049--owner-approved-declaration-checking-exception) |
 | `npm run build` | Typecheck, then client and Worker build |
 | `npm run preview` | Serve the production build in the local Workers runtime |
+| `npm run db:generate` | Generate SQL migration from Drizzle schema |
+| `npm run db:migrate:local` | Apply pending migrations to local D1 database |
 
 Use `npm install` when intentionally updating dependencies and keep the lockfile with those changes.
 Linting and formatting are configured via ESLint and Prettier; a test framework is not configured yet.
