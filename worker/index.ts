@@ -1,12 +1,16 @@
 import { Hono } from 'hono';
+import type { WorkerEnv } from './env';
 import { systemRoutes } from './api/system.routes';
+import { errorHandler, notFoundHandler } from './middleware/error-handler';
+import { ownerContext } from './middleware/owner-context';
 
-const app = new Hono();
+const app = new Hono<WorkerEnv>();
+
+app.onError(errorHandler);
+app.notFound(notFoundHandler);
+
+app.use('/api/*', ownerContext);
 
 app.route('/api/system', systemRoutes);
-
-app.notFound((context) =>
-  context.json({ error: { code: 'NOT_FOUND', message: 'Not found.' } }, 404),
-);
 
 export default app;
