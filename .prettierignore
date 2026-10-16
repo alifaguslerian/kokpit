@@ -3,5 +3,6 @@ dist/
 .wrangler/
 package-lock.json
 drizzle/migrations/
+worker-configuration.d.ts
 docs/
 *.md
