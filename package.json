@@ -10,7 +10,11 @@
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "hono": "4.13.13",
@@ -19,13 +23,19 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.63.1",
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "4.3.3",
     "@types/node": "26.6.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.9.10",
     "tailwindcss": "4.3.3",
-    "typescript": "7.0.2",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2",
     "vite": "8.3.3",
     "wrangler": "4.149.0"
   }
