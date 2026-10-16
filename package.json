@@ -16,13 +16,15 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply kokpit-db --local"
+    "db:migrate:local": "wrangler d1 migrations apply kokpit-db --local",
+    "db:seed:local": "wrangler d1 execute kokpit-db --local --file=drizzle/seed.sql"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
     "hono": "4.13.13",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.63.1",
