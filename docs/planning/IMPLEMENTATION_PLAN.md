@@ -71,7 +71,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 
 | Milestone | Deliverable | Packages | Status |
 | --- | --- | --- | --- |
-| 1 | Foundation | 1.1–1.7 | In progress; 1.1–1.6 complete |
+| 1 | Foundation | 1.1–1.7 | Complete |
 | 2 | App Shell & Home | 2.1–2.3 | Pending |
 | 3 | Ideas & Library | 3.1–3.3 | Pending |
 | 4 | College | 4.1–4.4 | Pending |
@@ -90,7 +90,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 1.4 | Linting, Formatting & Foundation Verification | 1.7–1.8 | Complete |
 | 1.5 | D1, Drizzle, Schema & Local Migration | 2.1–2.4 | Complete |
 | 1.6 | Owner Context & API Safety | 2.5–2.8 | Complete |
-| 1.7 | Server State & Backend Foundation Verification | 2.9–2.10 | Pending |
+| 1.7 | Server State & Backend Foundation Verification | 2.9–2.10 | Complete |
 | 2.1 | Visual Foundation | 3.1–3.3 | Pending |
 | 2.2 | App Shell & Navigation | 3.4–3.8 | Pending |
 | 2.3 | Home Core & Visual Review | 4.1–4.5 | Pending |
@@ -470,7 +470,7 @@ Errors return predictable JSON.
 
 ### 1.7 Server State & Backend Foundation Verification
 
-**Status:** Pending | **Legacy Phase checklist:** 2.9–2.10
+**Status:** Complete | **Legacy Phase checklist:** 2.9–2.10
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>

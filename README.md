@@ -37,9 +37,9 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestone 1 is in progress; packages 1.1–1.6 are complete:** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, Tailwind utilities, ESLint flat config, Prettier formatting, D1 binding, Drizzle ORM schema (17 tables), local migration, owner context middleware, idempotent local seed, standard API error handling, and Zod request validation.
-The app currently renders a minimal scaffold page with a local D1 database schema and owner identity initialized.
-The next documented package is **1.7: Server State & Backend Foundation Verification**.
+**Milestone 1 (Foundation) is complete (packages 1.1–1.7):** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, Tailwind utilities, ESLint flat config, Prettier formatting, D1 binding, Drizzle ORM schema (17 tables), local migration, owner context middleware, idempotent local seed, standard API error handling, Zod request validation, TanStack Query integration, and foundation integration test suite.
+The app currently renders a minimal scaffold page connected to the Hono backend via TanStack Query and verified with local integration tests.
+The next milestone is **Milestone 2: App Shell & Home (Package 2.1: Visual Foundation)**.
 
 The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}`, resolves owner context on `/api/*`, formats validation and application errors cleanly, and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
@@ -81,13 +81,14 @@ The dev server normally opens at `http://localhost:5173`.
 | `npm run format` | Format code via Prettier |
 | `npm run typecheck` | Strict source checking; declaration checking exception per [DEC-049](docs/product/DECISIONS.md#dec-049--owner-approved-declaration-checking-exception) |
 | `npm run build` | Typecheck, then client and Worker build |
+| `npm test` | Run foundation integration test suite via tsx and node:test |
 | `npm run preview` | Serve the production build in the local Workers runtime |
 | `npm run db:generate` | Generate SQL migration from Drizzle schema |
 | `npm run db:migrate:local` | Apply pending migrations to local D1 database |
 | `npm run db:seed:local` | Execute local D1 database seed for owner user and settings |
 
 Use `npm install` when intentionally updating dependencies and keep the lockfile with those changes.
-Linting and formatting are configured via ESLint and Prettier; a test framework is not configured yet.
+Linting and formatting are configured via ESLint and Prettier; integration tests run via `npm test`.
 `npm run dev` runs React HMR and the Worker locally on the same origin.
 Tailwind uses the official Vite plugin and `src/styles/globals.css`, scanning `src/`.
 The scaffold's `p-4` utility adds 16px padding using the documented 4px spacing unit.
