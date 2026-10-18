@@ -1,0 +1,108 @@
+:root {
+  /* =========================================================================
+     Kokpit Design Tokens — Dark Cozy Editorial Workspace
+     Source of truth: docs/design/DESIGN_SYSTEM.md
+     ========================================================================= */
+
+  /* Background Colors */
+  --kokpit-bg-base: #0d0b0b;
+  --kokpit-bg-app: #11100f;
+  --kokpit-bg-sidebar: #121110;
+
+  /* Surface Colors */
+  --kokpit-surface-1: #181615;
+  --kokpit-surface-2: #1f1c1a;
+  --kokpit-surface-3: #25211f;
+  --kokpit-surface-hover: #292421;
+  --kokpit-surface-active: #302821;
+
+  /* Text Colors */
+  --kokpit-text-primary: #f3ebdd;
+  --kokpit-text-secondary: #d7c8b6;
+  --kokpit-text-muted: #a39280;
+  --kokpit-text-soft: #806f61;
+  --kokpit-text-disabled: #65594f;
+  --kokpit-text-inverse: #15110e;
+
+  /* Accent Colors (Warm Copper / Amber) */
+  --kokpit-accent: #d7a06d;
+  --kokpit-accent-hover: #e2b282;
+  --kokpit-accent-active: #c48a58;
+  --kokpit-accent-muted: #a7754e;
+  --kokpit-accent-bg: rgba(215, 160, 109, 0.12);
+  --kokpit-accent-bg-hover: rgba(215, 160, 109, 0.18);
+  --kokpit-accent-glow: rgba(215, 160, 109, 0.22);
+
+  /* Border Colors */
+  --kokpit-border-subtle: rgba(255, 244, 232, 0.06);
+  --kokpit-border-default: rgba(255, 244, 232, 0.1);
+  --kokpit-border-strong: rgba(255, 244, 232, 0.16);
+
+  /* Status Colors */
+  --kokpit-success: #8faf88;
+  --kokpit-warning: #d3a05f;
+  --kokpit-danger: #c9786c;
+  --kokpit-info: #819dbd;
+
+  /* Status Background Colors */
+  --kokpit-success-bg: rgba(143, 175, 136, 0.12);
+  --kokpit-warning-bg: rgba(211, 160, 95, 0.12);
+  --kokpit-danger-bg: rgba(201, 120, 108, 0.12);
+  --kokpit-info-bg: rgba(129, 157, 189, 0.12);
+
+  /* Typography Families */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Typography Scales */
+  --text-clock: 112px;
+  --text-display-xl: 48px;
+  --text-display-lg: 34px;
+  --text-display-md: 28px;
+  --text-heading-lg: 22px;
+  --text-heading-md: 18px;
+  --text-heading-sm: 16px;
+  --text-body-lg: 16px;
+  --text-body-md: 14px;
+  --text-body-sm: 13px;
+  --text-caption: 12px;
+  --text-micro: 11px;
+
+  /* Border Radii */
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  /* Spacing Scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Layout Dimensions */
+  --sidebar-width: 280px;
+  --page-padding-x: 40px;
+  --page-padding-y: 32px;
+  --content-gap: 24px;
+  --section-gap: 24px;
+
+  /* Elevation Shadows */
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.18);
+  --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.26);
+  --shadow-float: 0 12px 36px rgba(0, 0, 0, 0.3);
+
+  /* Motion Timing & Easing */
+  --motion-fast: 120ms;
+  --motion-default: 180ms;
+  --motion-slow: 240ms;
+  --ease-default: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
