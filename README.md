@@ -37,9 +37,9 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestone 1 (Foundation) is complete (packages 1.1–1.7):** documentation preflight, npm package, strict TypeScript, Vite + React, Cloudflare Vite integration, Hono routing, Tailwind utilities, ESLint flat config, Prettier formatting, D1 binding, Drizzle ORM schema (17 tables), local migration, owner context middleware, idempotent local seed, standard API error handling, Zod request validation, TanStack Query integration, and foundation integration test suite.
-The app currently renders a minimal scaffold page connected to the Hono backend via TanStack Query and verified with local integration tests.
-The next milestone is **Milestone 2: App Shell & Home (Package 2.1: Visual Foundation)**.
+**Milestone 1 (Foundation) is complete (packages 1.1–1.7). Milestone 2 (App Shell & Home) is in progress:** Package 2.1 (Visual Foundation) is complete with design tokens, typography (Cormorant Garamond + Inter), dark cozy editorial styles, discreet scrollbars, accessible focus states, and reduced-motion handling implemented.
+The app renders the visual foundation scaffold connected to the Hono backend via TanStack Query.
+The next documented package is **2.2: App Shell & Navigation**.
 
 The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}`, resolves owner context on `/api/*`, formats validation and application errors cleanly, and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
