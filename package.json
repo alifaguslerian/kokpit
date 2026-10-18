@@ -15,7 +15,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "tsx --test tests/integration/foundation.test.ts",
+    "test": "tsx --test tests/**/*.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply kokpit-db --local",
     "db:seed:local": "wrangler d1 execute kokpit-db --local --file=drizzle/seed.sql"
@@ -24,8 +24,10 @@
     "@tanstack/react-query": "^5.104.4",
     "drizzle-orm": "^0.45.4",
     "hono": "4.13.13",
+    "lucide-react": "^1.59.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-router-dom": "^7.18.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {
