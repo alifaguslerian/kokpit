@@ -37,9 +37,8 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestone 1 (Foundation) is complete (packages 1.1–1.7). Milestone 2 (App Shell & Home) is in progress:** Package 2.1 (Visual Foundation) is complete with design tokens, typography (Cormorant Garamond + Inter), dark cozy editorial styles, discreet scrollbars, accessible focus states, and reduced-motion handling implemented.
-The app renders the visual foundation scaffold connected to the Hono backend via TanStack Query.
-The next documented package is **2.2: App Shell & Navigation**.
+**Milestone 1 (Foundation) is complete (packages 1.1–1.7). Milestone 2 (App Shell & Home) is in progress:** Package 2.1 (Visual Foundation) and Package 2.2 (App Shell & Navigation) are complete. The application features a full set of accessible UI primitives (`Button`, `IconButton`, `Input`, `Textarea`, `Card`, `Badge`, `Chip`, `Skeleton`, `EmptyState`, `ErrorState`), a responsive `AppShell` with persistent 280px desktop sidebar and mobile toggle drawer, 6 canonical route placeholders (`/home`, `/college`, `/music`, `/news`, `/ideas`, `/library`), and client-side routing.
+The next documented package is **2.3: Home Core & Visual Review**.
 
 The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}`, resolves owner context on `/api/*`, formats validation and application errors cleanly, and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
