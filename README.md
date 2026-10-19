@@ -37,8 +37,8 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestone 1 (Foundation) is complete (packages 1.1–1.7). Milestone 2 (App Shell & Home) is in progress:** Package 2.1 (Visual Foundation) and Package 2.2 (App Shell & Navigation) are complete. The application features a full set of accessible UI primitives (`Button`, `IconButton`, `Input`, `Textarea`, `Card`, `Badge`, `Chip`, `Skeleton`, `EmptyState`, `ErrorState`), a responsive `AppShell` with persistent 280px desktop sidebar and mobile toggle drawer, 6 canonical route placeholders (`/home`, `/college`, `/music`, `/news`, `/ideas`, `/library`), and client-side routing.
-The next documented package is **2.3: Home Core & Visual Review**.
+**Milestone 1 (Foundation) and Milestone 2 (App Shell & Home) are complete (packages 1.1–2.3).** The application features the Dark Cozy Editorial Workspace design system, full accessible UI primitives, a responsive `AppShell` with persistent 280px sidebar and mobile drawer, client-side routing across 6 canonical destinations, and a rich Home overview featuring the real-time serif Clock, date, atmospheric late-night study backdrop, dynamic quote rotation with "another thought" refresh, and 5 balanced preview cards (`MusicPreview`, `CollegePreview`, `IdeasPreview`, `NewsPreview`, and `QuickLinksPreview`).
+The next documented package is **3.1: Ideas Backend**.
 
 The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}`, resolves owner context on `/api/*`, formats validation and application errors cleanly, and returns structured 404 responses for unknown API routes. Feature APIs are pending.
 Database, final UI, and production deployment are not implemented.
