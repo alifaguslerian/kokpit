@@ -1,86 +1,81 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { Lightbulb, ArrowRight, ArrowUp } from 'lucide-react';
-import { Chip } from '@/components/ui/Chip';
+import { ArrowUpRight, ArrowUp } from 'lucide-react';
+import { cn } from '@/lib/cn';
 
-const SUGGESTED_TAGS = ['Idea', 'Question', 'College', 'Project', 'Random'];
+const SUGGESTED_TAGS = ['Idea', 'Question', 'To-do', 'Random'];
 
 export function IdeasPreview() {
   const [content, setContent] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-
-    // Fast capture demonstration in V1 package 2.3
-    setIsSaved(true);
-    setTimeout(() => {
-      setContent('');
-      setSelectedTag(null);
-      setIsSaved(false);
-    }, 1200);
+    setContent('');
+    setSelectedTag(null);
   };
 
   return (
-    <div className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-5 sm:p-6 border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] flex flex-col justify-between group hover:border-[var(--kokpit-border-strong)] transition-all">
+    <div className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-4 sm:p-5 border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] flex flex-col justify-between group hover:border-[var(--kokpit-border-strong)] transition-all">
       <div>
         {/* Header pattern */}
-        <div className="flex items-center justify-between pb-4 border-b border-[var(--kokpit-border-subtle)]">
+        <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
           <div className="flex items-center gap-2">
-            <Lightbulb className="w-5 h-5 text-[var(--kokpit-accent)]" />
-            <h3 className="font-ui font-semibold text-base text-[var(--kokpit-text-primary)]">
-              Ideas
+            <span className="w-3.5 h-3.5 rounded-[4px] border border-[var(--kokpit-text-muted)] flex items-center justify-center">
+              <span className="w-1.5 h-1.5 bg-[var(--kokpit-text-muted)] rounded-full" />
+            </span>
+            <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)]">
+              Ideas & Notes
             </h3>
           </div>
+
           <Link
             to="/ideas"
-            className="inline-flex items-center gap-1 font-ui text-xs font-medium text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] transition-colors group-hover:translate-x-0.5"
+            className="inline-flex items-center gap-1 font-ui text-xs text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] transition-colors group-hover:translate-x-0.5"
           >
             <span>Open Ideas</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        {/* Quick capture form */}
-        <form onSubmit={handleSubmit} className="mt-4 relative">
+        {/* Input box with square copper submit button */}
+        <form onSubmit={handleSubmit} className="mt-3.5 relative">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Jot down a thought, idea, or reminder..."
-            rows={3}
-            className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] p-3.5 pr-12 rounded-xl border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--kokpit-accent-bg)] transition-all resize-none font-ui text-sm shadow-inner"
+            rows={2}
+            className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] p-3 pr-10 rounded-xl border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent-muted)] focus:outline-none transition-all resize-none font-ui text-xs shadow-inner"
           />
 
           <button
             type="submit"
             disabled={!content.trim()}
-            aria-label="Save idea"
-            className="absolute right-3 bottom-3 w-8 h-8 rounded-full bg-[var(--kokpit-accent)] text-[var(--kokpit-text-inverse)] flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all shadow-md cursor-pointer"
+            aria-label="Send thought"
+            className="absolute right-2.5 bottom-3 w-6 h-6 rounded-md bg-[var(--kokpit-accent)] text-[#2d1600] flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
           >
-            <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+            <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
           </button>
         </form>
-
-        {isSaved && (
-          <p className="text-xs text-[var(--kokpit-success)] mt-2 font-ui" role="status">
-            Captured to local thoughts.
-          </p>
-        )}
       </div>
 
-      {/* Quick tags row */}
-      <div className="mt-4 flex flex-wrap items-center gap-1.5 pt-2">
+      {/* Pill tags matching Stitch */}
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
         {SUGGESTED_TAGS.map((tag) => (
-          <Chip
+          <button
             key={tag}
-            isSelected={selectedTag === tag}
+            type="button"
             onClick={() => setSelectedTag((prev) => (prev === tag ? null : tag))}
-            className="text-xs"
+            className={cn(
+              'px-2.5 py-0.5 rounded-full text-[11px] font-ui border transition-all cursor-pointer',
+              selectedTag === tag
+                ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent)] border-[var(--kokpit-accent)] font-medium'
+                : 'bg-transparent text-[var(--kokpit-text-secondary)] border-[var(--kokpit-border-default)] hover:border-[var(--kokpit-border-strong)] hover:text-[var(--kokpit-text-primary)]',
+            )}
           >
             {tag}
-          </Chip>
+          </button>
         ))}
       </div>
     </div>
