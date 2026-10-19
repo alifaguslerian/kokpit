@@ -4,31 +4,33 @@ export function HomeHero() {
   const { time, dateString } = useRealtimeClock();
 
   return (
-    <div className="relative w-full rounded-[20px] overflow-hidden bg-[var(--kokpit-surface-1)] border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] transition-all select-none">
+    <div className="relative w-full rounded-[20px] overflow-hidden bg-[#161413]/75 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_36px_rgba(0,0,0,0.5)] transition-all select-none">
       {/* Background ambient lighting overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        {/* Official Stitch warm atmospheric room at night with glowing table lamp */}
         <div
-          className="w-full h-full bg-cover bg-right md:bg-center opacity-35 scale-105 filter blur-[0.5px]"
+          className="w-full h-full bg-cover bg-right md:bg-[position:75%_center] opacity-65 scale-105 filter brightness-105 contrast-110 saturate-110"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&w=1600&q=80')`,
-            filter: 'brightness(0.68) saturate(0.85) contrast(1.05)',
+            backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuD4VEdmichqbIcorgA2kd_m62fGApK0oEK_ACA9PXAF5pVgnRm10SqKXcwECQGgaQEEAqE51KVZY93iu00SFX2pu1SY5GQsRKDpT9bBl9cS5z-g0XTKuQWgEdAz3kNKCec-BZBEAVk16KQnf3LlMxitvHoy_K89CLZ7uOgV3JvMDRtTXW66HMBQ63fffSHrf3VcIHHeNLJ4Bh0vi9G4bWbPredZMN3Xc_afne4StGGb')`,
           }}
         />
-        {/* Horizontal dark gradient to ensure text readability */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(90deg, rgba(17,16,15,0.98) 0%, rgba(17,16,15,0.85) 50%, rgba(17,16,15,0.3) 100%)',
-          }}
-        />
+        {/* Soft horizontal gradient fading to dark on the left behind the clock */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(180deg, rgba(17,16,15,0.3) 0%, transparent 60%, rgba(17,16,15,0.8) 100%)',
+              'linear-gradient(90deg, #11100f 0%, #11100f 35%, rgba(17,16,15,0.7) 55%, transparent 80%)',
           }}
         />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(17,16,15,0.2) 0%, transparent 60%, rgba(17,16,15,0.7) 100%)',
+          }}
+        />
+        {/* Radial Warm Glow Overlay on right side matching Stitch */}
+        <div className="absolute right-16 top-1/2 -translate-y-1/2 w-72 h-72 bg-[var(--kokpit-accent)]/30 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Hero content region - compact vertical footprint */}
@@ -55,7 +57,7 @@ export function HomeHero() {
           </div>
 
           {/* Quote matching Stitch */}
-          <div className="mt-4 pt-3 border-t border-[var(--kokpit-border-subtle)] flex flex-col gap-0.5 max-w-md">
+          <div className="mt-4 border-l-2 border-[var(--kokpit-accent)]/40 pl-3.5 flex flex-col gap-0.5 max-w-md">
             <p className="font-display italic text-sm sm:text-base text-[var(--kokpit-text-primary)]/90 leading-snug font-light">
               “A calmer mind makes a brighter tomorrow.”
             </p>
@@ -66,13 +68,13 @@ export function HomeHero() {
         </div>
 
         {/* Right Column: Floating Plaque "Good Ideas Brighter Days" matching Stitch */}
-        <div className="hidden md:flex self-center">
-          <div className="relative overflow-hidden rounded-[18px] bg-gradient-to-br from-[#2a221d]/90 via-[#1e1814]/95 to-[#13100e]/95 border border-[var(--kokpit-accent)]/20 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.5)] backdrop-blur-md flex flex-col items-end justify-center min-w-[150px] sm:min-w-[170px]">
-            <div className="flex flex-col text-right font-display text-xl sm:text-2xl font-light text-[var(--kokpit-accent-hover)] leading-[1.15] tracking-tight">
-              <span>Good</span>
-              <span>Ideas</span>
-              <span>Brighter</span>
-              <span>Days</span>
+        <div className="hidden md:flex self-center relative z-20">
+          <div className="relative overflow-hidden rounded-[18px] bg-black/45 backdrop-blur-xl border border-[var(--kokpit-accent)]/30 p-5 shadow-[0_12px_32px_rgba(0,0,0,0.6)] flex flex-col items-end justify-center min-w-[150px] sm:min-w-[170px] rotate-1 hover:rotate-0 transition-transform">
+            <div className="flex flex-col text-right font-display text-xl sm:text-2xl font-light text-[#f3ebdd] leading-[1.15] tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+              <span className="text-[var(--kokpit-accent-hover)] font-medium">Good</span>
+              <span className="text-[var(--kokpit-accent)]">Ideas</span>
+              <span className="text-[#f3ebdd]/90">Brighter</span>
+              <span className="text-[var(--kokpit-accent-hover)]">Days</span>
             </div>
           </div>
         </div>
