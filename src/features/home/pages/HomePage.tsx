@@ -7,23 +7,25 @@ import { QuickLinksPreview } from '../components/previews/QuickLinksPreview';
 
 export function HomePage() {
   return (
-    <div className="flex flex-col w-full pb-16 animate-fade-in">
+    <div className="flex flex-col w-full pb-10 animate-fade-in">
       {/* Visual focal point: Spacious Clock & Atmospheric Hero */}
       <HomeHero />
 
-      {/* Highlights Grid: Two balanced columns on desktop per DESIGN_SYSTEM.md */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Row 1: Music & College */}
-        <MusicPreview />
-        <CollegePreview />
+      {/* Two Vertical Columns matching Stitch Reference Screenshot */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start mt-1">
+        {/* Left Column: Now Playing stacked directly on Ideas & Notes */}
+        <div className="flex flex-col gap-5">
+          <MusicPreview />
+          <IdeasPreview />
+        </div>
 
-        {/* Row 2: Ideas & News */}
-        <IdeasPreview />
-        <NewsPreview />
+        {/* Right Column: College stacked on News stacked on Quick Links */}
+        <div className="flex flex-col gap-5">
+          <CollegePreview />
+          <NewsPreview />
+          <QuickLinksPreview />
+        </div>
       </div>
-
-      {/* Spanning Row: Quick Links */}
-      <QuickLinksPreview />
     </div>
   );
 }
