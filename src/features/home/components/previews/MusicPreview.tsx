@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, SkipBack, SkipForward, Play, Pause, Bookmark } from 'lucide-react';
+import { ArrowUpRight, SkipBack, SkipForward, Play, Pause, Music, Heart } from 'lucide-react';
 
 export function MusicPreview() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,14 +10,12 @@ export function MusicPreview() {
   const eqTicks = [2, 4, 3, 7, 4, 6, 9, 5, 11, 6, 3, 8, 5, 4, 7, 5, 10, 6, 4, 5, 2, 4, 6, 3];
 
   return (
-    <div className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-4 sm:p-5 border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] flex flex-col justify-between group hover:border-[var(--kokpit-border-strong)] transition-all">
+    <div className="bg-[#161413]/85 backdrop-blur-xl rounded-[18px] p-4 sm:p-5 border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between group hover:border-[var(--kokpit-accent)]/35 transition-all">
       <div>
         {/* Header pattern */}
         <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
           <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 rounded-[4px] border border-[var(--kokpit-accent)] flex items-center justify-center">
-              <span className="w-1.5 h-1.5 bg-[var(--kokpit-accent)] rounded-full" />
-            </span>
+            <Music className="w-4 h-4 text-[var(--kokpit-accent)] shrink-0" />
             <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)]">
               Now Playing
             </h3>
@@ -63,10 +61,10 @@ export function MusicPreview() {
 
           <button
             type="button"
-            aria-label="Bookmark track"
-            className="text-[var(--kokpit-text-soft)] hover:text-[var(--kokpit-text-primary)] transition-colors p-1"
+            aria-label="Favorite track"
+            className="text-[var(--kokpit-text-soft)] hover:text-[var(--kokpit-accent)] transition-colors p-1 cursor-pointer"
           >
-            <Bookmark className="w-4 h-4" />
+            <Heart className="w-4 h-4 text-[var(--kokpit-accent)]" />
           </button>
         </div>
 
