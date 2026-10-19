@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Plus, Mail, Video, Cloud } from 'lucide-react';
+import { ArrowUpRight, Plus, Link2 } from 'lucide-react';
 
 interface QuickLinkItem {
   id: string;
@@ -18,13 +18,11 @@ const SHORTCUTS: QuickLinkItem[] = [
 
 export function QuickLinksPreview() {
   return (
-    <div className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-4 sm:p-5 border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] group hover:border-[var(--kokpit-border-strong)] transition-all">
+    <div className="bg-[#161413]/85 backdrop-blur-xl rounded-[18px] p-4 sm:p-5 border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)] group hover:border-[var(--kokpit-accent)]/35 transition-all">
       {/* Header pattern */}
       <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
         <div className="flex items-center gap-2">
-          <span className="w-3.5 h-3.5 rounded-[4px] border border-[var(--kokpit-text-muted)] flex items-center justify-center">
-            <span className="w-1.5 h-1.5 bg-[var(--kokpit-text-muted)] rounded-full" />
-          </span>
+          <Link2 className="w-4 h-4 text-[var(--kokpit-accent)] shrink-0" />
           <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)]">
             Quick Links
           </h3>
@@ -68,13 +66,58 @@ export function QuickLinksPreview() {
               </span>
             )}
             {link.icon === 'drive' && (
-              <Cloud className="w-4 h-4 text-[var(--kokpit-accent)] group-hover/tile:scale-110 transition-transform" />
+              <svg
+                className="w-4 h-4 group-hover/tile:scale-110 transition-transform shrink-0"
+                fill="none"
+                viewBox="0 0 87.3 78"
+              >
+                <path
+                  d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z"
+                  fill="#0066DA"
+                />
+                <path
+                  d="M43.65 25 29.9 1.2c-1.35.8-2.5 1.9-3.3 3.3L1.2 49.35C.4 50.75 0 52.3 0 53.85h27.5z"
+                  fill="#00AC47"
+                />
+                <path
+                  d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.95 10.3z"
+                  fill="#EA4335"
+                />
+                <path
+                  d="M43.65 25 57.4 1.2C56.05.4 54.5 0 52.95 0H34.35c-1.55 0-3.1.4-4.45 1.2z"
+                  fill="#00832D"
+                />
+                <path
+                  d="M59.8 53H27.5L13.75 76.8c1.35.8 2.9 1.2 4.45 1.2h50.9c1.55 0 3.1-.4 4.45-1.2z"
+                  fill="#2684FC"
+                />
+                <path
+                  d="M73.4 26.5 59.65 2.7C58.3 3.5 57.15 4.6 56.35 6L39.85 34.6 43.65 41.2 59.8 53h27.5c0-1.55-.4-3.1-1.2-4.5z"
+                  fill="#FFBA00"
+                />
+              </svg>
             )}
             {link.icon === 'mail' && (
-              <Mail className="w-4 h-4 text-[var(--kokpit-text-secondary)] group-hover/tile:text-[var(--kokpit-accent)] transition-colors" />
+              <svg
+                className="w-4 h-4 group-hover/tile:scale-110 transition-transform shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6z"
+                  stroke="#EA4335"
+                  strokeWidth="2"
+                />
+                <path d="M2 7l10 7 10-7" stroke="#EA4335" strokeLinecap="round" strokeWidth="2" />
+              </svg>
             )}
             {link.icon === 'youtube' && (
-              <Video className="w-4 h-4 text-[var(--kokpit-text-secondary)] group-hover/tile:text-[var(--kokpit-accent)] transition-colors" />
+              <svg
+                className="w-4 h-4 text-[#FF0000] fill-current group-hover/tile:scale-110 transition-transform shrink-0"
+                viewBox="0 0 24 24"
+              >
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
             )}
           </a>
         ))}
@@ -83,7 +126,7 @@ export function QuickLinksPreview() {
         <Link
           to="/library"
           title="Add shortcut in Library"
-          className="aspect-square rounded-xl bg-[var(--kokpit-surface-2)]/50 flex items-center justify-center border border-dashed border-[var(--kokpit-border-strong)] hover:border-[var(--kokpit-accent)] hover:scale-105 transition-all group/add"
+          className="aspect-square rounded-xl bg-[var(--kokpit-surface-2)]/50 flex items-center justify-center border border-dashed border-[var(--kokpit-border-strong)] hover:border-[var(--kokpit-accent)] hover:scale-105 transition-all group/add cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5 text-[var(--kokpit-text-soft)] group-hover/add:text-[var(--kokpit-accent)] transition-colors" />
         </Link>
