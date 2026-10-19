@@ -1,7 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { Home, GraduationCap, Disc3, Newspaper, Lightbulb, Bookmark, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { KokpitLogo } from '@/components/shared/KokpitLogo';
 
 export interface NavItemConfig {
   path: string;
@@ -27,15 +26,48 @@ export function Sidebar({ onClose, className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)] border-r border-[var(--kokpit-border-subtle)] flex flex-col justify-between p-6 select-none',
+        'w-[260px] lg:w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)] border-r border-[var(--kokpit-border-subtle)] flex flex-col justify-between p-6 select-none',
         className,
       )}
     >
       <div className="flex flex-col gap-8">
-        {/* Header / Brand */}
+        {/* Header / Brand matching Stitch */}
         <div className="flex items-center justify-between">
-          <NavLink to="/home" className="group block focus-visible:outline-none">
-            <KokpitLogo />
+          <NavLink to="/home" className="group flex items-center gap-3 focus-visible:outline-none">
+            <div className="w-10 h-10 rounded-xl bg-[var(--kokpit-surface-2)] border border-[var(--kokpit-border-default)] flex items-center justify-center shrink-0 shadow-sm group-hover:border-[var(--kokpit-accent-muted)] transition-colors">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-[var(--kokpit-accent)]"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="9"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  className="opacity-40"
+                />
+                <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+                <path
+                  d="M12 3V7.5M12 16.5V21M3 12H7.5M16.5 12H21"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-display text-2xl font-normal text-[var(--kokpit-text-primary)] leading-none tracking-tight">
+                Kokpit
+              </span>
+              <span className="font-ui text-[9px] uppercase tracking-wider text-[var(--kokpit-text-muted)] font-semibold mt-1">
+                A CALMER MIND FOR A FULLER LIFE.
+              </span>
+            </div>
           </NavLink>
 
           {onClose && (
@@ -61,10 +93,10 @@ export function Sidebar({ onClose, className }: SidebarProps) {
                 onClick={onClose}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center h-11 px-3.5 gap-3 rounded-[12px] font-ui text-sm transition-all duration-[var(--motion-fast)] ease-[var(--ease-default)]',
+                    'flex items-center h-11 px-3.5 gap-3.5 rounded-[12px] font-ui text-sm transition-all duration-[var(--motion-fast)] ease-[var(--ease-default)]',
                     'focus-visible:outline-2 focus-visible:outline-[var(--kokpit-accent)] focus-visible:outline-offset-1',
                     isActive
-                      ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent-hover)] font-medium border border-[var(--kokpit-accent)]/30 shadow-sm'
+                      ? 'bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] font-medium border border-[var(--kokpit-border-strong)] shadow-sm'
                       : 'text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.035] border border-transparent',
                   )
                 }
@@ -88,17 +120,20 @@ export function Sidebar({ onClose, className }: SidebarProps) {
         </nav>
       </div>
 
-      {/* Atmospheric Lower Card per DESIGN_SYSTEM.md */}
+      {/* Atmospheric Lower Card matching Stitch Screenshot */}
       <div className="pt-6">
-        <div className="relative overflow-hidden rounded-[var(--radius-md)] border border-[var(--kokpit-border-subtle)] bg-gradient-to-b from-[#1c1714]/80 to-[#120f0d] p-3.5 text-center shadow-inner">
-          <div className="w-6 h-6 mx-auto rounded-full bg-[var(--kokpit-accent)]/20 flex items-center justify-center mb-2">
-            <span className="w-2 h-2 rounded-full bg-[var(--kokpit-accent)] shadow-[0_0_8px_var(--kokpit-accent)]" />
-          </div>
-          <p className="font-display italic text-sm text-[var(--kokpit-accent-hover)] leading-snug">
-            A quiet room for focus.
+        <div className="relative overflow-hidden rounded-[18px] border border-[var(--kokpit-border-default)] bg-[var(--kokpit-surface-1)] p-5 text-center shadow-[var(--shadow-card)]">
+          {/* Glowing amber lamp orb */}
+          <div className="w-3 h-3 rounded-full bg-[var(--kokpit-accent)] shadow-[0_0_12px_var(--kokpit-accent)] mx-auto mb-2.5" />
+          <p className="font-display text-lg text-[var(--kokpit-text-primary)] leading-tight font-normal">
+            Same Mind.
+            <br />
+            A Kinder
+            <br />
+            Tomorrow.
           </p>
-          <span className="mt-1.5 text-[10px] uppercase tracking-widest text-[var(--kokpit-text-soft)] font-ui font-medium block">
-            Kokpit V1
+          <span className="mt-3 text-[10px] uppercase tracking-widest text-[var(--kokpit-text-soft)] font-ui font-semibold block">
+            NIGHT SESSION
           </span>
         </div>
       </div>
