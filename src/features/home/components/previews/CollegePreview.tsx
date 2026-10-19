@@ -1,78 +1,75 @@
 import { Link } from 'react-router-dom';
-import { GraduationCap, ArrowRight, BookOpen } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 export function CollegePreview() {
   return (
-    <div className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-5 sm:p-6 border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] flex flex-col justify-between group hover:border-[var(--kokpit-border-strong)] transition-all">
+    <div className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-4 sm:p-5 border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] flex flex-col justify-between group hover:border-[var(--kokpit-border-strong)] transition-all">
       <div>
         {/* Header pattern */}
-        <div className="flex items-center justify-between pb-4 border-b border-[var(--kokpit-border-subtle)]">
+        <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
           <div className="flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-[var(--kokpit-accent)]" />
-            <h3 className="font-ui font-semibold text-base text-[var(--kokpit-text-primary)]">
+            <span className="w-3.5 h-3.5 rounded-[4px] border border-[var(--kokpit-text-muted)] flex items-center justify-center">
+              <span className="w-1.5 h-1.5 bg-[var(--kokpit-text-muted)] rounded-full" />
+            </span>
+            <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)]">
               College
             </h3>
           </div>
+
           <Link
             to="/college"
-            className="inline-flex items-center gap-1 font-ui text-xs font-medium text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] transition-colors group-hover:translate-x-0.5"
+            className="inline-flex items-center gap-1 font-ui text-xs text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] transition-colors group-hover:translate-x-0.5"
           >
             <span>Go to College</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        {/* Semester & Course Highlight */}
-        <div className="flex items-start gap-4 mt-4">
-          <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-[var(--kokpit-surface-2)] shadow-md">
+        {/* Semester & Week pill */}
+        <div className="flex items-center gap-2 mt-3.5">
+          <h4 className="font-ui font-bold text-base text-[var(--kokpit-text-primary)]">
+            Spring 2025
+          </h4>
+          <span className="px-2 py-0.5 rounded-full bg-[var(--kokpit-surface-2)] text-[10px] text-[var(--kokpit-text-muted)] border border-[var(--kokpit-border-subtle)] font-ui font-medium">
+            Week 9 of 14
+          </span>
+        </div>
+
+        {/* Inner Card Container matching Stitch */}
+        <div className="mt-3 bg-[var(--kokpit-surface-2)] rounded-xl p-3 border border-[var(--kokpit-border-default)] flex items-center gap-3.5">
+          <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-[var(--kokpit-surface-3)] shadow-sm">
             <img
               src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=200&q=80"
-              alt="University library study hall"
+              alt="University campus tower"
               className="w-full h-full object-cover"
             />
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-ui text-xs font-semibold text-[var(--kokpit-text-secondary)]">
-                Spring 2026
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent)] font-ui text-[11px] border border-[var(--kokpit-border-subtle)]">
-                Week 9 of 14
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 mt-1 font-ui text-xs text-[var(--kokpit-text-soft)]">
+            <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--kokpit-accent)]" />
-              <span>CS 180 • Computer Science</span>
+              <span className="font-ui text-[11px] text-[var(--kokpit-text-muted)]">
+                CS 180 • Computer Science
+              </span>
             </div>
-            <h4 className="font-ui text-sm text-[var(--kokpit-text-primary)] font-medium mt-1 leading-snug">
+            <h5 className="font-ui text-sm font-semibold text-[var(--kokpit-text-primary)] truncate mt-0.5">
               Data Structures and Algorithms
-            </h4>
+            </h5>
+            <p className="font-ui text-[11px] text-[var(--kokpit-text-soft)] mt-0.5 truncate">
+              Next up: Lecture 8 — Trees • Tue, Apr 22
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Next Upcoming Material / Continuation */}
-      <div className="mt-5 bg-[var(--kokpit-surface-2)]/80 rounded-xl p-3 flex items-center justify-between border border-[var(--kokpit-border-subtle)]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-[var(--kokpit-surface-3)] flex items-center justify-center text-[var(--kokpit-accent)] shrink-0">
-            <BookOpen className="w-4 h-4" />
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="font-ui text-xs text-[var(--kokpit-text-primary)] font-medium truncate">
-              Next: Lecture 8 — Balanced Trees
-            </span>
-            <span className="font-ui text-[11px] text-[var(--kokpit-text-soft)]">
-              Tue • 10:30 AM • Hall 204
-            </span>
-          </div>
-        </div>
-
+      {/* Bottom link matching Stitch: View Syllabus ↗ */}
+      <div className="mt-3 flex justify-end">
         <Link
           to="/college"
-          className="px-2.5 py-1 rounded-lg bg-[var(--kokpit-surface-3)] hover:bg-[var(--kokpit-surface-hover)] text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-text-primary)] font-ui text-xs font-medium transition-colors border border-[var(--kokpit-border-subtle)] shrink-0 ml-2"
+          className="inline-flex items-center gap-1 font-ui text-xs text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] transition-colors"
         >
-          Materials
+          <span>View Syllabus</span>
+          <ArrowUpRight className="w-3.5 h-3.5" />
         </Link>
       </div>
     </div>
