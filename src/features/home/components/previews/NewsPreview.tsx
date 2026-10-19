@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Newspaper } from 'lucide-react';
 
 interface NewsItem {
   id: string;
@@ -33,14 +33,12 @@ const NEWS_STORIES: NewsItem[] = [
 
 export function NewsPreview() {
   return (
-    <div className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-4 sm:p-5 border border-[var(--kokpit-border-default)] shadow-[var(--shadow-card)] flex flex-col justify-between group hover:border-[var(--kokpit-border-strong)] transition-all">
+    <div className="bg-[#161413]/85 backdrop-blur-xl rounded-[18px] p-4 sm:p-5 border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between group hover:border-[var(--kokpit-accent)]/35 transition-all">
       <div>
         {/* Header pattern */}
         <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
           <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 rounded-[4px] border border-[var(--kokpit-text-muted)] flex items-center justify-center">
-              <span className="w-1.5 h-1.5 bg-[var(--kokpit-text-muted)] rounded-full" />
-            </span>
+            <Newspaper className="w-4 h-4 text-[var(--kokpit-accent)] shrink-0" />
             <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)]">News</h3>
           </div>
 
