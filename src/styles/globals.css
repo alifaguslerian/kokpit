@@ -1,6 +1,5 @@
-@layer theme, base, components, utilities;
+@import 'tailwindcss';
 @import './tokens.css';
-@import 'tailwindcss/utilities.css' layer(utilities) source('../');
 
 @theme {
   --spacing: 4px;
