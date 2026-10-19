@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, GraduationCap, Disc3, Newspaper, Lightbulb, Bookmark, X } from 'lucide-react';
+import { Home, GraduationCap, Music, Newspaper, Lightbulb, BookOpen, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 export interface NavItemConfig {
@@ -11,10 +11,10 @@ export interface NavItemConfig {
 export const navItems: NavItemConfig[] = [
   { path: '/home', label: 'Home', icon: Home },
   { path: '/college', label: 'College', icon: GraduationCap },
-  { path: '/music', label: 'Music', icon: Disc3 },
+  { path: '/music', label: 'Music', icon: Music },
   { path: '/news', label: 'News', icon: Newspaper },
   { path: '/ideas', label: 'Ideas', icon: Lightbulb },
-  { path: '/library', label: 'Library', icon: Bookmark },
+  { path: '/library', label: 'Library', icon: BookOpen },
 ];
 
 export interface SidebarProps {
@@ -26,22 +26,26 @@ export function Sidebar({ onClose, className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'w-[260px] lg:w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)] border-r border-[var(--kokpit-border-subtle)] flex flex-col justify-between p-6 select-none',
+        'w-[260px] lg:w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)]/95 backdrop-blur-md border-r border-[var(--kokpit-border-subtle)] flex flex-col justify-between p-6 select-none',
         className,
       )}
     >
       <div className="flex flex-col gap-8">
         {/* Header / Brand matching Stitch */}
         <div className="flex items-center justify-between">
-          <NavLink to="/home" className="group flex items-center gap-3 focus-visible:outline-none">
-            <div className="w-10 h-10 rounded-xl bg-[var(--kokpit-surface-2)] border border-[var(--kokpit-border-default)] flex items-center justify-center shrink-0 shadow-sm group-hover:border-[var(--kokpit-accent-muted)] transition-colors">
+          <NavLink
+            to="/home"
+            className="group flex items-center gap-3.5 focus-visible:outline-none"
+          >
+            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-[#27201b] via-[#1a1614] to-[#12100f] border border-[var(--kokpit-accent)]/40 flex items-center justify-center shrink-0 shadow-md group-hover:border-[var(--kokpit-accent)]/70 transition-all p-2">
+              <div className="absolute inset-0 rounded-xl bg-[var(--kokpit-accent)]/15 blur-xs opacity-70 group-hover:opacity-100 transition-opacity" />
               <svg
-                width="20"
-                height="20"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="text-[var(--kokpit-accent)]"
+                className="text-[var(--kokpit-accent)] relative z-10 drop-shadow-[0_2px_8px_rgba(215,160,109,0.3)] transform group-hover:scale-105 transition-transform"
               >
                 <circle
                   cx="12"
@@ -51,7 +55,7 @@ export function Sidebar({ onClose, className }: SidebarProps) {
                   strokeWidth="1.75"
                   className="opacity-40"
                 />
-                <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+                <circle cx="12" cy="12" r="3.5" fill="currentColor" />
                 <path
                   d="M12 3V7.5M12 16.5V21M3 12H7.5M16.5 12H21"
                   stroke="currentColor"
@@ -60,7 +64,7 @@ export function Sidebar({ onClose, className }: SidebarProps) {
                 />
               </svg>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-0">
               <span className="font-display text-2xl font-normal text-[var(--kokpit-text-primary)] leading-none tracking-tight">
                 Kokpit
               </span>
@@ -96,7 +100,7 @@ export function Sidebar({ onClose, className }: SidebarProps) {
                     'flex items-center h-11 px-3.5 gap-3.5 rounded-[12px] font-ui text-sm transition-all duration-[var(--motion-fast)] ease-[var(--ease-default)]',
                     'focus-visible:outline-2 focus-visible:outline-[var(--kokpit-accent)] focus-visible:outline-offset-1',
                     isActive
-                      ? 'bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] font-medium border border-[var(--kokpit-border-strong)] shadow-sm'
+                      ? 'bg-[#26211d]/90 text-[var(--kokpit-text-primary)] font-medium border border-[var(--kokpit-accent)]/30 shadow-sm'
                       : 'text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.035] border border-transparent',
                   )
                 }

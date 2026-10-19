@@ -39,7 +39,7 @@ export function KokpitLogo({ className, size = 36, showTagline = true }: KokpitL
         </span>
         {showTagline && (
           <span className="text-[10px] text-[var(--kokpit-text-muted)] mt-1 leading-snug font-ui tracking-widest uppercase block opacity-80">
-            Personal Digital Room
+            A CALMER MIND FOR A FULLER LIFE.
           </span>
         )}
       </div>
