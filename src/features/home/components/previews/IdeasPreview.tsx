@@ -1,6 +1,14 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, ArrowUp, Lightbulb, HelpCircle, CheckSquare, Sparkles } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ArrowUp,
+  Lightbulb,
+  HelpCircle,
+  CheckSquare,
+  Sparkles,
+  Pin,
+} from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 interface TagConfig {
@@ -15,22 +23,56 @@ const SUGGESTED_TAGS: TagConfig[] = [
   { label: 'Random', icon: Sparkles },
 ];
 
+interface CapturedThought {
+  id: string;
+  tag: string;
+  title: string;
+  snippet: string;
+  time: string;
+  isPinned?: boolean;
+}
+
+const INITIAL_PINNED_THOUGHT: CapturedThought = {
+  id: 'pinned-1',
+  tag: 'Idea',
+  title: 'Warmth over Cold Glass',
+  snippet:
+    'The digital desk should feel less like a clinical monitor and more like an aged walnut bureau bathed in evening amber glow.',
+  time: 'Today, 9:42 PM',
+  isPinned: true,
+};
+
 export function IdeasPreview() {
   const [content, setContent] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [activeThought, setActiveThought] = useState<CapturedThought>(INITIAL_PINNED_THOUGHT);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
+
+    const trimmed = content.trim();
+    const tag = selectedTag || 'Idea';
+    const title = trimmed.length > 36 ? trimmed.slice(0, 36) + '...' : trimmed;
+
+    setActiveThought({
+      id: `thought-${Date.now()}`,
+      tag,
+      title,
+      snippet: trimmed,
+      time: 'Just now',
+      isPinned: false,
+    });
+
     setContent('');
     setSelectedTag(null);
   };
 
   return (
-    <div className="bg-[#161413]/85 backdrop-blur-xl rounded-[18px] p-4 sm:p-5 border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between group hover:border-[var(--kokpit-accent)]/35 transition-all">
+    <div className="bg-[#161413]/85 backdrop-blur-xl rounded-[18px] p-4 sm:p-5 border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between group hover:border-[var(--kokpit-accent)]/35 transition-all flex-1 min-h-0">
       <div>
         {/* Header pattern */}
-        <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
+        <div className="flex items-center justify-between pb-2.5 border-b border-[var(--kokpit-border-subtle)]">
           <div className="flex items-center gap-2">
             <Lightbulb className="w-4 h-4 text-[var(--kokpit-accent)] shrink-0" />
             <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)]">
@@ -47,54 +89,88 @@ export function IdeasPreview() {
           </Link>
         </div>
 
-        {/* Input box with square copper submit button */}
-        <form onSubmit={handleSubmit} className="mt-3.5 relative">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Jot down a thought, idea, or reminder..."
-            rows={2}
-            className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] p-3 pr-10 rounded-xl border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent-muted)] focus:outline-none transition-all resize-none font-ui text-xs shadow-inner"
-          />
+        {/* Input box with copper submit button */}
+        <form onSubmit={handleSubmit} className="mt-3 relative">
+          <div className="relative">
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Jot down a thought, idea, or reminder..."
+              rows={2}
+              className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] p-2.5 pr-10 rounded-xl border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent-muted)] focus:outline-none transition-all resize-none font-ui text-xs shadow-inner leading-relaxed"
+            />
 
-          <button
-            type="submit"
-            disabled={!content.trim()}
-            aria-label="Send thought"
-            className="absolute right-2.5 bottom-3 w-6 h-6 rounded-md bg-[var(--kokpit-accent)] text-[#2d1600] flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
-          >
-            <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
-          </button>
+            <button
+              type="submit"
+              disabled={!content.trim()}
+              aria-label="Send thought"
+              className="absolute right-2 bottom-2.5 w-6 h-6 rounded-md bg-[var(--kokpit-accent)] text-[#2d1600] flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
+            >
+              <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
+            </button>
+          </div>
+
+          {/* Pill tags placed directly below input */}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {SUGGESTED_TAGS.map((tag) => {
+              const TagIcon = tag.icon;
+              const isSelected = selectedTag === tag.label;
+              return (
+                <button
+                  key={tag.label}
+                  type="button"
+                  onClick={() => setSelectedTag((prev) => (prev === tag.label ? null : tag.label))}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-ui border transition-all cursor-pointer',
+                    isSelected
+                      ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent)] border-[var(--kokpit-accent)] font-medium shadow-xs'
+                      : 'bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-secondary)] border-[var(--kokpit-border-subtle)] hover:border-[var(--kokpit-border-default)] hover:text-[var(--kokpit-text-primary)]',
+                  )}
+                >
+                  <TagIcon
+                    className={cn(
+                      'w-3 h-3',
+                      isSelected ? 'text-[var(--kokpit-accent)]' : 'text-[var(--kokpit-text-soft)]',
+                    )}
+                  />
+                  <span>{tag.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </form>
       </div>
 
-      {/* Pill tags matching Stitch */}
-      <div className="mt-3 flex flex-wrap items-center gap-1.5">
-        {SUGGESTED_TAGS.map((tag) => {
-          const TagIcon = tag.icon;
-          const isSelected = selectedTag === tag.label;
-          return (
-            <button
-              key={tag.label}
-              type="button"
-              onClick={() => setSelectedTag((prev) => (prev === tag.label ? null : tag.label))}
-              className={cn(
-                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-ui border transition-all cursor-pointer',
-                isSelected
-                  ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent)] border-[var(--kokpit-accent)] font-medium shadow-xs'
-                  : 'bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-secondary)] border-[var(--kokpit-border-subtle)] hover:border-[var(--kokpit-border-default)] hover:text-[var(--kokpit-text-primary)]',
-              )}
-            >
-              <TagIcon
-                className={cn(
-                  'w-3 h-3',
-                  isSelected ? 'text-[var(--kokpit-accent)]' : 'text-[var(--kokpit-text-soft)]',
-                )}
-              />
-              <span>{tag.label}</span>
-            </button>
-          );
-        })}
+      {/* Pinned / Recent thought snippet filling the lower card naturally */}
+      <div className="mt-3 pt-2.5 border-t border-[var(--kokpit-border-subtle)]/70">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-1.5">
+            <Pin className="w-3 h-3 text-[var(--kokpit-accent)] shrink-0" />
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
+              {activeThought.isPinned ? 'Pinned Reflection' : 'Recent Thought'}
+            </span>
+          </div>
+          <span className="font-ui text-[11px] text-[var(--kokpit-text-muted)]">
+            {activeThought.time}
+          </span>
+        </div>
+
+        <Link
+          to="/ideas"
+          className="block group/thought rounded-lg p-2 -mx-2 hover:bg-white/[0.03] transition-colors"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="font-ui font-medium text-xs text-[var(--kokpit-text-primary)] group-hover/thought:text-[var(--kokpit-accent)] transition-colors truncate">
+              {activeThought.title}
+            </h4>
+            <span className="font-ui text-[10px] text-[var(--kokpit-text-muted)] bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06] shrink-0">
+              #{activeThought.tag}
+            </span>
+          </div>
+          <p className="font-ui text-[11px] text-[var(--kokpit-text-secondary)] line-clamp-2 leading-relaxed mt-0.5">
+            {activeThought.snippet}
+          </p>
+        </Link>
       </div>
     </div>
   );
