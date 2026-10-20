@@ -139,6 +139,23 @@ export function MusicPreview() {
             <SkipForward className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Up Next Cozy Queue Preview matching Stitch */}
+        <div className="mt-3.5 pt-2.5 border-t border-[var(--kokpit-border-subtle)] flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-[var(--kokpit-text-muted)] truncate min-w-0">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--kokpit-accent)] font-semibold">
+              Up Next:
+            </span>
+            <span className="text-[var(--kokpit-text-primary)] font-medium truncate text-xs">
+              offshore
+            </span>
+            <span className="text-[var(--kokpit-text-soft)]">•</span>
+            <span className="text-[var(--kokpit-text-muted)] truncate text-xs">Wave to Earth</span>
+          </div>
+          <span className="text-[10px] text-[var(--kokpit-accent)] font-mono shrink-0 pl-2">
+            3:18
+          </span>
+        </div>
       </div>
     </div>
   );
