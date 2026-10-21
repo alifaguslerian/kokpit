@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { Home, GraduationCap, Music, Newspaper, Lightbulb, BookOpen, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { KokpitLogo } from '@/components/shared/KokpitLogo';
 
 export interface NavItemConfig {
   path: string;
@@ -33,45 +34,8 @@ export function Sidebar({ onClose, className }: SidebarProps) {
       <div className="flex flex-col gap-8">
         {/* Header / Brand matching Stitch */}
         <div className="flex items-center justify-between">
-          <NavLink
-            to="/home"
-            className="group flex items-center gap-3.5 focus-visible:outline-none"
-          >
-            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-[#27201b] via-[#1a1614] to-[#12100f] border border-[var(--kokpit-accent)]/40 flex items-center justify-center shrink-0 shadow-md group-hover:border-[var(--kokpit-accent)]/70 transition-all p-2">
-              <div className="absolute inset-0 rounded-xl bg-[var(--kokpit-accent)]/15 blur-xs opacity-70 group-hover:opacity-100 transition-opacity" />
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-[var(--kokpit-accent)] relative z-10 drop-shadow-[0_2px_8px_rgba(215,160,109,0.3)] transform group-hover:scale-105 transition-transform"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="9"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  className="opacity-40"
-                />
-                <circle cx="12" cy="12" r="3.5" fill="currentColor" />
-                <path
-                  d="M12 3V7.5M12 16.5V21M3 12H7.5M16.5 12H21"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-display text-2xl font-normal text-[var(--kokpit-text-primary)] leading-none tracking-tight">
-                Kokpit
-              </span>
-              <span className="font-ui text-[9px] uppercase tracking-wider text-[var(--kokpit-text-muted)] font-semibold mt-1">
-                A CALMER MIND FOR A FULLER LIFE.
-              </span>
-            </div>
+          <NavLink to="/home" className="group focus-visible:outline-none">
+            <KokpitLogo size={42} showTagline={true} />
           </NavLink>
 
           {onClose && (

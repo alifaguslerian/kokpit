@@ -6,31 +6,20 @@ export interface KokpitLogoProps {
   showTagline?: boolean;
 }
 
-export function KokpitLogo({ className, size = 36, showTagline = true }: KokpitLogoProps) {
+export function KokpitLogo({ className, size = 38, showTagline = true }: KokpitLogoProps) {
   return (
-    <div className={cn('flex items-center gap-3.5 select-none', className)}>
+    <div className={cn('flex items-center gap-3.5 select-none group', className)}>
       <div
         style={{ width: size, height: size }}
-        className="relative rounded-xl bg-gradient-to-br from-[#27201b] via-[#1a1614] to-[#12100f] border border-[var(--kokpit-accent)]/40 flex items-center justify-center shrink-0 shadow-md p-1.5 transition-all duration-[var(--motion-fast)] group-hover:border-[var(--kokpit-accent)]/70"
+        className="relative rounded-[12px] bg-gradient-to-br from-[#241e1a] via-[#161413] to-[#0f0e0d] border border-[var(--kokpit-accent)]/40 flex items-center justify-center shrink-0 shadow-[0_4px_16px_rgba(0,0,0,0.5)] p-1.5 transition-all duration-[var(--motion-fast)] group-hover:border-[var(--kokpit-accent)]/80 group-hover:shadow-[0_0_20px_rgba(211,155,122,0.25)]"
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--kokpit-accent)"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-full h-full drop-shadow-[0_2px_8px_rgba(215,160,109,0.3)]"
-          aria-hidden="true"
-        >
-          {/* Kokpit geometric aperture / compass room mark */}
-          <circle cx="12" cy="12" r="9" stroke="var(--kokpit-accent)" strokeOpacity="0.4" />
-          <path d="M12 3v4" />
-          <path d="M12 17v4" />
-          <path d="M3 12h4" />
-          <path d="M17 12h4" />
-          <circle cx="12" cy="12" r="2.5" fill="var(--kokpit-accent)" />
-        </svg>
+        <div className="absolute inset-0 rounded-[12px] bg-[var(--kokpit-accent)]/10 blur-[2px] opacity-60 group-hover:opacity-100 transition-opacity" />
+        <img
+          src="/kokpit-icon.png"
+          alt="Kokpit"
+          className="w-full h-full object-contain relative z-10 transform group-hover:scale-105 transition-transform duration-[var(--motion-fast)] drop-shadow-[0_2px_8px_rgba(211,155,122,0.3)]"
+          loading="eager"
+        />
       </div>
 
       <div className="min-w-0">
@@ -38,7 +27,7 @@ export function KokpitLogo({ className, size = 36, showTagline = true }: KokpitL
           Kokpit
         </span>
         {showTagline && (
-          <span className="text-[10px] text-[var(--kokpit-text-muted)] mt-1 leading-snug font-ui tracking-widest uppercase block opacity-80">
+          <span className="text-[9px] text-[var(--kokpit-text-muted)] mt-1 leading-snug font-ui tracking-wider uppercase block opacity-80 font-medium">
             A CALMER MIND FOR A FULLER LIFE.
           </span>
         )}
