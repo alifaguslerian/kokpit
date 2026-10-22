@@ -10,6 +10,8 @@ import {
   Pin,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { formatRelativeDate } from '@/lib/format-time';
+import { useIdeas, useCreateIdea } from '@/features/ideas/api/use-ideas';
 
 interface TagConfig {
   label: string;
@@ -23,45 +25,23 @@ const SUGGESTED_TAGS: TagConfig[] = [
   { label: 'Random', icon: Sparkles },
 ];
 
-interface CapturedThought {
-  id: string;
-  tag: string;
-  title: string;
-  snippet: string;
-  time: string;
-  isPinned?: boolean;
-}
-
-const INITIAL_PINNED_THOUGHT: CapturedThought = {
-  id: 'pinned-1',
-  tag: 'Idea',
-  title: 'Warmth over Cold Glass',
-  snippet:
-    'The digital desk should feel less like a clinical monitor and more like an aged walnut bureau bathed in evening amber glow.',
-  time: 'Today, 9:42 PM',
-  isPinned: true,
-};
-
 export function IdeasPreview() {
   const [content, setContent] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [activeThought, setActiveThought] = useState<CapturedThought>(INITIAL_PINNED_THOUGHT);
 
-  const handleSubmit = (e: FormEvent) => {
+  const { data: ideas = [], isLoading } = useIdeas({ limit: 1 });
+  const createIdeaMutation = useCreateIdea();
+
+  const activeIdea = ideas[0];
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
-
     const trimmed = content.trim();
-    const tag = selectedTag || 'Idea';
-    const title = trimmed.length > 36 ? trimmed.slice(0, 36) + '...' : trimmed;
+    if (!trimmed || createIdeaMutation.isPending) return;
 
-    setActiveThought({
-      id: `thought-${Date.now()}`,
-      tag,
-      title,
-      snippet: trimmed,
-      time: 'Just now',
-      isPinned: false,
+    await createIdeaMutation.mutateAsync({
+      content: trimmed,
+      tags: selectedTag ? [selectedTag] : undefined,
     });
 
     setContent('');
@@ -90,7 +70,7 @@ export function IdeasPreview() {
         </div>
 
         {/* Input box with copper submit button */}
-        <form onSubmit={handleSubmit} className="mt-3 relative">
+        <form onSubmit={(e) => void handleSubmit(e)} className="mt-3 relative">
           <div className="relative">
             <textarea
               value={content}
@@ -102,7 +82,7 @@ export function IdeasPreview() {
 
             <button
               type="submit"
-              disabled={!content.trim()}
+              disabled={!content.trim() || createIdeaMutation.isPending}
               aria-label="Send thought"
               className="absolute right-2 bottom-2.5 w-6 h-6 rounded-md bg-[var(--kokpit-accent)] text-[#2d1600] flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed transition-all shadow-sm cursor-pointer"
             >
@@ -143,34 +123,67 @@ export function IdeasPreview() {
 
       {/* Pinned / Recent thought snippet filling the lower card naturally */}
       <div className="mt-3 pt-2.5 border-t border-[var(--kokpit-border-subtle)]/70">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-1.5">
-            <Pin className="w-3 h-3 text-[var(--kokpit-accent)] shrink-0" />
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
-              {activeThought.isPinned ? 'Pinned Reflection' : 'Recent Thought'}
-            </span>
+        {isLoading ? (
+          <div className="space-y-1.5 py-1">
+            <div className="w-24 h-3 bg-white/[0.05] rounded animate-pulse" />
+            <div className="w-full h-4 bg-white/[0.05] rounded animate-pulse" />
           </div>
-          <span className="font-ui text-[11px] text-[var(--kokpit-text-muted)]">
-            {activeThought.time}
-          </span>
-        </div>
+        ) : activeIdea ? (
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1.5">
+                <Pin
+                  className={cn(
+                    'w-3 h-3 text-[var(--kokpit-accent)] shrink-0',
+                    activeIdea.isPinned && 'fill-current',
+                  )}
+                />
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
+                  {activeIdea.isPinned ? 'Pinned Reflection' : 'Recent Thought'}
+                </span>
+              </div>
+              <span className="font-ui text-[11px] text-[var(--kokpit-text-muted)]">
+                {formatRelativeDate(activeIdea.createdAt)}
+              </span>
+            </div>
 
-        <Link
-          to="/ideas"
-          className="block group/thought rounded-lg p-2 -mx-2 hover:bg-white/[0.03] transition-colors"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <h4 className="font-ui font-medium text-xs text-[var(--kokpit-text-primary)] group-hover/thought:text-[var(--kokpit-accent)] transition-colors truncate">
-              {activeThought.title}
-            </h4>
-            <span className="font-ui text-[10px] text-[var(--kokpit-text-muted)] bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06] shrink-0">
-              #{activeThought.tag}
-            </span>
+            <Link
+              to="/ideas"
+              className="block group/thought rounded-lg p-2 -mx-2 hover:bg-white/[0.03] transition-colors"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <h4 className="font-ui font-medium text-xs text-[var(--kokpit-text-primary)] group-hover/thought:text-[var(--kokpit-accent)] transition-colors truncate">
+                  {activeIdea.title ||
+                    (activeIdea.content.length > 36
+                      ? activeIdea.content.slice(0, 36) + '...'
+                      : activeIdea.content)}
+                </h4>
+                {activeIdea.tags && activeIdea.tags[0] && (
+                  <span className="font-ui text-[10px] text-[var(--kokpit-text-muted)] bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06] shrink-0">
+                    #{activeIdea.tags[0]}
+                  </span>
+                )}
+              </div>
+              <p className="font-ui text-[11px] text-[var(--kokpit-text-secondary)] line-clamp-2 leading-relaxed mt-0.5">
+                {activeIdea.content}
+              </p>
+            </Link>
           </div>
-          <p className="font-ui text-[11px] text-[var(--kokpit-text-secondary)] line-clamp-2 leading-relaxed mt-0.5">
-            {activeThought.snippet}
-          </p>
-        </Link>
+        ) : (
+          <Link
+            to="/ideas"
+            className="block group/thought rounded-lg p-2 -mx-2 hover:bg-white/[0.03] transition-colors"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="font-ui font-medium text-xs text-[var(--kokpit-text-muted)] group-hover/thought:text-[var(--kokpit-accent)] transition-colors">
+                Your desk is quiet
+              </h4>
+            </div>
+            <p className="font-ui text-[11px] text-[var(--kokpit-text-soft)] line-clamp-2 leading-relaxed mt-0.5">
+              Jot down a quick thought above to save it to your desk.
+            </p>
+          </Link>
+        )}
       </div>
     </div>
   );
