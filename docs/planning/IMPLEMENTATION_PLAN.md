@@ -11,9 +11,8 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Milestone 1 is in progress. Packages **1.1, 1.2, 1.3, 1.4, and 1.5 are complete**, preserving
-the completed legacy Phase 0.1–0.2 and Phase 1.1–2.4 work.
-The next implementation package is **1.6 Owner Context & API Safety**.
+Milestones 1 and 2 are complete. Milestone 3 is in progress. Package **3.1 Ideas Backend is complete**.
+The next implementation package is **3.2 Ideas UI, Home Capture & Verification**.
 
 Use **milestone → work package → checklist**. Only milestones and work packages
 have active numbers; the unnumbered checklist sections below are implementation details.
@@ -746,7 +745,7 @@ Do not proceed if Home already feels like a generic SaaS dashboard.
 
 ### 3.1 Ideas Backend
 
-**Status:** Pending | **Legacy Phase checklist:** 5.1–5.3
+**Status:** Complete | **Legacy Phase checklist:** 5.1–5.3
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
