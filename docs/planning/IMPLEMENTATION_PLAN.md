@@ -11,8 +11,8 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Milestones 1 and 2 are complete. Milestone 3 is in progress. Package **3.1 Ideas Backend is complete**.
-The next implementation package is **3.2 Ideas UI, Home Capture & Verification**.
+Milestones 1 and 2 are complete. Milestone 3 is in progress. Packages **3.1 Ideas Backend** and **3.2 Ideas UI, Home Capture & Verification** are complete.
+The next implementation package is **3.3 Library & Quick Links**.
 
 Use **milestone → work package → checklist**. Only milestones and work packages
 have active numbers; the unnumbered checklist sections below are implementation details.
@@ -793,7 +793,7 @@ Conceptual endpoints:
 
 ### 3.2 Ideas UI, Home Capture & Verification
 
-**Status:** Pending | **Legacy Phase checklist:** 5.4–5.7
+**Status:** Complete | **Legacy Phase checklist:** 5.4–5.7
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
