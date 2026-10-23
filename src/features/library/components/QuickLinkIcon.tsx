@@ -1,4 +1,5 @@
-import { Book, Code, Bookmark, Terminal, FileText, Music } from 'lucide-react';
+import { useState } from 'react';
+import { Book, Code, Bookmark, Terminal, FileText } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 interface QuickLinkIconProps {
@@ -16,7 +17,9 @@ export function QuickLinkIcon({
   className,
   size = 'md',
 }: QuickLinkIconProps) {
-  const iconKey = (iconValue || iconType || '').toLowerCase();
+  const [failedImage, setFailedImage] = useState<string | null>(null);
+  const iconKey = (iconValue || '').toLowerCase();
+  const isBrand = iconType === 'brand' || iconType === 'platform';
 
   const sizeClasses = {
     sm: 'w-3.5 h-3.5',
@@ -24,8 +27,28 @@ export function QuickLinkIcon({
     lg: 'w-6 h-6',
   };
 
+  if ((iconType === 'favicon' || iconType === 'custom') && iconValue && failedImage !== iconValue) {
+    let imageUrl: URL | null = null;
+    try {
+      imageUrl = new URL(iconValue);
+    } catch {
+      /* Object references have no image endpoint in V1. */
+    }
+    if (imageUrl && ['https:', 'http:'].includes(imageUrl.protocol)) {
+      return (
+        <img
+          src={imageUrl.href}
+          alt=""
+          referrerPolicy="no-referrer"
+          className={cn(sizeClasses[size], 'object-contain', className)}
+          onError={() => setFailedImage(iconValue)}
+        />
+      );
+    }
+  }
+
   // Platform SVG logos
-  if (iconKey === 'github' || iconKey.includes('github')) {
+  if (isBrand && iconKey === 'github') {
     return (
       <svg
         className={cn(sizeClasses[size], 'fill-current', className)}
@@ -41,11 +64,11 @@ export function QuickLinkIcon({
     );
   }
 
-  if (iconKey === 'notion' || iconKey.includes('notion')) {
+  if (isBrand && iconKey === 'notion') {
     return (
       <span
         className={cn(
-          'font-display font-bold select-none leading-none flex items-center justify-center',
+          'font-ui font-bold select-none leading-none flex items-center justify-center',
           size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-sm',
           className,
         )}
@@ -55,7 +78,7 @@ export function QuickLinkIcon({
     );
   }
 
-  if (iconKey === 'drive' || iconKey.includes('drive')) {
+  if (isBrand && iconKey === 'drive') {
     return (
       <svg
         className={cn(sizeClasses[size], 'shrink-0', className)}
@@ -91,7 +114,7 @@ export function QuickLinkIcon({
     );
   }
 
-  if (iconKey === 'mail' || iconKey.includes('mail') || iconKey.includes('gmail')) {
+  if (isBrand && iconKey === 'mail') {
     return (
       <svg
         className={cn(sizeClasses[size], 'shrink-0', className)}
@@ -109,7 +132,7 @@ export function QuickLinkIcon({
     );
   }
 
-  if (iconKey === 'youtube' || iconKey.includes('youtube')) {
+  if (isBrand && iconKey === 'youtube') {
     return (
       <svg
         className={cn(sizeClasses[size], 'text-[#FF0000] fill-current shrink-0', className)}
@@ -121,7 +144,7 @@ export function QuickLinkIcon({
     );
   }
 
-  if (iconKey === 'figma' || iconKey.includes('figma')) {
+  if (isBrand && iconKey === 'figma') {
     return (
       <svg
         className={cn(sizeClasses[size], 'shrink-0', className)}
@@ -153,16 +176,38 @@ export function QuickLinkIcon({
     );
   }
 
-  if (iconKey === 'spotify' || iconKey.includes('spotify')) {
-    return <Music className={cn(sizeClasses[size], 'text-[#1DB954]', className)} />;
+  if (isBrand && iconKey === 'discord') {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        className={cn(sizeClasses[size], 'fill-current', className)}
+      >
+        <path d="M20.3 4.4a19.8 19.8 0 0 0-4.9-1.5l-.6 1.2a18.3 18.3 0 0 0-5.6 0l-.6-1.2a19.8 19.8 0 0 0-4.9 1.5C.6 9 .2 13.4.4 17.8a20 20 0 0 0 6 3l1.2-2a12.8 12.8 0 0 1-1.9-.9l.5-.4a14.1 14.1 0 0 0 11.6 0l.5.4a12.8 12.8 0 0 1-1.9.9l1.2 2a20 20 0 0 0 6-3c.4-5.1-.8-9.5-3.3-13.4ZM8.1 15.1c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Zm7.8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4Z" />
+      </svg>
+    );
+  }
+
+  if (isBrand && iconKey === 'spotify') {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        className={cn(sizeClasses[size], 'fill-current', className)}
+      >
+        <path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1 .3c-2.8-1.7-6.3-2.1-10.5-1.1a.75.75 0 1 1-.4-1.5c4.6-1 8.5-.6 11.6 1.3.4.2.5.7.3 1Zm1.5-3.4a.94.94 0 0 1-1.3.3c-3.2-2-8.1-2.6-11.9-1.4a.94.94 0 1 1-.5-1.8c4.3-1.3 9.7-.7 13.4 1.6.5.3.6.8.3 1.3Zm.1-3.5C15.3 8.1 9 7.9 5.3 9a1.13 1.13 0 1 1-.7-2.1c4.3-1.3 11.2-1.1 15.7 1.5a1.13 1.13 0 0 1-1.2 2Z" />
+      </svg>
+    );
   }
 
   // Lucide icon choices
-  if (iconKey === 'book') return <Book className={cn(sizeClasses[size], className)} />;
-  if (iconKey === 'code') return <Code className={cn(sizeClasses[size], className)} />;
-  if (iconKey === 'terminal') return <Terminal className={cn(sizeClasses[size], className)} />;
-  if (iconKey === 'file') return <FileText className={cn(sizeClasses[size], className)} />;
-  if (iconKey === 'bookmark') return <Bookmark className={cn(sizeClasses[size], className)} />;
+  if (iconType === 'lucide') {
+    if (iconKey === 'book') return <Book className={cn(sizeClasses[size], className)} />;
+    if (iconKey === 'code') return <Code className={cn(sizeClasses[size], className)} />;
+    if (iconKey === 'terminal') return <Terminal className={cn(sizeClasses[size], className)} />;
+    if (iconKey === 'file') return <FileText className={cn(sizeClasses[size], className)} />;
+    if (iconKey === 'bookmark') return <Bookmark className={cn(sizeClasses[size], className)} />;
+  }
 
   // Default Monogram / Letter Mark if no known logo
   const initial = name.trim().charAt(0).toUpperCase() || '?';

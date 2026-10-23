@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { X, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Dialog } from '@/components/ui/Dialog';
 import { cn } from '@/lib/cn';
 import { useCreateQuickLink, useUpdateQuickLink } from '../api/use-quick-links';
 import type { QuickLink } from '../types';
@@ -22,6 +23,23 @@ const POPULAR_ICONS = [
   { label: 'Terminal', value: 'terminal' },
 ];
 
+function validateShortcutUrl(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (/[\s\\]/.test(trimmed)) return 'Enter a valid URL without spaces or backslashes.';
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(trimmed);
+  if (hasScheme && !/^https?:\/\/[^/]/i.test(trimmed)) return 'Use an http or https URL.';
+  try {
+    const parsed = new URL(hasScheme ? trimmed : `https://${trimmed}`);
+    if (!['http:', 'https:'].includes(parsed.protocol)) return 'Use an http or https URL.';
+    if (parsed.username || parsed.password) return 'Remove the username and password from the URL.';
+    if (!parsed.hostname) return 'Enter a valid website URL.';
+    return '';
+  } catch {
+    return 'Enter a valid website URL.';
+  }
+}
+
 interface QuickLinkModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -34,6 +52,7 @@ interface QuickLinkFormProps {
 }
 
 function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
+  const submitting = useRef(false);
   const [name, setName] = useState(link?.name ?? '');
   const [url, setUrl] = useState(link?.url ?? '');
   const [groupName, setGroupName] = useState(link?.groupName ?? '');
@@ -45,13 +64,15 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
   const updateMutation = useUpdateQuickLink();
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const urlError = validateShortcutUrl(url);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (submitting.current) return;
     setErrorMsg('');
 
     const trimmedName = name.trim();
-    let trimmedUrl = url.trim();
+    const trimmedUrl = url.trim();
 
     if (!trimmedName) {
       setErrorMsg('Name is required.');
@@ -63,17 +84,30 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
       return;
     }
 
-    if (!/^https?:\/\//i.test(trimmedUrl)) {
-      trimmedUrl = `https://${trimmedUrl}`;
-    }
-
-    try {
-      new URL(trimmedUrl);
-    } catch {
-      setErrorMsg('Please enter a valid URL.');
+    if (urlError) {
       return;
     }
 
+    submitting.current = true;
+    const iconType =
+      iconValue &&
+      iconValue === link?.iconValue &&
+      ['brand', 'lucide', 'favicon', 'custom'].includes(link.iconType)
+        ? link.iconType
+        : iconValue
+          ? [
+              'github',
+              'notion',
+              'drive',
+              'mail',
+              'youtube',
+              'figma',
+              'discord',
+              'spotify',
+            ].includes(iconValue)
+            ? 'brand'
+            : 'lucide'
+          : undefined;
     try {
       if (link) {
         await updateMutation.mutateAsync({
@@ -83,6 +117,7 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
             url: trimmedUrl,
             groupName: groupName.trim() || null,
             iconValue: iconValue || null,
+            iconType,
             isFavorite,
           },
         });
@@ -92,50 +127,56 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
           url: trimmedUrl,
           groupName: groupName.trim() || null,
           iconValue: iconValue || undefined,
+          iconType,
           isFavorite,
         });
       }
       onClose();
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to save shortcut.');
+    } catch {
+      setErrorMsg('Could not save this shortcut. Your changes are here; please try again.');
+    } finally {
+      submitting.current = false;
     }
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+    <Dialog
+      isOpen
+      onClose={() => {
+        if (!submitting.current) onClose();
+      }}
+      labelledBy="modal-title"
+      className="max-w-md"
     >
-      <div
-        className="w-full max-w-md bg-[var(--kokpit-surface-1)] border border-[var(--kokpit-border-strong)] rounded-[var(--radius-lg)] p-5 shadow-2xl relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
-          <h2
-            id="modal-title"
-            className="font-ui font-medium text-base text-[var(--kokpit-text-primary)]"
-          >
-            {link ? 'Edit Shortcut' : 'Add New Shortcut'}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close dialog"
-            className="p-1 rounded text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.04] transition-colors cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
+      <div className="flex items-center justify-between pb-3 border-b border-[var(--kokpit-border-subtle)]">
+        <h2
+          id="modal-title"
+          className="font-ui font-medium text-base text-[var(--kokpit-text-primary)]"
+        >
+          {link ? 'Edit Shortcut' : 'Add New Shortcut'}
+        </h2>
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={onClose}
+          aria-label="Close dialog"
+          className="p-1 rounded text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.04] transition-colors cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {errorMsg && (
+        <div
+          role="alert"
+          className="mt-3 p-2.5 rounded-lg bg-[var(--kokpit-danger-bg)] border border-[var(--kokpit-danger)]/30 text-xs text-[var(--kokpit-text-primary)]"
+        >
+          {errorMsg}
         </div>
+      )}
 
-        {errorMsg && (
-          <div className="mt-3 p-2.5 rounded-lg bg-[var(--kokpit-danger-bg)] border border-[var(--kokpit-danger)]/30 text-xs text-[var(--kokpit-danger)]">
-            {errorMsg}
-          </div>
-        )}
-
-        <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-3.5">
+      <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-3.5">
+        <fieldset disabled={isPending} className="min-w-0 space-y-3.5">
           <div>
             <label
               htmlFor="shortcut-name"
@@ -152,7 +193,7 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
               placeholder="e.g. GitHub, Notion, College Portal"
               maxLength={100}
               autoFocus
-              className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] px-3 py-2 rounded-lg border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent)] focus:outline-none font-ui text-sm transition-colors"
+              className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-muted)] px-3 py-2 rounded-lg border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent)] focus:outline-none font-ui text-sm transition-colors"
             />
           </div>
 
@@ -165,17 +206,32 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
             </label>
             <input
               id="shortcut-url"
+              aria-invalid={Boolean(urlError)}
+              aria-describedby={urlError ? 'shortcut-url-error' : undefined}
+              maxLength={2000}
               type="text"
               required
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] px-3 py-2 rounded-lg border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent)] focus:outline-none font-mono text-xs transition-colors"
+              className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-muted)] px-3 py-2 rounded-lg border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent)] focus:outline-none font-ui text-xs transition-colors"
             />
+            {urlError && (
+              <p
+                id="shortcut-url-error"
+                role="alert"
+                className="mt-1 text-xs text-[var(--kokpit-text-primary)]"
+              >
+                {urlError}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block font-ui text-xs text-[var(--kokpit-text-secondary)] mb-1">
+            <label
+              htmlFor="shortcut-group"
+              className="block font-ui text-xs text-[var(--kokpit-text-secondary)] mb-1"
+            >
               Category / Group
             </label>
             <div className="flex flex-wrap items-center gap-1.5 mb-2">
@@ -196,12 +252,13 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
               ))}
             </div>
             <input
+              id="shortcut-group"
               type="text"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               placeholder="Or type custom category..."
               maxLength={50}
-              className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] px-3 py-1.5 rounded-lg border border-[var(--kokpit-border-subtle)] focus:border-[var(--kokpit-accent)] focus:outline-none font-ui text-xs"
+              className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-muted)] px-3 py-1.5 rounded-lg border border-[var(--kokpit-border-subtle)] focus:border-[var(--kokpit-accent)] focus:outline-none font-ui text-xs"
             />
           </div>
 
@@ -218,18 +275,26 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
               onChange={(e) => setIconValue(e.target.value)}
               className="w-full bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)] px-3 py-2 rounded-lg border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent)] focus:outline-none font-ui text-xs"
             >
+              {iconValue && !POPULAR_ICONS.some((icon) => icon.value === iconValue) && (
+                <option value={iconValue}>Current icon</option>
+              )}
               {POPULAR_ICONS.map((icon) => (
-                <option key={icon.value} value={icon.value} className="bg-[#1c1917] text-white">
+                <option
+                  key={icon.value}
+                  value={icon.value}
+                  className="bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-primary)]"
+                >
                   {icon.label}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="pt-2 flex items-center justify-between border-t border-[var(--kokpit-border-subtle)]">
+          <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--kokpit-border-subtle)]">
             <button
               type="button"
               onClick={() => setIsFavorite((prev) => !prev)}
+              aria-pressed={isFavorite}
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-ui border transition-colors cursor-pointer',
                 isFavorite
@@ -250,9 +315,9 @@ function QuickLinkForm({ link, onClose }: QuickLinkFormProps) {
               </Button>
             </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </fieldset>
+      </form>
+    </Dialog>
   );
 }
 
