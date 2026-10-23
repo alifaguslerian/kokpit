@@ -93,9 +93,9 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 2.1 | Visual Foundation | 3.1–3.3 | Complete |
 | 2.2 | App Shell & Navigation | 3.4–3.8 | Complete |
 | 2.3 | Home Core & Visual Review | 4.1–4.5 | Complete |
-| 3.1 | Ideas Backend | 5.1–5.3 | Pending |
-| 3.2 | Ideas UI, Home Capture & Verification | 5.4–5.7 | Pending |
-| 3.3 | Library & Quick Links | 6.1–6.5 | Pending |
+| 3.1 | Ideas Backend | 5.1–5.3 | Complete |
+| 3.2 | Ideas UI, Home Capture & Verification | 5.4–5.7 | Complete |
+| 3.3 | Library & Quick Links | 6.1–6.5 | Complete |
 | 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Pending |
 | 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Pending |
 | 4.3 | Private Storage & Material APIs | 8.1–8.6 | Pending |
@@ -850,7 +850,7 @@ Test:
 
 ### 3.3 Library & Quick Links
 
-**Status:** Pending | **Legacy Phase checklist:** 6.1–6.5
+**Status:** Complete | **Legacy Phase checklist:** 6.1–6.5
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
