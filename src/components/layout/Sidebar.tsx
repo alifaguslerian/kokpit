@@ -27,14 +27,13 @@ export function Sidebar({ onClose, className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'w-[260px] lg:w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)]/95 backdrop-blur-md border-r border-[var(--kokpit-border-subtle)] flex flex-col justify-between p-6 select-none',
+        'w-[280px] md:w-[220px] min-[1440px]:w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)] border-r border-[var(--kokpit-border-subtle)] flex flex-col p-6 select-none overflow-y-auto',
         className,
       )}
     >
       <div className="flex flex-col gap-8">
-        {/* Header / Brand matching Stitch */}
         <div className="flex items-center justify-between">
-          <NavLink to="/home" className="group focus-visible:outline-none">
+          <NavLink to="/home" onClick={onClose} className="group rounded-lg">
             <KokpitLogo size={42} showTagline={true} />
           </NavLink>
 
@@ -43,14 +42,13 @@ export function Sidebar({ onClose, className }: SidebarProps) {
               type="button"
               onClick={onClose}
               aria-label="Close navigation"
-              className="md:hidden p-1.5 text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] rounded-[8px] hover:bg-white/[0.04]"
+              className="md:hidden p-1.5 text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] rounded-[8px] hover:bg-[var(--kokpit-surface-hover)]"
             >
               <X className="w-5 h-5" />
             </button>
           )}
         </div>
 
-        {/* Navigation List */}
         <nav className="flex flex-col gap-1.5" aria-label="Main Navigation">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -64,8 +62,8 @@ export function Sidebar({ onClose, className }: SidebarProps) {
                     'flex items-center h-11 px-3.5 gap-3.5 rounded-[12px] font-ui text-sm transition-all duration-[var(--motion-fast)] ease-[var(--ease-default)]',
                     'focus-visible:outline-2 focus-visible:outline-[var(--kokpit-accent)] focus-visible:outline-offset-1',
                     isActive
-                      ? 'bg-[#26211d]/90 text-[var(--kokpit-text-primary)] font-medium border border-[var(--kokpit-accent)]/30 shadow-sm'
-                      : 'text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.035] border border-transparent',
+                      ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent-hover)] font-medium'
+                      : 'text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-text-primary)] hover:bg-[var(--kokpit-surface-hover)]',
                   )
                 }
               >
@@ -86,24 +84,6 @@ export function Sidebar({ onClose, className }: SidebarProps) {
             );
           })}
         </nav>
-      </div>
-
-      {/* Atmospheric Lower Card matching Stitch Screenshot */}
-      <div className="pt-6">
-        <div className="relative overflow-hidden rounded-[18px] border border-[var(--kokpit-border-default)] bg-[var(--kokpit-surface-1)] p-5 text-center shadow-[var(--shadow-card)]">
-          {/* Glowing amber lamp orb */}
-          <div className="w-3 h-3 rounded-full bg-[var(--kokpit-accent)] shadow-[0_0_12px_var(--kokpit-accent)] mx-auto mb-2.5" />
-          <p className="font-display text-lg text-[var(--kokpit-text-primary)] leading-tight font-normal">
-            Same Mind.
-            <br />
-            A Kinder
-            <br />
-            Tomorrow.
-          </p>
-          <span className="mt-3 text-[10px] uppercase tracking-widest text-[var(--kokpit-text-soft)] font-ui font-semibold block">
-            NIGHT SESSION
-          </span>
-        </div>
       </div>
     </aside>
   );
