@@ -12,9 +12,9 @@ export function createTestD1(seedUserId = 'user-owner-1'): D1Database {
   db.exec(migrationSql);
 
   // Insert seed owner
-  db.exec(
-    `INSERT INTO users (id, email, display_name, role, created_at, updated_at) VALUES ('${seedUserId}', 'owner@example.com', 'Owner', 'owner', datetime('now'), datetime('now'))`,
-  );
+  db.prepare(
+    "INSERT INTO users (id, email, display_name, role, created_at, updated_at) VALUES (?, 'owner@example.com', 'Owner', 'owner', datetime('now'), datetime('now'))",
+  ).run(seedUserId);
 
   function createStatement(query: string, boundParams: unknown[] = []): unknown {
     return {
@@ -54,11 +54,18 @@ export function createTestD1(seedUserId = 'user-owner-1'): D1Database {
       return createStatement(query);
     },
     async batch(statements: Array<{ all: () => Promise<unknown> }>) {
-      const results = [];
-      for (const s of statements) {
-        results.push(await s.all());
+      db.exec('BEGIN');
+      try {
+        const results = [];
+        for (const s of statements) {
+          results.push(await s.all());
+        }
+        db.exec('COMMIT');
+        return results;
+      } catch (error) {
+        db.exec('ROLLBACK');
+        throw error;
       }
-      return results;
     },
     async exec(query: string) {
       db.exec(query);
