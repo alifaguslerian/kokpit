@@ -71,7 +71,7 @@ export function useReorderQuickLinks() {
   return useMutation({
     mutationFn: (ids: string[]) => reorderQuickLinks(ids),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
+      return queryClient.invalidateQueries({ queryKey: queryKeys.library.all });
     },
   });
 }

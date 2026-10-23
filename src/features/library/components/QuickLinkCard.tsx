@@ -39,7 +39,7 @@ export function QuickLinkCard({
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
-    void toggleFavoriteMutation.mutateAsync({
+    toggleFavoriteMutation.mutate({
       id: link.id,
       isFavorite: !link.isFavorite,
     });
@@ -47,13 +47,13 @@ export function QuickLinkCard({
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    void deleteMutation.mutateAsync(link.id);
+    deleteMutation.mutate(link.id);
   };
 
   return (
     <div
       className={cn(
-        'group relative bg-[var(--kokpit-surface-1)] border rounded-[var(--radius-lg)] p-3.5 sm:p-4 shadow-[var(--shadow-card)] flex items-center justify-between gap-3 transition-all duration-[var(--motion-default)] hover:border-[var(--kokpit-border-strong)] hover:shadow-md',
+        'group relative min-w-0 bg-[var(--kokpit-surface-1)] border rounded-[var(--radius-lg)] p-3.5 sm:p-4 shadow-[var(--shadow-card)] flex flex-wrap items-center justify-between gap-3 transition-all duration-[var(--motion-default)] hover:border-[var(--kokpit-border-strong)]',
         link.isFavorite
           ? 'border-[var(--kokpit-accent)]/30'
           : 'border-[var(--kokpit-border-default)]',
@@ -65,7 +65,7 @@ export function QuickLinkCard({
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3.5 flex-1 min-w-0 group/link cursor-pointer"
+        className="flex items-center gap-3.5 grow basis-full min-w-0 group/link cursor-pointer"
         title={`Open ${link.name} (${link.url})`}
       >
         <div className="w-10 h-10 rounded-xl bg-[var(--kokpit-surface-2)] flex items-center justify-center border border-[var(--kokpit-border-default)] group-hover/link:border-[var(--kokpit-accent)]/50 group-hover/link:scale-105 transition-all shrink-0 shadow-xs">
@@ -78,33 +78,33 @@ export function QuickLinkCard({
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)] group-hover/link:text-[var(--kokpit-accent)] transition-colors truncate">
+          <div className="flex flex-wrap items-center gap-2 min-w-0">
+            <h3 className="font-ui font-medium text-sm text-[var(--kokpit-text-primary)] group-hover/link:text-[var(--kokpit-accent)] transition-colors break-words min-w-0 max-w-full">
               {link.name}
             </h3>
             {link.groupName && (
-              <span className="font-ui text-[10px] text-[var(--kokpit-text-muted)] bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06] shrink-0">
+              <span className="font-ui text-[10px] text-[var(--kokpit-text-muted)] bg-[var(--kokpit-surface-2)] px-1.5 py-0.5 rounded border border-[var(--kokpit-border-subtle)] max-w-full break-words">
                 {link.groupName}
               </span>
             )}
           </div>
-          <p className="font-mono text-xs text-[var(--kokpit-text-muted)] truncate mt-0.5">
+          <p className="font-ui text-xs text-[var(--kokpit-text-muted)] truncate mt-0.5">
             {domain}
           </p>
         </div>
       </a>
 
       {/* Right Actions */}
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex flex-wrap items-center justify-end gap-1 ml-auto">
         {/* Reorder Arrows */}
         {(onMoveUp || onMoveDown) && (
-          <div className="hidden sm:flex items-center flex-col opacity-40 group-hover:opacity-80 transition-opacity">
+          <div className="flex items-center gap-1 text-[var(--kokpit-text-muted)]">
             <button
               type="button"
               disabled={!canMoveUp}
               onClick={onMoveUp}
               aria-label="Move link up"
-              className="p-0.5 hover:text-[var(--kokpit-accent)] disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+              className="p-1.5 hover:text-[var(--kokpit-accent)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
             >
               <ArrowUp className="w-3 h-3" />
             </button>
@@ -113,7 +113,7 @@ export function QuickLinkCard({
               disabled={!canMoveDown}
               onClick={onMoveDown}
               aria-label="Move link down"
-              className="p-0.5 hover:text-[var(--kokpit-accent)] disabled:opacity-20 cursor-pointer disabled:cursor-not-allowed"
+              className="p-1.5 hover:text-[var(--kokpit-accent)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
             >
               <ArrowDown className="w-3 h-3" />
             </button>
@@ -126,12 +126,13 @@ export function QuickLinkCard({
           onClick={handleToggleFavorite}
           disabled={toggleFavoriteMutation.isPending}
           aria-label={link.isFavorite ? 'Remove from favorites' : 'Mark as favorite'}
+          aria-pressed={link.isFavorite}
           title={link.isFavorite ? 'Remove from favorites' : 'Mark as favorite'}
           className={cn(
             'p-1.5 rounded-lg transition-colors cursor-pointer',
             link.isFavorite
               ? 'text-[var(--kokpit-accent)] hover:bg-[var(--kokpit-accent-bg)]'
-              : 'text-[var(--kokpit-text-soft)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.04]',
+              : 'text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.04]',
           )}
         >
           <Star className={cn('w-4 h-4', link.isFavorite && 'fill-current')} />
@@ -191,6 +192,13 @@ export function QuickLinkCard({
           </>
         )}
       </div>
+      {(toggleFavoriteMutation.isError || deleteMutation.isError) && (
+        <p role="alert" className="basis-full text-sm text-[var(--kokpit-text-primary)]">
+          {deleteMutation.isError
+            ? 'Could not delete this shortcut. Please try again.'
+            : 'Could not update this favorite. Please try again.'}
+        </p>
+      )}
     </div>
   );
 }

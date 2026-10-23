@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { Bookmark, Plus, Star, RefreshCw } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/Button';
@@ -12,11 +12,12 @@ import { QuickLinkModal } from '../components/QuickLinkModal';
 import type { QuickLink } from '../types';
 
 export function LibraryPage() {
+  const reordering = useRef(false);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'favorites' | string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<QuickLink | null>(null);
 
-  const { data: links = [], isLoading, isError, error, refetch } = useQuickLinks();
+  const { data: links = [], isLoading, isError, refetch } = useQuickLinks();
   const reorderMutation = useReorderQuickLinks();
 
   // Extract all unique group names
@@ -45,7 +46,8 @@ export function LibraryPage() {
     setIsModalOpen(true);
   };
 
-  const handleMove = async (currentIndex: number, targetIndex: number) => {
+  const handleMove = (currentIndex: number, targetIndex: number) => {
+    if (reordering.current) return;
     if (targetIndex < 0 || targetIndex >= filteredLinks.length) return;
     const currentItem = filteredLinks[currentIndex];
     const targetItem = filteredLinks[targetIndex];
@@ -60,7 +62,12 @@ export function LibraryPage() {
     newOrderedIds.splice(fromPos, 1);
     newOrderedIds.splice(toPos, 0, currentItem.id);
 
-    await reorderMutation.mutateAsync(newOrderedIds);
+    reordering.current = true;
+    reorderMutation.mutate(newOrderedIds, {
+      onSettled: () => {
+        reordering.current = false;
+      },
+    });
   };
 
   return (
@@ -68,10 +75,10 @@ export function LibraryPage() {
       {/* Editorial Header */}
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
         <div>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
+          <span className="font-ui text-[11px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
             Quick Launch & Portals
           </span>
-          <h1 className="font-serif text-3xl sm:text-4xl text-[var(--kokpit-text-primary)] mt-1 font-normal tracking-tight">
+          <h1 className="font-ui text-3xl sm:text-4xl text-[var(--kokpit-text-primary)] mt-1 font-normal tracking-tight">
             Library
           </h1>
           <p className="font-ui text-sm text-[var(--kokpit-text-secondary)] mt-1 max-w-xl">
@@ -110,7 +117,7 @@ export function LibraryPage() {
             type="button"
             onClick={() => setSelectedFilter('all')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-ui border transition-all cursor-pointer',
+              'max-w-full break-all text-left px-3 py-1.5 rounded-lg text-xs font-ui border transition-all cursor-pointer',
               selectedFilter === 'all'
                 ? 'bg-[var(--kokpit-surface-3)] text-[var(--kokpit-text-primary)] border-[var(--kokpit-border-strong)] font-medium shadow-xs'
                 : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-muted)] border-[var(--kokpit-border-subtle)] hover:text-[var(--kokpit-text-primary)]',
@@ -141,7 +148,7 @@ export function LibraryPage() {
                 type="button"
                 onClick={() => setSelectedFilter(group)}
                 className={cn(
-                  'px-3 py-1.5 rounded-lg text-xs font-ui border transition-all cursor-pointer',
+                  'max-w-full break-all text-left px-3 py-1.5 rounded-lg text-xs font-ui border transition-all cursor-pointer',
                   isSelected
                     ? 'bg-[var(--kokpit-surface-3)] text-[var(--kokpit-text-primary)] border-[var(--kokpit-border-strong)] font-medium'
                     : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-muted)] border-[var(--kokpit-border-subtle)] hover:text-[var(--kokpit-text-primary)]',
@@ -156,6 +163,11 @@ export function LibraryPage() {
 
       {/* Grid of Shortcuts */}
       <section aria-label="Shortcuts list" className="pt-2">
+        {reorderMutation.isError && (
+          <p role="alert" className="mb-3 text-sm text-[var(--kokpit-text-primary)]">
+            Could not reorder shortcuts. Please try moving the shortcut again.
+          </p>
+        )}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -174,7 +186,7 @@ export function LibraryPage() {
         ) : isError ? (
           <ErrorState
             title="Failed to load shortcuts"
-            message={error instanceof Error ? error.message : 'Please check your connection.'}
+            message="Please check your connection and try again."
             onRetry={() => void refetch()}
           />
         ) : filteredLinks.length === 0 ? (
@@ -219,8 +231,8 @@ export function LibraryPage() {
                       }
                     : undefined
                 }
-                canMoveUp={idx > 0}
-                canMoveDown={idx < filteredLinks.length - 1}
+                canMoveUp={idx > 0 && !reorderMutation.isPending}
+                canMoveDown={idx < filteredLinks.length - 1 && !reorderMutation.isPending}
               />
             ))}
           </div>
