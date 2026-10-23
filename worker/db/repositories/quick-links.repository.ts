@@ -1,13 +1,16 @@
 import { eq, and, asc } from 'drizzle-orm';
 import type { Database } from '../client';
 import { quickLinks } from '../schema';
+import { BadRequestError } from '../../utils/errors';
+
+export type QuickLinkIconType = 'brand' | 'lucide' | 'favicon' | 'custom';
 
 export interface QuickLinkRecord {
   id: string;
   userId: string;
   name: string;
   url: string;
-  iconType: string;
+  iconType: QuickLinkIconType;
   iconValue: string | null;
   groupName: string | null;
   position: number;
@@ -28,7 +31,7 @@ export interface CreateQuickLinkData {
   userId: string;
   name: string;
   url: string;
-  iconType: string;
+  iconType: QuickLinkIconType;
   iconValue?: string | null | undefined;
   groupName?: string | null | undefined;
   position: number;
@@ -40,7 +43,7 @@ export interface CreateQuickLinkData {
 export interface UpdateQuickLinkData {
   name?: string | undefined;
   url?: string | undefined;
-  iconType?: string | undefined;
+  iconType?: QuickLinkIconType | undefined;
   iconValue?: string | null | undefined;
   groupName?: string | null | undefined;
   position?: number | undefined;
@@ -52,12 +55,29 @@ export class QuickLinksRepository {
   constructor(private readonly db: Database) {}
 
   private mapRow(row: typeof quickLinks.$inferSelect): QuickLinkRecord {
+    let iconType: QuickLinkIconType;
+    switch (row.iconType) {
+      case 'platform':
+        iconType = 'brand';
+        break;
+      case 'domain':
+        iconType = 'favicon';
+        break;
+      case 'brand':
+      case 'lucide':
+      case 'favicon':
+      case 'custom':
+        iconType = row.iconType;
+        break;
+      default:
+        iconType = row.iconValue ? 'lucide' : 'favicon';
+    }
     return {
       id: row.id,
       userId: row.userId,
       name: row.name,
       url: row.url,
-      iconType: row.iconType,
+      iconType,
       iconValue: row.iconValue,
       groupName: row.groupName,
       position: row.position,
@@ -182,13 +202,24 @@ export class QuickLinksRepository {
   }
 
   async reorder(userId: string, orderedIds: string[]): Promise<boolean> {
-    for (let index = 0; index < orderedIds.length; index++) {
-      const id = orderedIds[index]!;
-      await this.db
-        .update(quickLinks)
-        .set({ position: index, updatedAt: new Date().toISOString() })
-        .where(and(eq(quickLinks.id, id), eq(quickLinks.userId, userId)));
+    const current = await this.list(userId);
+    const ownerIds = new Set(current.map((link) => link.id));
+    if (
+      orderedIds.length !== current.length ||
+      new Set(orderedIds).size !== orderedIds.length ||
+      orderedIds.some((id) => !ownerIds.has(id))
+    ) {
+      throw new BadRequestError('Provide every current quick link ID exactly once.');
     }
+    if (orderedIds.length === 0) return true;
+    const updatedAt = new Date().toISOString();
+    const statements = orderedIds.map((id, index) =>
+      this.db
+        .update(quickLinks)
+        .set({ position: index, updatedAt })
+        .where(and(eq(quickLinks.id, id), eq(quickLinks.userId, userId))),
+    );
+    await this.db.batch([statements[0]!, ...statements.slice(1)]);
     return true;
   }
 
