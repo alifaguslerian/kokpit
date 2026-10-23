@@ -33,7 +33,11 @@ export const errorHandler: ErrorHandler<WorkerEnv> = (err, c) => {
     );
   }
 
-  console.error('[Unhandled Server Error]', err);
+  // Drizzle errors can contain SQL bind values, including private idea content.
+  console.error('[Unhandled Server Error]', {
+    code: 'INTERNAL_SERVER_ERROR',
+    method: c.req.method,
+  });
   return c.json(
     {
       error: {
