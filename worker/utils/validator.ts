@@ -21,6 +21,24 @@ export function validateJson<T>(schema: ZodSchema<T>): MiddlewareHandler {
   };
 }
 
+export function validateOptionalJson<T>(schema: ZodSchema<T>): MiddlewareHandler {
+  return async (c, next) => {
+    const text = await c.req.text();
+    let body: unknown = {};
+    if (text !== '') {
+      try {
+        body = JSON.parse(text);
+      } catch {
+        throw new AppError('BAD_REQUEST', 'Malformed JSON in request body.', 400);
+      }
+    }
+    const result = schema.safeParse(body);
+    if (!result.success) throw result.error;
+    c.set('validatedJson' as never, result.data as never);
+    await next();
+  };
+}
+
 export function validateParams<T>(schema: ZodSchema<T>): MiddlewareHandler {
   return async (c, next) => {
     const params = c.req.param();

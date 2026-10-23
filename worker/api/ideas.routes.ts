@@ -4,7 +4,13 @@ import type { WorkerEnv } from '../env';
 import { createDb } from '../db/client';
 import { IdeasRepository } from '../db/repositories/ideas.repository';
 import { IdeasService } from '../services/ideas.service';
-import { validateJson, validateParams, validateQuery, idParamSchema } from '../utils/validator';
+import {
+  validateJson,
+  validateOptionalJson,
+  validateParams,
+  validateQuery,
+  idParamSchema,
+} from '../utils/validator';
 
 export const createIdeaSchema = z.object({
   content: z
@@ -115,21 +121,17 @@ ideasRoutes.delete('/:id', validateParams(idParamSchema), async (c) => {
 });
 
 // POST /api/ideas/:id/pin - Toggle or set pin status
-ideasRoutes.post('/:id/pin', validateParams(idParamSchema), async (c) => {
-  const { id } = c.get('validatedParams' as never) as z.infer<typeof idParamSchema>;
-  const userId = c.get('userId');
-  const service = getIdeasService(c);
+ideasRoutes.post(
+  '/:id/pin',
+  validateParams(idParamSchema),
+  validateOptionalJson(pinIdeaSchema),
+  async (c) => {
+    const { id } = c.get('validatedParams' as never) as z.infer<typeof idParamSchema>;
+    const userId = c.get('userId');
+    const service = getIdeasService(c);
 
-  let targetPin: boolean | undefined;
-  try {
-    const body = (await c.req.json()) as { isPinned?: boolean };
-    if (typeof body?.isPinned === 'boolean') {
-      targetPin = body.isPinned;
-    }
-  } catch {
-    // Optional body, ignore malformed/absent JSON and toggle
-  }
-
-  const data = await service.togglePin(id, userId, targetPin);
-  return c.json({ data });
-});
+    const body = c.get('validatedJson' as never) as z.infer<typeof pinIdeaSchema>;
+    const data = await service.togglePin(id, userId, body.isPinned);
+    return c.json({ data });
+  },
+);

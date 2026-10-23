@@ -4,7 +4,15 @@ import type { WorkerEnv } from '../env';
 import { createDb } from '../db/client';
 import { QuickLinksRepository } from '../db/repositories/quick-links.repository';
 import { QuickLinksService } from '../services/quick-links.service';
-import { validateJson, validateParams, validateQuery, idParamSchema } from '../utils/validator';
+import {
+  validateJson,
+  validateOptionalJson,
+  validateParams,
+  validateQuery,
+  idParamSchema,
+} from '../utils/validator';
+
+const iconTypeSchema = z.enum(['brand', 'lucide', 'favicon', 'custom']);
 
 export const createQuickLinkSchema = z.object({
   name: z
@@ -13,7 +21,7 @@ export const createQuickLinkSchema = z.object({
     .min(1, 'Name is required.')
     .max(100, 'Name cannot exceed 100 characters.'),
   url: z.string().trim().min(1, 'URL is required.').max(2000, 'URL too long.'),
-  iconType: z.string().trim().max(50).optional(),
+  iconType: iconTypeSchema.optional(),
   iconValue: z.string().trim().max(100).optional().nullable(),
   groupName: z.string().trim().max(50).optional().nullable(),
   position: z.coerce.number().int().min(0).optional(),
@@ -28,7 +36,7 @@ export const updateQuickLinkSchema = z.object({
     .max(100, 'Name cannot exceed 100 characters.')
     .optional(),
   url: z.string().trim().min(1, 'URL cannot be empty.').max(2000, 'URL too long.').optional(),
-  iconType: z.string().trim().max(50).optional(),
+  iconType: iconTypeSchema.optional(),
   iconValue: z.string().trim().max(100).optional().nullable(),
   groupName: z.string().trim().max(50).optional().nullable(),
   position: z.coerce.number().int().min(0).optional(),
@@ -134,21 +142,17 @@ quickLinksRoutes.delete('/:id', validateParams(idParamSchema), async (c) => {
 });
 
 // POST /api/quick-links/:id/favorite
-quickLinksRoutes.post('/:id/favorite', validateParams(idParamSchema), async (c) => {
-  const { id } = c.get('validatedParams' as never) as z.infer<typeof idParamSchema>;
-  const service = getQuickLinksService(c);
-  const userId = c.get('userId');
+quickLinksRoutes.post(
+  '/:id/favorite',
+  validateParams(idParamSchema),
+  validateOptionalJson(favoriteQuickLinkSchema),
+  async (c) => {
+    const { id } = c.get('validatedParams' as never) as z.infer<typeof idParamSchema>;
+    const service = getQuickLinksService(c);
+    const userId = c.get('userId');
 
-  let targetFav: boolean | undefined;
-  try {
-    const body = (await c.req.json()) as { isFavorite?: boolean };
-    if (typeof body?.isFavorite === 'boolean') {
-      targetFav = body.isFavorite;
-    }
-  } catch {
-    // Optional body, ignore absent JSON and toggle
-  }
-
-  const link = await service.toggleFavorite(id, userId, targetFav);
-  return c.json({ data: link }, 200);
-});
+    const body = c.get('validatedJson' as never) as z.infer<typeof favoriteQuickLinkSchema>;
+    const link = await service.toggleFavorite(id, userId, body.isFavorite);
+    return c.json({ data: link }, 200);
+  },
+);
