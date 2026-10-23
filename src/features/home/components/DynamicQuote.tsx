@@ -8,34 +8,31 @@ interface DynamicQuoteProps {
 
 export function DynamicQuote({ initialQuote }: DynamicQuoteProps) {
   const [quoteIndex, setQuoteIndex] = useState(0);
-  const quotes = FALLBACK_QUOTES;
-  const currentQuote = initialQuote ?? quotes[quoteIndex % quotes.length];
-
-  const handleNextThought = () => {
-    setQuoteIndex((prev) => (prev + 1) % quotes.length);
-  };
+  const quotes = initialQuote
+    ? [initialQuote, ...FALLBACK_QUOTES.filter((quote) => quote.id !== initialQuote.id)]
+    : FALLBACK_QUOTES;
+  const currentQuote = quotes[quoteIndex % quotes.length];
 
   return (
-    <div className="pt-4 border-t border-[var(--kokpit-border-subtle)] flex flex-col gap-2 max-w-xl">
-      <p className="font-display italic text-lg sm:text-xl text-[var(--kokpit-text-primary)]/95 leading-relaxed font-light">
+    <div className="mt-4 pt-4 border-t border-[var(--kokpit-border-subtle)] flex flex-col gap-2 max-w-xl">
+      <p
+        className="font-display italic text-xl sm:text-2xl text-[var(--kokpit-text-primary)] leading-relaxed"
+        aria-live="polite"
+      >
         “{currentQuote?.content}”
       </p>
-
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <span className="font-ui text-xs text-[var(--kokpit-text-soft)] tracking-wider uppercase font-medium">
-          {currentQuote?.author
-            ? `— ${currentQuote.author}`
-            : `Kokpit · ${currentQuote?.mood ?? 'thought'}`}
+        <span className="font-ui text-xs text-[var(--kokpit-text-muted)]">
+          Temporary thought · Unattributed
         </span>
-
         <button
           type="button"
-          onClick={handleNextThought}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] transition-colors py-1 px-2 rounded-md hover:bg-[var(--kokpit-surface-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--kokpit-accent)]"
-          title="Cycle to another thought for this session"
+          onClick={() => setQuoteIndex((previous) => (previous + 1) % quotes.length)}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-accent)] transition-colors py-1 px-2 rounded-md hover:bg-[var(--kokpit-surface-hover)]"
+          title="Show another temporary thought for this session"
         >
-          <RotateCw className="w-3 h-3 text-[var(--kokpit-accent)]" />
-          <span>another thought</span>
+          <RotateCw className="w-3 h-3" aria-hidden="true" />
+          <span>Another thought</span>
         </button>
       </div>
     </div>
