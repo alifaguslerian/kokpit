@@ -30,7 +30,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
         rows={rows}
         disabled={disabled}
         className={cn(
-          'w-full bg-[var(--kokpit-surface-2)] text-sm text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] rounded-[12px] p-3.5 border outline-none resize-y transition-all duration-[var(--motion-fast)] ease-[var(--ease-default)]',
+          'w-full bg-[var(--kokpit-surface-2)] text-sm text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-muted)] rounded-[12px] p-3.5 border outline-none resize-y transition-all duration-[var(--motion-fast)] ease-[var(--ease-default)]',
           error
             ? 'border-[var(--kokpit-danger)] focus:ring-2 focus:ring-[var(--kokpit-danger-bg)]'
             : 'border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent-muted)] focus:ring-3 focus:ring-[var(--kokpit-accent-bg)]',

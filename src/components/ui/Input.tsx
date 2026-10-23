@@ -47,7 +47,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           id={inputId}
           disabled={disabled}
           className={cn(
-            'w-full h-full bg-transparent text-sm text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-soft)] outline-none px-3.5',
+            'w-full h-full bg-transparent text-sm text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-muted)] outline-none px-3.5',
             leftIcon ? 'pl-1' : undefined,
             rightIcon ? 'pr-1' : undefined,
             'disabled:cursor-not-allowed',
