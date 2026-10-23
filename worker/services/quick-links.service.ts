@@ -3,12 +3,13 @@ import type {
   QuickLinksRepository,
   QuickLinkRecord,
   ListQuickLinksFilters,
+  QuickLinkIconType,
 } from '../db/repositories/quick-links.repository';
 
 export interface CreateQuickLinkDTO {
   name: string;
   url: string;
-  iconType?: string | undefined;
+  iconType?: QuickLinkIconType | undefined;
   iconValue?: string | null | undefined;
   groupName?: string | null | undefined;
   position?: number | undefined;
@@ -18,7 +19,7 @@ export interface CreateQuickLinkDTO {
 export interface UpdateQuickLinkDTO {
   name?: string | undefined;
   url?: string | undefined;
-  iconType?: string | undefined;
+  iconType?: QuickLinkIconType | undefined;
   iconValue?: string | null | undefined;
   groupName?: string | null | undefined;
   position?: number | undefined;
@@ -34,7 +35,12 @@ export class QuickLinksService {
       throw new BadRequestError('URL cannot be empty.');
     }
 
-    if (!/^https?:\/\//i.test(trimmed)) {
+    if (/[\s\\]/.test(trimmed)) throw new BadRequestError('Invalid URL format.');
+    const explicitScheme = /^[a-z][a-z0-9+.-]*:/i.test(trimmed);
+    if (explicitScheme && !/^https?:\/\/[^/]/i.test(trimmed)) {
+      throw new BadRequestError('URL must use http or https protocol.');
+    }
+    if (!explicitScheme) {
       trimmed = `https://${trimmed}`;
     }
 
@@ -43,41 +49,56 @@ export class QuickLinksService {
       if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
         throw new BadRequestError('URL must use http or https protocol.');
       }
+      if (parsed.username || parsed.password || !parsed.hostname) {
+        throw new BadRequestError('Invalid URL format.');
+      }
       return parsed.toString();
     } catch {
       throw new BadRequestError('Invalid URL format.');
     }
   }
 
-  private detectIcon(url: string, explicitType?: string, explicitValue?: string | null) {
-    if (explicitType && explicitValue) {
+  private detectIcon(
+    url: string,
+    explicitType?: QuickLinkIconType,
+    explicitValue?: string | null,
+  ): {
+    iconType: QuickLinkIconType;
+    iconValue: string | null;
+  } {
+    const value = explicitValue?.trim();
+    if (value) {
       return {
-        iconType: explicitType,
-        iconValue: explicitValue.trim() || null,
+        iconType:
+          explicitType ||
+          (['github', 'notion', 'drive', 'mail', 'youtube', 'figma', 'discord', 'spotify'].includes(
+            value,
+          )
+            ? 'brand'
+            : 'lucide'),
+        iconValue: value,
       };
     }
 
-    const lower = url.toLowerCase();
-    if (lower.includes('github.com')) return { iconType: 'platform', iconValue: 'github' };
-    if (lower.includes('notion.so') || lower.includes('notion.site')) {
-      return { iconType: 'platform', iconValue: 'notion' };
+    const hostname = new URL(url).hostname.toLowerCase();
+    const matches = (domain: string) => hostname === domain || hostname.endsWith(`.${domain}`);
+    const brands: Array<[string[], string]> = [
+      [['github.com'], 'github'],
+      [['notion.so', 'notion.site'], 'notion'],
+      [['drive.google.com'], 'drive'],
+      [['mail.google.com', 'gmail.com'], 'mail'],
+      [['youtube.com', 'youtu.be'], 'youtube'],
+      [['figma.com'], 'figma'],
+      [['discord.com', 'discord.gg'], 'discord'],
+      [['spotify.com'], 'spotify'],
+    ];
+    for (const [domains, icon] of brands) {
+      if (domains.some(matches)) return { iconType: 'brand', iconValue: icon };
     }
-    if (lower.includes('drive.google.com')) return { iconType: 'platform', iconValue: 'drive' };
-    if (lower.includes('mail.google.com') || lower.includes('gmail.com')) {
-      return { iconType: 'platform', iconValue: 'mail' };
-    }
-    if (lower.includes('youtube.com') || lower.includes('youtu.be')) {
-      return { iconType: 'platform', iconValue: 'youtube' };
-    }
-    if (lower.includes('figma.com')) return { iconType: 'platform', iconValue: 'figma' };
-    if (lower.includes('discord.com') || lower.includes('discord.gg')) {
-      return { iconType: 'platform', iconValue: 'discord' };
-    }
-    if (lower.includes('spotify.com')) return { iconType: 'platform', iconValue: 'spotify' };
 
     return {
-      iconType: explicitType || 'domain',
-      iconValue: explicitValue?.trim() || null,
+      iconType: 'favicon',
+      iconValue: null,
     };
   }
 
@@ -127,12 +148,12 @@ export class QuickLinksService {
   }
 
   async update(id: string, userId: string, input: UpdateQuickLinkDTO): Promise<QuickLinkRecord> {
-    await this.getById(id, userId);
+    const existing = await this.getById(id, userId);
 
     const updateData: {
       name?: string | undefined;
       url?: string | undefined;
-      iconType?: string | undefined;
+      iconType?: QuickLinkIconType | undefined;
       iconValue?: string | null | undefined;
       groupName?: string | null | undefined;
       position?: number | undefined;
@@ -153,12 +174,10 @@ export class QuickLinksService {
       updateData.url = this.normalizeUrl(input.url);
     }
 
-    if (input.iconType !== undefined) {
-      updateData.iconType = input.iconType.trim();
-    }
-
-    if (input.iconValue !== undefined) {
-      updateData.iconValue = input.iconValue?.trim() || null;
+    if (input.iconValue !== undefined || input.iconType !== undefined) {
+      const icon = this.detectIcon(updateData.url ?? existing.url, input.iconType, input.iconValue);
+      updateData.iconType = icon.iconType;
+      updateData.iconValue = icon.iconValue;
     }
 
     if (input.groupName !== undefined) {
