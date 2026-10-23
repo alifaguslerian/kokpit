@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Button } from '@/components/ui/Button';
-import { useIdeas } from '../api/use-ideas';
+import { useInfiniteIdeas } from '../api/use-ideas';
 import { IdeaComposer } from '../components/IdeaComposer';
 import { IdeaCard } from '../components/IdeaCard';
 import { IdeasFilterBar } from '../components/IdeasFilterBar';
@@ -19,16 +19,20 @@ export function IdeasPage() {
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
 
   const {
-    data: ideas = [],
+    data,
     isLoading,
     isError,
-    error,
     refetch,
-  } = useIdeas({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useInfiniteIdeas({
     q: searchQuery.trim() || undefined,
     tag: selectedTag || undefined,
     pinned: pinnedOnly ? true : undefined,
   });
+  const ideas = useMemo(() => data?.pages.flat() ?? [], [data]);
 
   // Extract all unique tags across existing ideas
   const availableTags = useMemo(() => {
@@ -46,10 +50,10 @@ export function IdeasPage() {
       {/* Editorial Page Header */}
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
         <div>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
+          <span className="font-ui text-[11px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
             Personal Notes & Thinking
           </span>
-          <h1 className="font-serif text-3xl sm:text-4xl text-[var(--kokpit-text-primary)] mt-1 font-normal tracking-tight">
+          <h1 className="font-ui text-3xl sm:text-4xl text-[var(--kokpit-text-primary)] mt-1 font-normal tracking-tight">
             Ideas & Reflections
           </h1>
           <p className="font-ui text-sm text-[var(--kokpit-text-secondary)] mt-1 max-w-xl">
@@ -111,10 +115,10 @@ export function IdeasPage() {
               </div>
             ))}
           </div>
-        ) : isError ? (
+        ) : isError && ideas.length === 0 ? (
           <ErrorState
             title="Failed to load ideas"
-            message={error instanceof Error ? error.message : 'Please check your connection.'}
+            message="Please check your connection and try again."
             onRetry={() => void refetch()}
           />
         ) : ideas.length === 0 ? (
@@ -156,6 +160,22 @@ export function IdeasPage() {
                 onTagClick={(tag) => setSelectedTag(tag)}
               />
             ))}
+          </div>
+        )}
+        {ideas.length > 0 && (hasNextPage || isFetchNextPageError) && (
+          <div className="mt-5 flex flex-col items-center gap-2">
+            {isFetchNextPageError && (
+              <p role="alert" className="text-sm text-[var(--kokpit-text-primary)]">
+                Could not load more thoughts. Your loaded thoughts are still here.
+              </p>
+            )}
+            <Button
+              variant="secondary"
+              isLoading={isFetchingNextPage}
+              onClick={() => void fetchNextPage()}
+            >
+              {isFetchNextPageError ? 'Retry loading more' : 'Load more thoughts'}
+            </Button>
           </div>
         )}
       </section>

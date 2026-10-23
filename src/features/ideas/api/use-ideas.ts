@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { listIdeas, getIdea, createIdea, updateIdea, deleteIdea, togglePinIdea } from './ideas-api';
 import type { Idea, ListIdeasParams, CreateIdeaInput, UpdateIdeaInput } from '../types';
@@ -7,6 +7,17 @@ export function useIdeas(params?: ListIdeasParams) {
   return useQuery<Idea[]>({
     queryKey: queryKeys.ideas.list(params as Record<string, unknown> | undefined),
     queryFn: () => listIdeas(params),
+  });
+}
+
+export function useInfiniteIdeas(params: Omit<ListIdeasParams, 'limit' | 'offset'>) {
+  const pageSize = 50;
+  return useInfiniteQuery({
+    queryKey: [...queryKeys.ideas.all, 'infinite', params],
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => listIdeas({ ...params, limit: pageSize, offset: pageParam }),
+    getNextPageParam: (lastPage, _pages, lastOffset) =>
+      lastPage.length === pageSize ? lastOffset + pageSize : undefined,
   });
 }
 
