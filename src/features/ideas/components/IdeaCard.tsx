@@ -19,14 +19,14 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
   const deleteMutation = useDeleteIdea();
 
   const handleTogglePin = () => {
-    void togglePinMutation.mutateAsync({
+    togglePinMutation.mutate({
       id: idea.id,
       isPinned: !idea.isPinned,
     });
   };
 
   const handleDelete = () => {
-    void deleteMutation.mutateAsync(idea.id);
+    deleteMutation.mutate(idea.id);
   };
 
   return (
@@ -34,35 +34,36 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
       className={cn(
         'group bg-[var(--kokpit-surface-1)] border rounded-[var(--radius-lg)] p-4 sm:p-5 shadow-[var(--shadow-card)] flex flex-col justify-between transition-all duration-[var(--motion-default)]',
         idea.isPinned
-          ? 'border-[var(--kokpit-accent)]/35 shadow-[0_4px_24px_rgba(217,119,6,0.06)]'
+          ? 'border-[var(--kokpit-accent)]/35'
           : 'border-[var(--kokpit-border-default)] hover:border-[var(--kokpit-border-strong)]',
         className,
       )}
     >
       <div>
         {/* Top meta & action bar */}
-        <div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-[var(--kokpit-border-subtle)] text-xs text-[var(--kokpit-text-muted)]">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-[var(--kokpit-border-subtle)] text-xs text-[var(--kokpit-text-muted)]">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleTogglePin}
               disabled={togglePinMutation.isPending}
               aria-label={idea.isPinned ? 'Unpin thought' : 'Pin thought to top'}
+              aria-pressed={idea.isPinned}
               title={idea.isPinned ? 'Unpin thought' : 'Pin thought to top'}
               className={cn(
                 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors cursor-pointer',
                 idea.isPinned
                   ? 'text-[var(--kokpit-accent)] bg-[var(--kokpit-accent-bg)] font-medium'
-                  : 'text-[var(--kokpit-text-soft)] hover:text-[var(--kokpit-text-secondary)]',
+                  : 'text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-secondary)]',
               )}
             >
               <Pin className={cn('w-3.5 h-3.5', idea.isPinned && 'fill-current')} />
-              <span className="font-mono text-[10px] uppercase tracking-wider">
+              <span className="font-ui text-[10px] uppercase tracking-wider">
                 {idea.isPinned ? 'Pinned' : 'Pin'}
               </span>
             </button>
 
-            <span className="text-[var(--kokpit-text-soft)]">•</span>
+            <span className="text-[var(--kokpit-text-muted)]">•</span>
             <time dateTime={idea.createdAt} className="font-ui text-[11px]">
               {formatRelativeDate(idea.createdAt)}
             </time>
@@ -115,7 +116,7 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
 
         {/* Title if present */}
         {idea.title && (
-          <h3 className="font-serif text-lg font-medium text-[var(--kokpit-text-primary)] mb-1.5 leading-snug">
+          <h3 className="font-ui break-words text-lg font-medium text-[var(--kokpit-text-primary)] mb-1.5 leading-snug">
             {idea.title}
           </h3>
         )}
@@ -126,6 +127,14 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
         </p>
       </div>
 
+      {(togglePinMutation.isError || deleteMutation.isError) && (
+        <p role="alert" className="mt-3 text-sm text-[var(--kokpit-text-primary)]">
+          {deleteMutation.isError
+            ? 'Could not delete this thought. Please try again.'
+            : 'Could not update the pin. Please try again.'}
+        </p>
+      )}
+
       {/* Tags footer */}
       {idea.tags && idea.tags.length > 0 && (
         <div className="mt-3.5 pt-2.5 border-t border-[var(--kokpit-border-subtle)] flex flex-wrap items-center gap-1.5">
@@ -135,7 +144,7 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
               type="button"
               onClick={() => onTagClick?.(tag)}
               title={`Filter by #${tag}`}
-              className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-ui bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] hover:border-[var(--kokpit-accent)]/30 border border-[var(--kokpit-border-subtle)] transition-colors cursor-pointer"
+              className="max-w-full break-all text-left inline-flex items-center px-2 py-0.5 rounded text-[11px] font-ui bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] hover:border-[var(--kokpit-accent)]/30 border border-[var(--kokpit-border-subtle)] transition-colors cursor-pointer"
             >
               #{tag}
             </button>
