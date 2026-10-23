@@ -1,4 +1,5 @@
-import { eq, and, desc, like, or, inArray } from 'drizzle-orm';
+import { eq, and, desc, like, or, inArray, sql } from 'drizzle-orm';
+import type { BatchItem } from 'drizzle-orm/batch';
 import type { Database } from '../client';
 import { ideas, ideaTags, ideaTagLinks } from '../schema';
 
@@ -78,7 +79,7 @@ export class IdeasRepository {
       .select()
       .from(ideas)
       .where(and(...conditions))
-      .orderBy(desc(ideas.isPinned), desc(ideas.createdAt))
+      .orderBy(desc(ideas.isPinned), desc(ideas.createdAt), desc(ideas.id))
       .limit(limit)
       .offset(offset);
 
@@ -87,7 +88,7 @@ export class IdeasRepository {
     }
 
     const ideaIds = rows.map((r) => r.id);
-    const tagMap = await this.getTagsForIdeaIds(ideaIds);
+    const tagMap = await this.getTagsForIdeaIds(ideaIds, userId);
 
     return rows.map((row) => ({
       id: row.id,
@@ -112,7 +113,7 @@ export class IdeasRepository {
       return null;
     }
 
-    const tagMap = await this.getTagsForIdeaIds([id]);
+    const tagMap = await this.getTagsForIdeaIds([id], userId);
 
     return {
       id: row.id,
@@ -127,7 +128,7 @@ export class IdeasRepository {
   }
 
   async create(data: CreateIdeaData): Promise<IdeaWithTags> {
-    await this.db.insert(ideas).values({
+    const insert = this.db.insert(ideas).values({
       id: data.id,
       userId: data.userId,
       title: data.title,
@@ -138,9 +139,10 @@ export class IdeasRepository {
     });
 
     const tags = data.tags || [];
-    if (tags.length > 0) {
-      await this.syncTags(data.id, data.userId, tags, data.createdAt);
-    }
+    await this.db.batch([
+      insert,
+      ...this.tagStatements(data.id, data.userId, tags, data.createdAt),
+    ]);
 
     return {
       id: data.id,
@@ -176,21 +178,31 @@ export class IdeasRepository {
       updateValues.isPinned = data.isPinned ? 1 : 0;
     }
 
-    await this.db
+    const update = this.db
       .update(ideas)
       .set(updateValues)
       .where(and(eq(ideas.id, id), eq(ideas.userId, userId)));
 
+    const statements: [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]] = [update];
     let finalTags = existing.tags;
     if (data.tags !== undefined) {
-      // Remove existing tag links for this idea
-      await this.db.delete(ideaTagLinks).where(eq(ideaTagLinks.ideaId, id));
-
-      if (data.tags.length > 0) {
-        await this.syncTags(id, userId, data.tags, data.updatedAt);
-      }
+      statements.push(
+        this.db
+          .delete(ideaTagLinks)
+          .where(
+            and(
+              eq(ideaTagLinks.ideaId, id),
+              inArray(
+                ideaTagLinks.ideaId,
+                this.db.select({ id: ideas.id }).from(ideas).where(eq(ideas.userId, userId)),
+              ),
+            ),
+          ),
+      );
+      statements.push(...this.tagStatements(id, userId, data.tags, data.updatedAt));
       finalTags = data.tags;
     }
+    await this.db.batch(statements);
 
     return {
       id,
@@ -210,16 +222,28 @@ export class IdeasRepository {
       return false;
     }
 
-    // Delete tag links first
-    await this.db.delete(ideaTagLinks).where(eq(ideaTagLinks.ideaId, id));
-
-    // Delete idea
-    await this.db.delete(ideas).where(and(eq(ideas.id, id), eq(ideas.userId, userId)));
+    await this.db.batch([
+      this.db
+        .delete(ideaTagLinks)
+        .where(
+          and(
+            eq(ideaTagLinks.ideaId, id),
+            inArray(
+              ideaTagLinks.ideaId,
+              this.db.select({ id: ideas.id }).from(ideas).where(eq(ideas.userId, userId)),
+            ),
+          ),
+        ),
+      this.db.delete(ideas).where(and(eq(ideas.id, id), eq(ideas.userId, userId))),
+    ]);
 
     return true;
   }
 
-  private async getTagsForIdeaIds(ideaIds: string[]): Promise<Map<string, string[]>> {
+  private async getTagsForIdeaIds(
+    ideaIds: string[],
+    userId: string,
+  ): Promise<Map<string, string[]>> {
     const map = new Map<string, string[]>();
     if (ideaIds.length === 0) return map;
 
@@ -230,7 +254,14 @@ export class IdeasRepository {
       })
       .from(ideaTagLinks)
       .innerJoin(ideaTags, eq(ideaTagLinks.tagId, ideaTags.id))
-      .where(inArray(ideaTagLinks.ideaId, ideaIds));
+      .innerJoin(ideas, eq(ideaTagLinks.ideaId, ideas.id))
+      .where(
+        and(
+          inArray(ideaTagLinks.ideaId, ideaIds),
+          eq(ideaTags.userId, userId),
+          eq(ideas.userId, userId),
+        ),
+      );
 
     for (const link of links) {
       const list = map.get(link.ideaId) || [];
@@ -241,53 +272,40 @@ export class IdeasRepository {
     return map;
   }
 
-  private async syncTags(
+  private tagStatements(
     ideaId: string,
     userId: string,
     tagNames: string[],
     timestamp: string,
-  ): Promise<void> {
+  ): BatchItem<'sqlite'>[] {
     const uniqueTags = Array.from(new Set(tagNames.map((t) => t.trim()).filter(Boolean)));
-
+    const statements: BatchItem<'sqlite'>[] = [];
     for (const name of uniqueTags) {
-      // Find or create tag
-      let [tag] = await this.db
-        .select({ id: ideaTags.id })
-        .from(ideaTags)
-        .where(and(eq(ideaTags.userId, userId), eq(ideaTags.name, name)))
-        .limit(1);
-
-      if (!tag) {
-        const newTagId = crypto.randomUUID();
-        try {
-          await this.db.insert(ideaTags).values({
-            id: newTagId,
+      statements.push(
+        this.db
+          .insert(ideaTags)
+          .values({
+            id: crypto.randomUUID(),
             userId,
             name,
             createdAt: timestamp,
-          });
-          tag = { id: newTagId };
-        } catch {
-          // In case of concurrency/conflict, fetch again
-          const [fetched] = await this.db
-            .select({ id: ideaTags.id })
-            .from(ideaTags)
-            .where(and(eq(ideaTags.userId, userId), eq(ideaTags.name, name)))
-            .limit(1);
-          tag = fetched;
-        }
-      }
-
-      if (tag?.id) {
-        try {
-          await this.db.insert(ideaTagLinks).values({
-            ideaId,
-            tagId: tag.id,
-          });
-        } catch {
-          // Primary key duplicate collision ignored
-        }
-      }
+          })
+          .onConflictDoNothing({ target: [ideaTags.userId, ideaTags.name] }),
+      );
+      // Resolve the winning tag ID inside the same atomic batch, including existing tags.
+      statements.push(
+        this.db
+          .insert(ideaTagLinks)
+          .select(
+            this.db
+              .select({ ideaId: sql<string>`${ideaId}`.as('idea_id'), tagId: ideaTags.id })
+              .from(ideaTags)
+              .innerJoin(ideas, and(eq(ideas.id, ideaId), eq(ideas.userId, userId)))
+              .where(and(eq(ideaTags.userId, userId), eq(ideaTags.name, name))),
+          )
+          .onConflictDoNothing({ target: [ideaTagLinks.ideaId, ideaTagLinks.tagId] }),
+      );
     }
+    return statements;
   }
 }
