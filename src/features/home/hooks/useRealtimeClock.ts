@@ -18,7 +18,7 @@ export interface UseRealtimeClockResult {
   toggle24Hour: () => void;
 }
 
-export function useRealtimeClock(initial24Hour = false): UseRealtimeClockResult {
+export function useRealtimeClock(initial24Hour = true): UseRealtimeClockResult {
   const [now, setNow] = useState(() => new Date());
   const [is24Hour, setIs24Hour] = useState(initial24Hour);
 
