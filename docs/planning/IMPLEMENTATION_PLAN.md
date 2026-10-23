@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.4 | **Status:** V1 implementation plan | **Updated:** 2026-10-10
+**Version:** 0.5 | **Status:** V1 implementation plan | **Updated:** 2026-10-23
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,8 +11,11 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Milestones 1 and 2 are complete. Milestone 3 is in progress. Packages **3.1 Ideas Backend** and **3.2 Ideas UI, Home Capture & Verification** are complete.
-The next implementation package is **3.3 Library & Quick Links**.
+Milestones 1–3 are complete, including **3.3 Library & Quick Links**.
+The next implementation package is **4.1 Semester, Course & Week APIs**.
+The owner separately authorized the [pre-College audit fixes](AUDIT_FIXES.md) on
+2026-10-23. That corrective work does not start Milestone 4 or implement later
+Music, storage, Quotes or News packages.
 
 Use **milestone → work package → checklist**. Only milestones and work packages
 have active numbers; the unnumbered checklist sections below are implementation details.
@@ -72,7 +75,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | --- | --- | --- | --- |
 | 1 | Foundation | 1.1–1.7 | Complete |
 | 2 | App Shell & Home | 2.1–2.3 | Complete |
-| 3 | Ideas & Library | 3.1–3.3 | Pending |
+| 3 | Ideas & Library | 3.1–3.3 | Complete |
 | 4 | College | 4.1–4.4 | Pending |
 | 5 | Music | 5.1–5.3 | Pending |
 | 6 | Quotes & News | 6.1–6.5 | Pending |
@@ -1989,8 +1992,8 @@ Stop at the authorized boundary. Review gates still apply within a package.
 
 The owner stages, commits, and pushes manually. Agents must not run Git staging,
 commits, or pushes. After edits, supply commands covering every changed file with
-concrete English messages. Group related files that serve the same change; keep
-unrelated work separate and avoid bundling the whole session into one commit.
+concrete English messages. The owner requires one commit per file/component;
+do not bundle several files into a session-wide commit.
 
 ## Review gates and trade-offs
 

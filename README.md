@@ -11,10 +11,8 @@ Kokpit should feel like a room to return to, without the pressure of a productiv
 
 ## Preview
 
-> Main screenshot will be added when the Kokpit interface is implemented.
-> The current app is a minimal React scaffold with utility padding, not the final design.
-
-<!-- Replace this preview note with a real screenshot when one is available. -->
+The application has a responsive shell, Home, Ideas and Library. A runtime screenshot
+is not committed yet; the reference gallery below contains design concepts.
 
 The owner-supplied Stitch concepts for all six pages are saved in the
 [UI reference gallery](docs/design/UI_REFERENCES.md). They guide the planned interface;
@@ -37,12 +35,20 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestone 1 (Foundation) and Milestone 2 (App Shell & Home) are complete (packages 1.1–2.3).** The application features the Dark Cozy Editorial Workspace design system, full accessible UI primitives, a responsive `AppShell` with persistent 280px sidebar and mobile drawer, client-side routing across 6 canonical destinations, and a rich Home overview featuring the real-time serif Clock, date, atmospheric late-night study backdrop, dynamic quote rotation with "another thought" refresh, and 5 balanced preview cards (`MusicPreview`, `CollegePreview`, `IdeasPreview`, `NewsPreview`, and `QuickLinksPreview`).
-The next documented package is **3.1: Ideas Backend**.
+**Milestones 1–3 are complete (packages 1.1–3.3).** Foundation includes the 17-table
+Drizzle schema and local migration, explicit owner context, Zod boundaries and safe
+API errors. Ideas supports capture, search, tags, pinning, editing, deletion and
+paginated browsing. Library supports shortcuts, icons, favorites and persistent ordering.
+Home uses real Ideas/Library data, a local clock and temporary unattributed session
+thoughts. College, Music and News previews have honest empty states.
 
-The Hono Worker exposes `GET /api/system/health` with `200 {"status":"ok"}`, resolves owner context on `/api/*`, formats validation and application errors cleanly, and returns structured 404 responses for unknown API routes. Feature APIs are pending.
-Database, final UI, and production deployment are not implemented.
-Install, typecheck, client/Worker build, and local dev/preview smoke checks passed on 2026-10-09.
+The next documented package is **4.1: Semester, Course & Week APIs**. College APIs,
+R2 file handling, real playback, hourly D1 quotes, News ingestion and private production
+deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
+
+The Worker currently exposes `/api/system/health`, `/api/ideas` and `/api/quick-links`.
+See the [pre-College audit fixes](docs/planning/AUDIT_FIXES.md) for regression coverage
+and validation limits.
 See the [implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) for the remaining work.
 
 ## Tech stack
@@ -80,7 +86,8 @@ The dev server normally opens at `http://localhost:5173`.
 | `npm run format` | Format code via Prettier |
 | `npm run typecheck` | Strict source checking; declaration checking exception per [DEC-049](docs/product/DECISIONS.md#dec-049--owner-approved-declaration-checking-exception) |
 | `npm run build` | Typecheck, then client and Worker build |
-| `npm test` | Run foundation integration test suite via tsx and node:test |
+| `npm test` | Run unit/API tests, ownership and failure-rollback regressions via tsx and node:test |
+| `npm run test:browser` | Run isolated browser regressions against a running local app; setup below |
 | `npm run preview` | Serve the production build in the local Workers runtime |
 | `npm run db:generate` | Generate SQL migration from Drizzle schema |
 | `npm run db:migrate:local` | Apply pending migrations to local D1 database |
@@ -90,13 +97,33 @@ Use `npm install` when intentionally updating dependencies and keep the lockfile
 Linting and formatting are configured via ESLint and Prettier; integration tests run via `npm test`.
 `npm run dev` runs React HMR and the Worker locally on the same origin.
 Tailwind uses the official Vite plugin and `src/styles/globals.css`, scanning `src/`.
-The scaffold's `p-4` utility adds 16px padding using the documented 4px spacing unit.
-Default Tailwind theme and Preflight are omitted; Kokpit tokens, fonts, and base styles belong to package 2.1 (Visual Foundation).
+Kokpit semantic tokens, Inter and Cormorant Garamond, explicit base styles and the
+documented 4px spacing unit control the interface. Tailwind utilities are imported
+without Preflight; its utility theme is overridden with the Kokpit tokens.
 SPA navigation falls back to `index.html`; `/api/*` reaches the Hono Worker.
 Open `http://localhost:5173/api/system/health` to check the local health response.
 Build output lives in `dist/client/` and `dist/kokpit/`; Vite generates the output Wrangler configuration.
-No production resources or data bindings are configured yet.
+The configured D1 binding uses a placeholder remote ID for local development.
+No production resources, private R2 binding or Access deployment are configured here.
 Local Cloudflare setup and deployment belong in the [deployment runbook](docs/engineering/DEPLOYMENT.md).
+
+### Browser regressions
+
+Start `npm run dev` in one terminal. In a second terminal, use an existing Playwright
+installation and browser; the test runner adds no project dependency. Codex desktop
+can resolve its bundled module with `load_workspace_dependencies`.
+
+```powershell
+$env:KOKPIT_PLAYWRIGHT_MODULE = '<absolute path to an existing playwright module>'
+$env:KOKPIT_BROWSER_CHANNEL = 'chrome'
+npm run test:browser
+```
+
+`KOKPIT_TEST_BASE_URL` defaults to `http://127.0.0.1:5173`. Omit the channel to use
+Playwright's installed Chromium. Optional `KOKPIT_TEST_SCREENSHOTS` names an output
+directory. The browser loads the real UI, while API requests use the Hono app and
+a fresh in-memory SQLite D1 adapter. No test writes to local or production Kokpit data.
+These tests do not verify production Cloudflare Access or remote storage.
 
 ## Documentation
 
