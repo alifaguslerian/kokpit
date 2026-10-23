@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "tsx --test tests/**/*.test.ts",
+    "test:browser": "tsx --test tests/e2e/audit-regressions.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply kokpit-db --local",
     "db:seed:local": "wrangler d1 execute kokpit-db --local --file=drizzle/seed.sql"
