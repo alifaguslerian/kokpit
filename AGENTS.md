@@ -1,6 +1,6 @@
 # Kokpit agent rules
 
-**Version:** 1.2 | **Status:** Active V1 Agent Rules | **Updated:** 2026-10-09
+**Version:** 1.3 | **Status:** Active V1 Agent Rules | **Updated:** 2026-10-23
 
 Applies to all AI coding agents working in this repository.
 
@@ -210,6 +210,6 @@ Keep it concise and stop at the authorized boundary.
 The owner stages, commits, and pushes manually.
 Do not run `git add`, `git commit`, or `git push`.
 After each edit/work package/milestone, supply manual commands covering every changed file.
-Use concrete English messages. Group related files that serve the same change; keep unrelated
-work separate and avoid bundling the whole session into one commit.
+Use concrete English messages. The owner's latest instruction requires one commit per
+file/component; provide separate commands and never bundle several files in one commit.
 Read-only Git inspection is allowed.

@@ -1,11 +1,31 @@
 # Kokpit — Decisions
 
-**Version:** 1.3
+**Version:** 1.4
 **Status:** Active V1 Decision Log
 **Product:** Kokpit · **Type:** Product + Architecture ADRs
-**Last Updated:** 2026-10-10
+**Last Updated:** 2026-10-23
 
 This log preserves decisions and their reasons, not minor implementation changes. Status vocabulary: Accepted, Superseded, Deprecated, Under Review. Each record retains its original date; shortening the record does not reopen or replace it.
+
+### DEC-052 — Pre-College audit corrections
+
+**Accepted · 2026-10-23**
+
+**Authorization:** The owner approved fixing all reproduced audit findings before
+College Package 4.1. The scope covers existing Foundation, Home, Ideas and Library,
+with regression tests and current-status documentation. It does not authorize the
+next milestone, new providers, production operations or a product redesign.
+
+**Decision:** Preserve the current schema and use atomic D1 batches for related
+idea/tag and reorder writes. Canonical icon types remain `brand`, `lucide`,
+`favicon`, `custom`; normalize legacy `platform`/`domain` on reads without rewriting
+applied migrations. Home previews must show honest empty states until their
+documented integrations exist. Temporary unattributed session thoughts do not
+replace the Milestone 6 hourly D1 quote system.
+
+**Git:** The owner's newer instruction requires one commit per file/component,
+superseding earlier grouping advice for future manual commit commands. The owner
+continues to stage, commit and push manually.
 
 Before changing a decision, preserve its reasoning, add a new approved record or mark it superseded, explain the change, and update affected documents/implementation. New product, architecture, privacy, data, or design choices require owner review. Use existing decisions before inventing another direction.
 
