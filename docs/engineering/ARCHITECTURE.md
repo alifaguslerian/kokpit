@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.2 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-09
+**Version:** 0.3 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-23
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -34,11 +34,11 @@ This document owns system boundaries; it does not redefine product or visual req
 | Content AI | Workers AI; cached/batched, optional to basic functionality |
 | Deployment | Workers + Static Assets through Cloudflare Vite integration |
 
-Package 1.3 is complete: Cloudflare Vite integration, Hono routing and
-`GET /api/system/health` alongside the static frontend, plus Tailwind's Vite plugin
-and frontend utility stylesheet without the default theme or Preflight.
-Kokpit tokens, fonts, and base styles follow in package 2.1 (Visual Foundation).
-Feature APIs and remote resources are pending.
+Milestones 1–3 are implemented: Cloudflare Vite integration, the D1 schema/local
+migration, owner context, safe Hono APIs, the responsive shell/Home, Ideas and
+Quick Links. The frontend uses Kokpit tokens/fonts with Tailwind utilities and
+explicit base styles, without Preflight. College APIs, R2, persistent audio,
+content jobs and production resources remain pending.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
@@ -111,6 +111,8 @@ flowchart LR
 ```
 
 Simple operations need only the layers that clarify responsibility; avoid ceremony.
+Related idea/tag writes and complete link reorder writes use atomic D1 batches.
+Expected tag conflicts are handled with targeted upserts, not suppressed write errors.
 Hono owns HTTP routing, not large embedded business workflows.
 External provider logic belongs in `worker/providers/`, normalized before database/API use.
 Drizzle schema and queries belong in the database layer; focused raw SQL is acceptable.

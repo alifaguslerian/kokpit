@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.3 | **Status:** V1 structure reference | **Updated:** 2026-10-10
+**Version:** 0.4 | **Status:** V1 structure reference | **Updated:** 2026-10-23
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -8,13 +8,14 @@ persisted entities remain in [PRD](../product/PRD.md),
 
 ## Current scaffold and growth
 
-Packages 1.2–1.3 are complete: package manifest/lockfile, strict TypeScript,
-Vite configuration, `index.html`, `src/main.tsx`, `src/app/App.tsx`, and
-`src/vite-env.d.ts`, Cloudflare Vite integration, `wrangler.jsonc`, and Hono routing
-in `worker/index.ts` with `worker/api/system.routes.ts` for the health endpoint.
-Tailwind's Vite plugin builds utilities from `src/` via `src/styles/globals.css`,
-imported by `src/main.tsx`. The scaffold uses `p-4` for 16px padding.
-Feature APIs, frontend routing, Kokpit tokens/fonts/base styles, and feature implementations are pending.
+Milestones 1–3 are implemented. `src/app/` owns the routed shell/providers;
+Home, Ideas and Library have feature implementations. `worker/api/`,
+`worker/services/` and `worker/db/repositories/` contain Ideas and Quick Links.
+The schema and reviewed initial migration already include all 17 V1 tables.
+`src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms and
+mobile navigation. `tests/e2e/audit-regressions.mjs` exercises rendered UI against
+Hono and isolated in-memory SQLite. College implementation, R2, playback and
+content pipelines remain pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their work package needs them; do not pre-create empty modules.
 
