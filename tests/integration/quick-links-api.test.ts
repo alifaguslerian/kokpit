@@ -111,7 +111,7 @@ describe('Quick Links API & Backend Integration Tests (Milestone 3.3)', () => {
   });
 
   describe('POST /api/quick-links', () => {
-    test('creates a quick link and auto-detects platform icon', async () => {
+    test('creates a quick link and auto-detects a brand icon', async () => {
       const { env } = createEnv();
 
       const res = await app.request(
@@ -133,7 +133,7 @@ describe('Quick Links API & Backend Integration Tests (Milestone 3.3)', () => {
       assert.ok(body.data.id);
       assert.strictEqual(body.data.name, 'GitHub');
       assert.strictEqual(body.data.url, 'https://github.com/my-profile');
-      assert.strictEqual(body.data.iconType, 'platform');
+      assert.strictEqual(body.data.iconType, 'brand');
       assert.strictEqual(body.data.iconValue, 'github');
       assert.strictEqual(body.data.groupName, 'Code');
       assert.strictEqual(body.data.position, 0);
