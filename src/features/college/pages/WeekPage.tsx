@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import {
@@ -59,24 +60,20 @@ function WeekWorkspace({ weekId }: { weekId: string }) {
             {weekQuery.isError && (
               <CollegeUnavailable error={weekQuery.error} retry={() => void weekQuery.refetch()} />
             )}
-            <header className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0 w-full sm:flex-1">
-                <p className="text-xs uppercase tracking-wider text-kokpit-accent">
-                  Week {week.weekNumber}
-                </p>
-                <h1 className="mt-2 text-2xl sm:text-3xl font-medium break-words">
-                  {week.title || `Week ${week.weekNumber}`}
-                </h1>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="secondary" onClick={() => setEditing(true)}>
-                  Edit week
-                </Button>
-                <Button variant="ghost" onClick={() => setDeleting(true)}>
-                  Delete week
-                </Button>
-              </div>
-            </header>
+            <PageHeader
+              eyebrow={`Week ${week.weekNumber}`}
+              title={week.title || `Week ${week.weekNumber}`}
+              actions={
+                <>
+                  <Button variant="secondary" onClick={() => setEditing(true)}>
+                    Edit week
+                  </Button>
+                  <Button variant="ghost" onClick={() => setDeleting(true)}>
+                    Delete week
+                  </Button>
+                </>
+              }
+            />
             {week.notes && (
               <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-kokpit-text-secondary">
                 {week.notes}
