@@ -11,7 +11,7 @@ Kokpit should feel like a room to return to, without the pressure of a productiv
 
 ## Preview
 
-The application has a responsive shell, Home, Ideas and Library. A runtime screenshot
+The application has a responsive shell, Home, College, Ideas and Library. A runtime screenshot
 is not committed yet; the reference gallery below contains design concepts.
 
 The owner-supplied Stitch concepts for all six pages are saved in the
@@ -39,12 +39,14 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 Drizzle schema and local migration, explicit owner context, Zod boundaries and safe
 API errors. Ideas supports capture, search, tags, pinning, editing, deletion and
 paginated browsing. Library supports shortcuts, icons, favorites and persistent ordering.
-Home uses real Ideas/Library data, a local clock and temporary unattributed session
-thoughts. College, Music and News previews have honest empty states.
+Home uses real Ideas/Library/College data, a local clock and temporary unattributed
+session thoughts. Music and News previews have honest empty states.
 
-**Package 4.1 is complete:** owner-scoped Semester, Course and Week APIs, atomic
-semester activation, ordering and safe hierarchy deletion. The next documented
-package is **4.2: College Pages, Home Preview & Verification**. College UI,
+**Packages 4.1–4.2 are complete:** owner-scoped Semester, Course and Week APIs,
+College pages, semester selection/activation, course ordering, metadata forms and
+confirmed hierarchy deletion. Home shows a saved course/week from the active semester.
+Week pages have a material placeholder; uploads and material links are not available yet.
+The next documented package is **4.3: Private Storage & Material APIs**.
 R2 file handling, real playback, hourly D1 quotes, News ingestion and private production
 deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
 
@@ -91,7 +93,7 @@ The dev server normally opens at `http://localhost:5173`.
 | `npm run typecheck` | Strict source checking; declaration checking exception per [DEC-049](docs/product/DECISIONS.md#dec-049--owner-approved-declaration-checking-exception) |
 | `npm run build` | Typecheck, then client and Worker build |
 | `npm test` | Run unit/API tests, ownership and failure-rollback regressions via tsx and node:test |
-| `npm run test:browser` | Run isolated browser regressions against a running local app; setup below |
+| `npm run test:browser` | Run audit and College browser regressions against a running local app; setup below |
 | `npm run preview` | Serve the production build in the local Workers runtime |
 | `npm run db:generate` | Generate SQL migration from Drizzle schema |
 | `npm run db:migrate:local` | Apply pending migrations to local D1 database |
