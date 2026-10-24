@@ -19,6 +19,9 @@ export const queryKeys = {
   college: {
     all: ['college'] as const,
     semesters: () => [...queryKeys.college.all, 'semesters'] as const,
+    semester: (id: string) => [...queryKeys.college.all, 'semester', id] as const,
+    course: (id: string) => [...queryKeys.college.all, 'course', id] as const,
+    week: (id: string) => [...queryKeys.college.all, 'week', id] as const,
     courses: (semesterId: string) => [...queryKeys.college.all, 'courses', semesterId] as const,
     weeks: (courseId: string) => [...queryKeys.college.all, 'weeks', courseId] as const,
     materials: (weekId: string) => [...queryKeys.college.all, 'materials', weekId] as const,
