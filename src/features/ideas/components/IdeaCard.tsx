@@ -30,19 +30,19 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
   };
 
   return (
-    <div
+    <article
+      aria-label={idea.title || 'Saved thought'}
       className={cn(
-        'group bg-[var(--kokpit-surface-1)] border rounded-[var(--radius-lg)] p-4 sm:p-5 shadow-[var(--shadow-card)] flex flex-col justify-between transition-all duration-[var(--motion-default)]',
+        'min-w-0 flex flex-col font-ui',
         idea.isPinned
-          ? 'border-[var(--kokpit-accent)]/35'
-          : 'border-[var(--kokpit-border-default)] hover:border-[var(--kokpit-border-strong)]',
+          ? 'rounded-[var(--radius-lg)] border border-[var(--kokpit-border-strong)] bg-[var(--kokpit-surface-2)] p-5 sm:p-6'
+          : 'border-b border-[var(--kokpit-border-default)] px-1 py-5 sm:px-2 sm:py-6',
         className,
       )}
     >
       <div>
-        {/* Top meta & action bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-[var(--kokpit-border-subtle)] text-xs text-[var(--kokpit-text-muted)]">
-          <div className="flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--kokpit-text-muted)]">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleTogglePin}
@@ -51,40 +51,36 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
               aria-pressed={idea.isPinned}
               title={idea.isPinned ? 'Unpin thought' : 'Pin thought to top'}
               className={cn(
-                'inline-flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors cursor-pointer',
+                'inline-flex min-h-9 items-center gap-1.5 rounded-[var(--radius-md)] px-2.5 transition-colors cursor-pointer disabled:cursor-wait',
                 idea.isPinned
                   ? 'text-[var(--kokpit-accent)] bg-[var(--kokpit-accent-bg)] font-medium'
                   : 'text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-secondary)]',
               )}
             >
               <Pin className={cn('w-3.5 h-3.5', idea.isPinned && 'fill-current')} />
-              <span className="font-ui text-[10px] uppercase tracking-wider">
-                {idea.isPinned ? 'Pinned' : 'Pin'}
-              </span>
+              <span className="text-xs font-medium">{idea.isPinned ? 'Pinned' : 'Pin'}</span>
             </button>
 
-            <span className="text-[var(--kokpit-text-muted)]">•</span>
-            <time dateTime={idea.createdAt} className="font-ui text-[11px]">
+            <time dateTime={idea.createdAt} className="text-xs">
               {formatRelativeDate(idea.createdAt)}
             </time>
           </div>
 
-          {/* Quick Card Actions */}
-          <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1">
             {showConfirmDelete ? (
-              <div className="flex items-center gap-1 animate-in fade-in duration-150">
+              <div className="flex flex-wrap items-center gap-1">
                 <button
                   type="button"
                   onClick={handleDelete}
                   disabled={deleteMutation.isPending}
-                  className="px-2 py-0.5 rounded bg-[var(--kokpit-danger-bg)] text-[var(--kokpit-danger)] text-[11px] font-ui border border-[var(--kokpit-danger)]/30 hover:bg-[var(--kokpit-danger)] hover:text-white transition-colors cursor-pointer"
+                  className="min-h-9 rounded-[var(--radius-md)] bg-[var(--kokpit-danger-bg)] px-3 text-xs text-[var(--kokpit-text-primary)] border border-[var(--kokpit-border-default)] hover:bg-[var(--kokpit-surface-hover)] transition-colors cursor-pointer disabled:cursor-wait"
                 >
                   Delete?
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowConfirmDelete(false)}
-                  className="px-1.5 py-0.5 rounded text-[11px] text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] transition-colors cursor-pointer"
+                  className="min-h-9 rounded-[var(--radius-md)] px-3 text-xs text-[var(--kokpit-text-secondary)] hover:bg-[var(--kokpit-surface-hover)] hover:text-[var(--kokpit-text-primary)] transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -96,33 +92,36 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
                   onClick={() => onEdit(idea)}
                   aria-label="Edit thought"
                   title="Edit thought"
-                  className="p-1 rounded text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.04] transition-colors cursor-pointer"
+                  className="flex size-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-text-primary)] hover:bg-[var(--kokpit-surface-hover)] transition-colors cursor-pointer"
                 >
-                  <Pencil className="w-3.5 h-3.5" />
+                  <Pencil className="size-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowConfirmDelete(true)}
                   aria-label="Delete thought"
                   title="Delete thought"
-                  className="p-1 rounded text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-danger)] hover:bg-[var(--kokpit-danger-bg)] transition-colors cursor-pointer"
+                  className="flex size-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-text-primary)] hover:bg-[var(--kokpit-danger-bg)] transition-colors cursor-pointer"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="size-4" />
                 </button>
               </>
             )}
           </div>
         </div>
 
-        {/* Title if present */}
         {idea.title && (
-          <h3 className="font-ui break-words text-lg font-medium text-[var(--kokpit-text-primary)] mb-1.5 leading-snug">
+          <h3 className="max-w-[64ch] break-words text-lg font-semibold text-[var(--kokpit-text-primary)] mb-2 leading-snug">
             {idea.title}
           </h3>
         )}
 
-        {/* Body content */}
-        <p className="font-ui text-sm text-[var(--kokpit-text-secondary)] leading-relaxed whitespace-pre-wrap break-words">
+        <p
+          className={cn(
+            'max-w-[72ch] text-[var(--kokpit-text-secondary)] leading-relaxed whitespace-pre-wrap break-words',
+            idea.isPinned ? 'text-base' : 'text-sm',
+          )}
+        >
           {idea.content}
         </p>
       </div>
@@ -135,22 +134,21 @@ export function IdeaCard({ idea, onEdit, onTagClick, className }: IdeaCardProps)
         </p>
       )}
 
-      {/* Tags footer */}
       {idea.tags && idea.tags.length > 0 && (
-        <div className="mt-3.5 pt-2.5 border-t border-[var(--kokpit-border-subtle)] flex flex-wrap items-center gap-1.5">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           {idea.tags.map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => onTagClick?.(tag)}
               title={`Filter by #${tag}`}
-              className="max-w-full break-all text-left inline-flex items-center px-2 py-0.5 rounded text-[11px] font-ui bg-[var(--kokpit-surface-2)] text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-accent)] hover:border-[var(--kokpit-accent)]/30 border border-[var(--kokpit-border-subtle)] transition-colors cursor-pointer"
+              className="min-h-[30px] max-w-full break-all text-left inline-flex items-center px-3 rounded-full text-xs bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-accent)] border border-[var(--kokpit-border-default)] transition-colors cursor-pointer"
             >
               #{tag}
             </button>
           ))}
         </div>
       )}
-    </div>
+    </article>
   );
 }
