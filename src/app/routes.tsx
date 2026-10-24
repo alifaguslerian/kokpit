@@ -1,7 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { AppShell } from './AppShell';
 import { HomeRoute } from './routes/HomeRoute';
-import { CollegeRoute } from './routes/CollegeRoute';
 import { MusicRoute } from './routes/MusicRoute';
 import { NewsRoute } from './routes/NewsRoute';
 import { IdeasRoute } from './routes/IdeasRoute';
@@ -22,7 +21,19 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'college',
-        element: <CollegeRoute />,
+        lazy: async () => ({ Component: (await import('./routes/CollegeRoute')).CollegeRoute }),
+      },
+      {
+        path: 'college/courses/:courseId',
+        lazy: async () => ({
+          Component: (await import('@/features/college/pages/CoursePage')).CoursePage,
+        }),
+      },
+      {
+        path: 'college/weeks/:weekId',
+        lazy: async () => ({
+          Component: (await import('@/features/college/pages/WeekPage')).WeekPage,
+        }),
       },
       {
         path: 'music',
