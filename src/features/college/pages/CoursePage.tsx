@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowUpRight, Plus } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import {
@@ -56,28 +57,25 @@ function CourseWorkspace({ courseId }: { courseId: string }) {
                 retry={() => void courseQuery.refetch()}
               />
             )}
-            <header className="flex flex-wrap items-start justify-between gap-4 border-b border-kokpit-border-subtle pb-6">
-              <div className="min-w-0 w-full sm:flex-1">
-                <p className="text-xs uppercase tracking-wider text-kokpit-accent break-all">
-                  {course.code || 'Course workspace'}
-                </p>
-                <h1 className="mt-2 text-2xl sm:text-3xl font-medium break-words">{course.name}</h1>
-                {course.lecturer && (
-                  <p className="mt-3 text-sm text-kokpit-text-secondary break-words">
-                    {course.lecturer}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="secondary" onClick={() => setEditor('course')}>
-                  Edit course
-                </Button>
-                <Button variant="ghost" onClick={() => setDeleting(true)}>
-                  Delete course
-                </Button>
-              </div>
-            </header>
-            <section aria-labelledby="course-weeks-title" className="space-y-4">
+            <PageHeader
+              eyebrow={course.code || 'Course workspace'}
+              title={course.name}
+              {...(course.lecturer ? { description: course.lecturer } : {})}
+              actions={
+                <>
+                  <Button variant="secondary" onClick={() => setEditor('course')}>
+                    Edit course
+                  </Button>
+                  <Button variant="ghost" onClick={() => setDeleting(true)}>
+                    Delete course
+                  </Button>
+                </>
+              }
+            />
+            <section
+              aria-labelledby="course-weeks-title"
+              className="space-y-4 border-t border-kokpit-border-subtle pt-6"
+            >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 id="course-weeks-title" className="text-lg font-semibold">
@@ -120,11 +118,11 @@ function CourseWorkspace({ courseId }: { courseId: string }) {
                         <li key={week.id} className="min-w-0">
                           <Link
                             to={`/college/weeks/${encodeURIComponent(week.id)}`}
-                            className="group flex items-center justify-between gap-4 p-5 hover:bg-kokpit-surface-hover rounded-lg"
+                            className="group flex items-center justify-between gap-4 p-5 sm:p-6 hover:bg-kokpit-surface-hover rounded-lg"
                           >
                             <div className="min-w-0">
                               <p className="text-xs text-kokpit-accent">Week {week.weekNumber}</p>
-                              <h3 className="mt-1 text-sm font-medium break-words">
+                              <h3 className="mt-1 text-base font-medium break-words">
                                 {week.title || `Week ${week.weekNumber} materials`}
                               </h3>
                               {week.notes && (
