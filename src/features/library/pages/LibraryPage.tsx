@@ -1,6 +1,7 @@
 import { useRef, useState, useMemo } from 'react';
 import { Bookmark, Plus, Star, RefreshCw } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -72,52 +73,44 @@ export function LibraryPage() {
 
   return (
     <PageContainer>
-      {/* Editorial Header */}
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
-        <div>
-          <span className="font-ui text-[11px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
-            Quick Launch & Portals
-          </span>
-          <h1 className="font-ui text-3xl sm:text-4xl text-[var(--kokpit-text-primary)] mt-1 font-normal tracking-tight">
-            Library
-          </h1>
-          <p className="font-ui text-sm text-[var(--kokpit-text-secondary)] mt-1 max-w-xl">
-            Personal shortcuts, daily links, and portals. Reorder, star favorites, and open with one
-            click.
-          </p>
-        </div>
+      <PageHeader
+        eyebrow="Quick Launch & Portals"
+        title="Library"
+        description="Personal shortcuts, daily links, and portals."
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => void refetch()}
+              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+              className="text-xs"
+            >
+              Refresh
+            </Button>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => void refetch()}
-            leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-            className="text-xs"
-          >
-            Refresh
-          </Button>
-
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleOpenAddModal}
-            leftIcon={<Plus className="w-3.5 h-3.5" />}
-          >
-            Add Shortcut
-          </Button>
-        </div>
-      </header>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleOpenAddModal}
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
+            >
+              Add Shortcut
+            </Button>
+          </div>
+        }
+      />
 
       {/* Category Tabs */}
       <section aria-label="Shortcut categories" className="pt-2">
         <div className="flex flex-wrap items-center gap-1.5 pb-2 border-b border-[var(--kokpit-border-subtle)]">
           <button
             type="button"
+            aria-pressed={selectedFilter === 'all'}
             onClick={() => setSelectedFilter('all')}
             className={cn(
-              'max-w-full break-all text-left px-3 py-1.5 rounded-lg text-xs font-ui border transition-all cursor-pointer',
+              'max-w-full min-h-9 break-words [overflow-wrap:anywhere] text-left px-3 py-1.5 rounded-lg text-sm font-ui border transition-colors cursor-pointer',
               selectedFilter === 'all'
                 ? 'bg-[var(--kokpit-surface-3)] text-[var(--kokpit-text-primary)] border-[var(--kokpit-border-strong)] font-medium shadow-xs'
                 : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-muted)] border-[var(--kokpit-border-subtle)] hover:text-[var(--kokpit-text-primary)]',
@@ -128,9 +121,10 @@ export function LibraryPage() {
 
           <button
             type="button"
+            aria-pressed={selectedFilter === 'favorites'}
             onClick={() => setSelectedFilter('favorites')}
             className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-ui border transition-all cursor-pointer',
+              'inline-flex min-h-9 items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-ui border transition-colors cursor-pointer',
               selectedFilter === 'favorites'
                 ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent)] border-[var(--kokpit-accent)]/50 font-medium shadow-xs'
                 : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-muted)] border-[var(--kokpit-border-subtle)] hover:text-[var(--kokpit-text-primary)]',
@@ -146,9 +140,10 @@ export function LibraryPage() {
               <button
                 key={group}
                 type="button"
+                aria-pressed={isSelected}
                 onClick={() => setSelectedFilter(group)}
                 className={cn(
-                  'max-w-full break-all text-left px-3 py-1.5 rounded-lg text-xs font-ui border transition-all cursor-pointer',
+                  'max-w-full min-h-9 break-words [overflow-wrap:anywhere] text-left px-3 py-1.5 rounded-lg text-sm font-ui border transition-colors cursor-pointer',
                   isSelected
                     ? 'bg-[var(--kokpit-surface-3)] text-[var(--kokpit-text-primary)] border-[var(--kokpit-border-strong)] font-medium'
                     : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-muted)] border-[var(--kokpit-border-subtle)] hover:text-[var(--kokpit-text-primary)]',
@@ -169,16 +164,16 @@ export function LibraryPage() {
           </p>
         )}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-[90rem]:grid-cols-4 gap-4 min-[90rem]:gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="bg-[var(--kokpit-surface-1)] border border-[var(--kokpit-border-default)] rounded-[var(--radius-lg)] p-4 flex items-center gap-3.5"
+                className="min-h-64 min-w-0 bg-[var(--kokpit-surface-1)] border border-[var(--kokpit-border-subtle)] rounded-[var(--radius-lg)] p-5 flex flex-col items-start gap-5"
               >
-                <Skeleton className="w-10 h-10 rounded-xl" />
-                <div className="flex-1 space-y-2">
+                <Skeleton className="w-14 h-14 rounded-xl" />
+                <div className="w-full space-y-2">
                   <Skeleton className="w-24 h-4" />
-                  <Skeleton className="w-36 h-3" />
+                  <Skeleton className="w-3/4 h-3" />
                 </div>
               </div>
             ))}
@@ -211,7 +206,7 @@ export function LibraryPage() {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-[90rem]:grid-cols-4 gap-4 min-[90rem]:gap-6">
             {filteredLinks.map((link, idx) => (
               <QuickLinkCard
                 key={link.id}
@@ -235,6 +230,16 @@ export function LibraryPage() {
                 canMoveDown={idx < filteredLinks.length - 1 && !reorderMutation.isPending}
               />
             ))}
+            <button
+              type="button"
+              onClick={handleOpenAddModal}
+              className="min-h-64 min-w-0 flex flex-col items-center justify-center gap-4 rounded-[var(--radius-lg)] border border-dashed border-[var(--kokpit-border-default)] bg-transparent p-5 text-sm font-ui text-[var(--kokpit-text-muted)] hover:bg-[var(--kokpit-surface-1)] hover:text-[var(--kokpit-text-primary)] hover:border-[var(--kokpit-border-strong)] transition-colors cursor-pointer"
+            >
+              <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--kokpit-surface-2)]">
+                <Plus className="h-6 w-6" aria-hidden="true" />
+              </span>
+              Add Shortcut
+            </button>
           </div>
         )}
       </section>
