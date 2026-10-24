@@ -27,7 +27,7 @@ export function Sidebar({ onClose, className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'w-[280px] md:w-[220px] min-[1440px]:w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)] border-r border-[var(--kokpit-border-subtle)] flex flex-col p-6 select-none overflow-y-auto',
+        'w-[280px] md:w-[220px] min-[90rem]:w-[280px] shrink-0 bg-[var(--kokpit-bg-sidebar)] border-r border-[var(--kokpit-border-subtle)] flex flex-col p-6 select-none overflow-y-auto',
         className,
       )}
     >
