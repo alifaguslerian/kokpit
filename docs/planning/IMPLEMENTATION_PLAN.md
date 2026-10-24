@@ -14,6 +14,9 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 Milestones 1–3 and College packages **4.1–4.2** are complete.
 Milestone 4 is in progress; the next implementation package is
 **4.3 Private Storage & Material APIs**.
+On 2026-10-24 the owner also authorized a visual correction before package 4.3:
+align the shared shell, Home, Ideas, Library and existing College pages with the
+normalized Stitch references. This does not authorize starting storage or later features.
 The owner separately authorized the [pre-College audit fixes](AUDIT_FIXES.md) on
 2026-10-23. That corrective work does not start Milestone 4 or implement later
 Music, storage, Quotes or News packages.
@@ -62,6 +65,29 @@ does not authorize implementing later playback, quotes, ingestion, or persistenc
 Fix clipped labels, broken assets, excess nesting,
 and unusable controls; also verify narrower viewports. Supplied screenshots resolve the
 old missing-reference finding; they do not prove implementation or complete any package.
+
+#### Pre-4.3 visual correction
+
+- Shared page headers and responsive spacing now follow the Design System. Large-screen
+  breakpoints use the same units as Tailwind's defaults so tablet padding/sidebar rules
+  cannot override the intended desktop geometry.
+- Home previews follow each column's content height while retaining a single DOM/mobile
+  and keyboard order. Resizing preserves the capture draft. The existing room artwork
+  is served locally with a surface fallback when it fails to load.
+- Ideas uses a prominent composer, a readable single-column stream and distinct pinned
+  thoughts. Library uses vertical shortcut portals with visible secondary management actions.
+- College overview, course and week pages share the functional heading scale and card/list
+  rhythm. Existing APIs, ownership checks and honest material placeholders remain unchanged.
+
+Eight new isolated browser regressions cover column height changes, draft/order preservation,
+local artwork failure, responsive shell geometry, College states, Ideas pin/search persistence
+and Library actions with maximum-length valid metadata. The Home layout checks failed on
+the previous implementation and passed after correction. Rendered desktop/mobile captures
+remain ignored test output. Final verification passed: lint, strict typecheck, formatting,
+production build, all 122 unit/API tests and all 37 browser regressions. Browser writes use
+isolated test SQLite; no owner data or production resources were changed. Desktop captures
+at 1366px/1600px and 390px mobile were reviewed against the normalized reference direction.
+The next documented implementation step remains package 4.3.
 
 ### Legacy numbering
 
