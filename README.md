@@ -42,11 +42,15 @@ paginated browsing. Library supports shortcuts, icons, favorites and persistent 
 Home uses real Ideas/Library data, a local clock and temporary unattributed session
 thoughts. College, Music and News previews have honest empty states.
 
-The next documented package is **4.1: Semester, Course & Week APIs**. College APIs,
+**Package 4.1 is complete:** owner-scoped Semester, Course and Week APIs, atomic
+semester activation, ordering and safe hierarchy deletion. The next documented
+package is **4.2: College Pages, Home Preview & Verification**. College UI,
 R2 file handling, real playback, hourly D1 quotes, News ingestion and private production
 deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
 
-The Worker currently exposes `/api/system/health`, `/api/ideas` and `/api/quick-links`.
+The Worker currently exposes `/api/system/health`, `/api/ideas`, `/api/quick-links`
+and `/api/college`. The [package 4.1 contract](docs/planning/IMPLEMENTATION_PLAN.md#41-semester-course--week-apis)
+documents College routes, response shapes and temporary file-deletion guards.
 See the [pre-College audit fixes](docs/planning/AUDIT_FIXES.md) for regression coverage
 and validation limits.
 See the [implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) for the remaining work.
