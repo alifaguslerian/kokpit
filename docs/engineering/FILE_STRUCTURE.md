@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.4 | **Status:** V1 structure reference | **Updated:** 2026-10-23
+**Version:** 0.5 | **Status:** V1 structure reference | **Updated:** 2026-10-24
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -10,11 +10,13 @@ persisted entities remain in [PRD](../product/PRD.md),
 
 Milestones 1–3 are implemented. `src/app/` owns the routed shell/providers;
 Home, Ideas and Library have feature implementations. `worker/api/`,
-`worker/services/` and `worker/db/repositories/` contain Ideas and Quick Links.
+`worker/services/` and `worker/db/repositories/` contain Ideas, Quick Links and
+the College hierarchy APIs (package 4.1). `tests/integration/college-api.test.ts`
+covers College lifecycle, ownership, validation, ordering and rollback behavior.
 The schema and reviewed initial migration already include all 17 V1 tables.
 `src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms and
 mobile navigation. `tests/e2e/audit-regressions.mjs` exercises rendered UI against
-Hono and isolated in-memory SQLite. College implementation, R2, playback and
+Hono and isolated in-memory SQLite. College UI, R2, playback and
 content pipelines remain pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their work package needs them; do not pre-create empty modules.
