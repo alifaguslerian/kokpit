@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.5 | **Status:** V1 implementation plan | **Updated:** 2026-10-23
+**Version:** 0.6 | **Status:** V1 implementation plan | **Updated:** 2026-10-24
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,8 +11,9 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Milestones 1–3 are complete, including **3.3 Library & Quick Links**.
-The next implementation package is **4.1 Semester, Course & Week APIs**.
+Milestones 1–3 and **4.1 Semester, Course & Week APIs** are complete.
+Milestone 4 is in progress; the next implementation package is
+**4.2 College Pages, Home Preview & Verification**.
 The owner separately authorized the [pre-College audit fixes](AUDIT_FIXES.md) on
 2026-10-23. That corrective work does not start Milestone 4 or implement later
 Music, storage, Quotes or News packages.
@@ -76,7 +77,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 1 | Foundation | 1.1–1.7 | Complete |
 | 2 | App Shell & Home | 2.1–2.3 | Complete |
 | 3 | Ideas & Library | 3.1–3.3 | Complete |
-| 4 | College | 4.1–4.4 | Pending |
+| 4 | College | 4.1–4.4 | In progress |
 | 5 | Music | 5.1–5.3 | Pending |
 | 6 | Quotes & News | 6.1–6.5 | Pending |
 | 7 | Polish & Hardening | 7.1–7.4 | Pending |
@@ -99,7 +100,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 3.1 | Ideas Backend | 5.1–5.3 | Complete |
 | 3.2 | Ideas UI, Home Capture & Verification | 5.4–5.7 | Complete |
 | 3.3 | Library & Quick Links | 6.1–6.5 | Complete |
-| 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Pending |
+| 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Complete |
 | 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Pending |
 | 4.3 | Private Storage & Material APIs | 8.1–8.6 | Pending |
 | 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Pending |
@@ -916,7 +917,7 @@ Test:
 
 ### 4.1 Semester, Course & Week APIs
 
-**Status:** Pending | **Legacy Phase checklist:** 7.1–7.3
+**Status:** Complete | **Legacy Phase checklist:** 7.1–7.3
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
@@ -954,6 +955,38 @@ Implement:
 - delete
 
 **Acceptance Criteria:** week number unique per course
+
+#### Implemented API contract and verification
+
+All routes use `/api/college`, owner context, strict Zod request schemas, and
+route → service → repository boundaries. Existing tables suffice; no migration
+or dependency change was needed.
+
+| Resource | Collection routes | Individual routes |
+| --- | --- | --- |
+| Semester | `GET/POST /semesters`, `POST /semesters/reorder` | `GET/PATCH/DELETE /semesters/:id` |
+| Course | `GET/POST /semesters/:semesterId/courses`, `POST /semesters/:semesterId/courses/reorder` | `GET/PATCH/DELETE /courses/:id` |
+| Week | `GET/POST /courses/:courseId/weeks` | `GET/PATCH/DELETE /weeks/:id` |
+
+- Reads and creates/updates return `{ data }`; creates use 201. Deletes return
+  `{ success: true, id }`, and reorder returns `{ success: true }`.
+- New semesters default to inactive. Explicit `isActive: true` atomically
+  deactivates the owner's other active semesters. Explicit deactivation or deletion
+  may leave no active semester; no replacement is selected automatically.
+- Reorder requires `{ ids }` containing every ID in the current owner/parent scope
+  exactly once, and persists contiguous positions atomically. Weeks sort by their
+  positive integer number, unique per course, without a 14-week limit.
+- Child access checks ownership through every ancestor. Invalid input returns 400,
+  inaccessible/missing resources 404, and duplicate week numbers or guarded
+  deletion conflicts 409. Unexpected database errors remain safe 500 responses.
+- Owned link metadata can cascade on deletion. A descendant file material, R2 key,
+  or mismatched ownership blocks hierarchy deletion with 409. Packages 4.3–4.4
+  must coordinate private-file cleanup before enabling those deletions.
+- Validation on 2026-10-24: 116 unit/API tests passed, including 28 College tests;
+  lint, strict typecheck, formatting and production build passed. The built Worker
+  also passed workerd/Miniflare D1 checks in an isolated temporary database:
+  initial migration application, active-semester rollback, 105-course reorder and
+  rollback, duplicate weeks, and file-deletion guards. No production data was used.
 
 </details>
 
