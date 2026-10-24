@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Lightbulb, RefreshCw } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -46,41 +47,32 @@ export function IdeasPage() {
   const hasActiveFilters = Boolean(searchQuery.trim() || selectedTag || pinnedOnly);
 
   return (
-    <PageContainer>
-      {/* Editorial Page Header */}
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
-        <div>
-          <span className="font-ui text-[11px] uppercase tracking-wider text-[var(--kokpit-accent)] font-medium">
-            Personal Notes & Thinking
-          </span>
-          <h1 className="font-ui text-3xl sm:text-4xl text-[var(--kokpit-text-primary)] mt-1 font-normal tracking-tight">
-            Ideas & Reflections
-          </h1>
-          <p className="font-ui text-sm text-[var(--kokpit-text-secondary)] mt-1 max-w-xl">
-            A quiet space for spontaneous thoughts, questions, and notes. Pinned items stay at the
-            top.
-          </p>
-        </div>
+    <PageContainer className="max-w-[1040px]!">
+      <PageHeader
+        eyebrow="Personal Notes & Thinking"
+        title="Ideas & Reflections"
+        description="A quiet space for spontaneous thoughts, questions, and notes. Pinned items stay at the top."
+        actions={
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => void refetch()}
+            leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+          >
+            Refresh
+          </Button>
+        }
+      />
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => void refetch()}
-          leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-          className="self-start sm:self-auto text-xs"
-        >
-          Refresh
-        </Button>
-      </header>
-
-      {/* Prominent Frictionless Composer */}
-      <section aria-label="Compose new thought">
-        <IdeaComposer />
+      <section aria-label="Compose new thought" className="space-y-3">
+        <h2 className="font-ui text-base font-medium text-[var(--kokpit-text-primary)]">
+          Capture a thought
+        </h2>
+        <IdeaComposer className="border-[var(--kokpit-border-strong)] bg-[var(--kokpit-surface-2)] p-5 sm:p-6 [&_textarea]:min-h-32 [&_textarea]:bg-[var(--kokpit-surface-1)] [&_textarea]:text-base" />
       </section>
 
-      {/* Filter and Search Bar */}
-      <section aria-label="Filter and search thoughts" className="pt-2">
+      <section aria-label="Filter and search thoughts">
         <IdeasFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -93,11 +85,13 @@ export function IdeasPage() {
         />
       </section>
 
-      {/* Content Stream / Grid */}
-      <section aria-label="Ideas list" className="pt-1">
+      <section aria-label="Ideas list" className="space-y-4">
+        <h2 className="font-ui text-lg font-semibold text-[var(--kokpit-text-primary)]">
+          Saved thoughts
+        </h2>
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((idx) => (
+          <div className="space-y-4">
+            {[1, 2, 3].map((idx) => (
               <div
                 key={idx}
                 className="bg-[var(--kokpit-surface-1)] border border-[var(--kokpit-border-default)] rounded-[var(--radius-lg)] p-5 space-y-3"
@@ -151,7 +145,7 @@ export function IdeasPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-3">
             {ideas.map((idea) => (
               <IdeaCard
                 key={idea.id}
