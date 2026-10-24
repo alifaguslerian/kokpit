@@ -9,7 +9,7 @@ export function PageContainer({ className, children, ...props }: PageContainerPr
   return (
     <div
       className={cn(
-        'w-full max-w-[1360px] mx-auto px-4 py-4 md:px-6 md:py-5 lg:px-8 lg:py-6 flex flex-col gap-5',
+        'w-full max-w-[1360px] mx-auto px-4 py-5 md:px-6 md:py-[22px] min-[90rem]:px-10 min-[90rem]:py-8 flex flex-col gap-5 min-[90rem]:gap-6',
         className,
       )}
       {...props}
