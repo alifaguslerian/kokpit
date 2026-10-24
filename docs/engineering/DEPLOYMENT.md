@@ -1,6 +1,6 @@
 # Kokpit — Deployment
 
-**Version:** 0.3 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-23
+**Version:** 0.4 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-24
 
 Operational runbook for one Cloudflare Worker + Static Assets, private Access gate,
 D1 metadata, private R2 files, Cron jobs and Workers AI content.
@@ -8,7 +8,8 @@ D1 metadata, private R2 files, Cron jobs and Workers AI content.
 [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) controls when this runbook is implemented.
 
 > Current boundary: Milestones 1–3 include the app shell/Home, Ideas and Quick Links
-> APIs/UI, D1 schema and local migration. The configured remote D1 ID is a placeholder.
+> APIs/UI, D1 schema and local migration. Package 4.1 adds College hierarchy APIs
+> using the existing schema and D1 binding. The configured remote D1 ID is a placeholder.
 > Private R2, Access, scheduled content and production deployment remain future work.
 
 ## 1. Environments and prerequisites
