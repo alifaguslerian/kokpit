@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.4 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-24
+**Version:** 0.5 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-24
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -39,7 +39,9 @@ migration, owner context, safe Hono APIs, the responsive shell/Home, Ideas and
 Quick Links. The frontend uses Kokpit tokens/fonts with Tailwind utilities and
 explicit base styles, without Preflight. Package 4.1 adds owner-scoped College
 hierarchy APIs through routes, a service and a repository using the existing schema.
-College UI, R2, persistent audio, content jobs and production resources remain pending.
+Package 4.2 adds lazy College, course and week pages, shared query-backed Home
+context and metadata forms. R2, material handling, persistent audio, content jobs
+and production resources remain pending.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
@@ -78,6 +80,8 @@ Conceptual page routes (exact supporting route names are implementation details)
 | Library | `/library` |
 
 College may nest semester/course/week paths; Music may nest playlist paths.
+Current College routes are `/college`, `/college/courses/:courseId` and
+`/college/weeks/:weekId`; `?semester=<id>` preserves the overview selection.
 Lazy-load deeper feature routes where useful. Home reads lightweight summaries from their
 own modules; it must not import complete College management or Music library functionality.
 
