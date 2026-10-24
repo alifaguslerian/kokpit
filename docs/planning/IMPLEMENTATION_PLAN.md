@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.6 | **Status:** V1 implementation plan | **Updated:** 2026-10-24
+**Version:** 0.7 | **Status:** V1 implementation plan | **Updated:** 2026-10-24
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,9 +11,9 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Milestones 1–3 and **4.1 Semester, Course & Week APIs** are complete.
+Milestones 1–3 and College packages **4.1–4.2** are complete.
 Milestone 4 is in progress; the next implementation package is
-**4.2 College Pages, Home Preview & Verification**.
+**4.3 Private Storage & Material APIs**.
 The owner separately authorized the [pre-College audit fixes](AUDIT_FIXES.md) on
 2026-10-23. That corrective work does not start Milestone 4 or implement later
 Music, storage, Quotes or News packages.
@@ -101,7 +101,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 3.2 | Ideas UI, Home Capture & Verification | 5.4–5.7 | Complete |
 | 3.3 | Library & Quick Links | 6.1–6.5 | Complete |
 | 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Complete |
-| 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Pending |
+| 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Complete |
 | 4.3 | Private Storage & Material APIs | 8.1–8.6 | Pending |
 | 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Pending |
 | 5.1 | Tracks, Upload & Private Streaming | 9.1–9.3 | Pending |
@@ -992,7 +992,7 @@ or dependency change was needed.
 
 ### 4.2 College Pages, Home Preview & Verification
 
-**Status:** Pending | **Legacy Phase checklist:** 7.4–7.8
+**Status:** Complete | **Legacy Phase checklist:** 7.4–7.8
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
@@ -1029,6 +1029,26 @@ or dependency change was needed.
 
 **Acceptance Criteria:** preview uses real College data; no fake course data remains
 
+#### Implemented UI contract
+
+- Lazy routes: `/college`, `/college/courses/:courseId` and `/college/weeks/:weekId`.
+  The overview stores its selection in `?semester=<id>`, defaulting to the active
+  semester, then the first saved semester. Browsing a semester does not activate it.
+- Native dialogs support semester/course/week creation and metadata editing,
+  explicit semester activation and confirmed hierarchy deletion. Course ordering
+  uses keyboard-accessible move controls and the existing complete-list API.
+- Home shares College query keys and displays the active semester's first positioned
+  course and first numbered week. These are navigation shortcuts, not claims about
+  the current calendar week or tracked recent activity. There are no material counts
+  or invented records. Disabled dependent queries make no requests without parents.
+- Mutations await cache refresh. Successful deletions remove cached descendants;
+  failed deletions retain them. Cached detail pages hide obsolete content after a
+  404, while transient failures offer local retry. Dialog identity and late request
+  completion cannot overwrite another entity's draft or undo later navigation.
+- Week pages render an explicit material placeholder. File/link controls, R2 cleanup
+  and material APIs remain in packages 4.3–4.4; the package 4.1 file-deletion guard
+  remains active. No backend, schema or dependency change was required.
+
 #### College Structure Tests
 
 Test:
@@ -1039,6 +1059,28 @@ Test:
 - cascade behavior
 - ownership
 - active semester
+
+#### Package verification
+
+On 2026-10-24, all 122 unit/API tests passed, including six College client/cache
+tests and the 28 hierarchy API tests from package 4.1. All 29 browser regressions
+passed, including 18 College flows and the existing 11 audit regressions. The
+browser loads real UI and calls Hono through isolated test SQLite; no owner data
+or production resources are used.
+
+Lint, strict typecheck, formatting and production build passed. College overview,
+course and week/editor code build into separate lazy chunks. Rendered captures
+were compared with the College reference and normalized Design System at 1366px
+and 1600px desktop widths, plus 390px mobile. Verification covered keyboard focus,
+Escape/return focus, loading/empty/error states, retry, long metadata without
+horizontal overflow, identity changes, late requests, cached 404 handling and
+persisted ordering. Captures are temporary local test output, not product assets.
+
+UI review passed for existing semantic tokens/fonts, functional controls and
+honest content; hierarchy uses semester context, course cards and week rows.
+The restrained copper accent identifies actions/current context, and whitespace
+separates hierarchy levels. No decorative assets, metrics or additional motion
+were introduced. Private storage and production verification remain later work.
 
 </details>
 
