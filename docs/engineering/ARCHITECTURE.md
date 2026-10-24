@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.3 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-23
+**Version:** 0.4 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-24
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -37,8 +37,9 @@ This document owns system boundaries; it does not redefine product or visual req
 Milestones 1–3 are implemented: Cloudflare Vite integration, the D1 schema/local
 migration, owner context, safe Hono APIs, the responsive shell/Home, Ideas and
 Quick Links. The frontend uses Kokpit tokens/fonts with Tailwind utilities and
-explicit base styles, without Preflight. College APIs, R2, persistent audio,
-content jobs and production resources remain pending.
+explicit base styles, without Preflight. Package 4.1 adds owner-scoped College
+hierarchy APIs through routes, a service and a repository using the existing schema.
+College UI, R2, persistent audio, content jobs and production resources remain pending.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
