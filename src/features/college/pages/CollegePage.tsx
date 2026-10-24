@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowDown, ArrowUp, ArrowUpRight, BookOpen, Plus } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import {
@@ -59,22 +60,20 @@ export function CollegePage() {
   };
   return (
     <PageContainer>
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-kokpit-accent">Academic workspace</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight">College</h1>
-          <p className="mt-2 text-sm text-kokpit-text-secondary">
-            A place for your courses, one week at a time.
-          </p>
-        </div>
-        <Button
-          disabled={activate.isPending}
-          onClick={() => setEditor('semester')}
-          leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
-        >
-          Add semester
-        </Button>
-      </header>
+      <PageHeader
+        eyebrow="Academic workspace"
+        title="College"
+        description="A place for your courses, one week at a time."
+        actions={
+          <Button
+            disabled={activate.isPending}
+            onClick={() => setEditor('semester')}
+            leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
+          >
+            Add semester
+          </Button>
+        }
+      />
       {semestersQuery.isPending ? (
         <CollegeLoading label="Loading semesters…" />
       ) : semestersQuery.isError && !semestersQuery.data ? (
@@ -211,13 +210,15 @@ export function CollegePage() {
                     description="Add a course to start organizing its weekly materials."
                   />
                 ) : (
-                  <ul className="grid list-none grid-cols-1 gap-4 xl:grid-cols-2">
+                  <ul className="grid list-none grid-cols-1 gap-4 xl:grid-cols-2 min-[90rem]:gap-6">
                     {courses.map((course, index) => (
                       <li
                         key={course.id}
-                        className="min-w-0 rounded-lg border border-kokpit-border-default bg-kokpit-surface-1 p-5"
+                        className="min-w-0 rounded-lg border border-kokpit-border-default bg-kokpit-surface-1 p-5 sm:p-6"
                       >
-                        <BookOpen className="h-5 w-5 text-kokpit-accent mb-4" aria-hidden="true" />
+                        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-md bg-kokpit-accent-bg text-kokpit-accent">
+                          <BookOpen className="h-5 w-5" aria-hidden="true" />
+                        </div>
                         {course.code && (
                           <p className="text-xs text-kokpit-text-muted break-all mb-1">
                             {course.code}
@@ -239,7 +240,7 @@ export function CollegePage() {
                         <div className="mt-5 flex items-center justify-between gap-2 border-t border-kokpit-border-subtle pt-3">
                           <Link
                             to={`/college/courses/${encodeURIComponent(course.id)}`}
-                            className="inline-flex items-center gap-1 text-xs text-kokpit-accent"
+                            className="inline-flex min-h-9 items-center gap-1 text-xs text-kokpit-accent"
                           >
                             Open course <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                           </Link>
