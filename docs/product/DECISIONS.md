@@ -1,9 +1,9 @@
 # Kokpit — Decisions
 
-**Version:** 1.4
+**Version:** 1.5
 **Status:** Active V1 Decision Log
 **Product:** Kokpit · **Type:** Product + Architecture ADRs
-**Last Updated:** 2026-10-23
+**Last Updated:** 2026-10-25
 
 This log preserves decisions and their reasons, not minor implementation changes. Status vocabulary: Accepted, Superseded, Deprecated, Under Review. Each record retains its original date; shortening the record does not reopen or replace it.
 
@@ -399,7 +399,7 @@ Implementation of the next package requires a separate owner instruction.
 
 ### DEC-051 — Stitch visual references and refined V1 layouts
 
-**Accepted · 2026-10-10**
+**Accepted · 2026-10-10 · Home composition and sidebar superseded by DEC-053**
 
 **Decision:** The owner supplied Home, College, Ideas, Library, Music, and News screens,
 then authorized documentation for a similar UI with cleaner execution. Retain the original
@@ -428,3 +428,37 @@ through a screenshot. The UI must still expose required V1 controls absent from 
 **Authorization:** Documentation and reference preservation only. No application code,
 schema, provider integration, deployment, or work-package completion is authorized by this
 decision. Historical missing-reference findings remain recorded, with the asset gap now resolved.
+
+### DEC-053 — FINAL room Home and shared bottom navigation
+
+**Accepted · 2026-10-25**
+
+**Decision:** The owner approved `ChatGPT Image Oct 25, 2026, 06_57_16 AM.png`
+as the FINAL Home visual direction and explicitly requested implementation. Preserve
+the exact image as `docs/design/references/home-final.png`. Replace the sidebar with
+a shared floating bottom dock containing Home, College, Music, News, Ideas and Library.
+Use a full-viewport warm room photograph, large clock and quote beside one another,
+four readable translucent panels and cream ruled-paper Ideas capture. Music sits above
+Ideas on the left; College, News and Quick Links form the right stack, with aligned
+lower edges and natural expansion for real content.
+
+**Reason:** The owner selected the room composition as the concrete visual target.
+The shared photograph establishes a personal room; distinct paper emphasizes capture,
+while subdued panels keep previews legible and the dock frees horizontal space.
+
+**Impact:** This supersedes DEC-051's sidebar, hero-only image treatment and independently
+ending Home columns. Earlier references and decision history remain available for
+feature-page composition. Keep Cormorant Garamond and Inter; normalize functional
+serif roles in the image to Inter. Shared semantic room/panel/dock/paper roles and
+readability overlays govern contrast rather than arbitrary per-feature colors. The
+runtime photograph is a separate clean asset without baked-in UI. Feature pages retain
+their functions and readable foreground surfaces within the same room/dock shell.
+
+**Authorization and boundary:** Implementation of this visual polish is authorized before
+package 4.3. It does not authorize package 4.3, Milestone 5 playback, Milestone 6 content
+pipelines, schema/provider changes or deployment. Preserve existing APIs, first-course/week
+College context, Ideas capture and Quick Links behavior. Music and News retain honest
+empty states; future music controls are clearly disabled. Existing unattributed thoughts
+remain temporary until Milestone 6. Reference sample records do not become production data.
+Validate desktop/responsive layouts, keyboard focus, current flows, empty/loading/error
+states, and lint/typecheck/build/tests before claiming visual completion.
