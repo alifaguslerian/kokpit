@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.7 | **Status:** V1 implementation plan | **Updated:** 2026-10-24
+**Version:** 0.8 | **Status:** V1 implementation plan | **Updated:** 2026-10-25
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -17,6 +17,9 @@ Milestone 4 is in progress; the next implementation package is
 On 2026-10-24 the owner also authorized a visual correction before package 4.3:
 align the shared shell, Home, Ideas, Library and existing College pages with the
 normalized Stitch references. This does not authorize starting storage or later features.
+On 2026-10-25 the owner approved the FINAL room Home image and requested its
+implementation, superseding the earlier correction's sidebar and Home composition.
+This bounded visual polish is recorded below and in DEC-053; package statuses stay unchanged.
 The owner separately authorized the [pre-College audit fixes](AUDIT_FIXES.md) on
 2026-10-23. That corrective work does not start Milestone 4 or implement later
 Music, storage, Quotes or News packages.
@@ -44,14 +47,16 @@ have active numbers; the unnumbered checklist sections below are implementation 
 
 ### UI reference review
 
-Owner-supplied Stitch screens are available in the [reference gallery](../design/UI_REFERENCES.md).
+The owner-approved FINAL Home image and supporting Stitch screens are available in the
+[reference gallery](../design/UI_REFERENCES.md). FINAL takes priority for Home and the
+shared shell; earlier feature screens continue to guide feature-page composition.
 Use their page composition through the normalized [Design System](../design/DESIGN_SYSTEM.md),
 including its mapping to V1. Raw screenshot controls and example data do not expand a package.
 
 | Packages | Visual review focus |
 | --- | --- |
-| 2.1–2.2 | Shared palette, typography roles, responsive shell geometry, sidebar and primitives. |
-| 2.3 | Primary dark Home hero and two-column preview shells; reserve space for required V1 controls within the package's placeholder scope. |
+| 2.1–2.2 | Shared palette, typography roles, room background, responsive bottom dock and primitives. |
+| 2.3 | FINAL clock/quote hero and aligned two-column previews; retain the package's placeholder scope. |
 | 3.2–3.3 | Ideas composer/search/saved cards and Library shortcut grid. |
 | 4.2, 4.4 | College course/week/material composition without LMS or calendar workflows. |
 | 5.2–5.3 | Music player/library/playlists, persistent native playback, and Home controls including volume. |
@@ -66,7 +71,7 @@ Fix clipped labels, broken assets, excess nesting,
 and unusable controls; also verify narrower viewports. Supplied screenshots resolve the
 old missing-reference finding; they do not prove implementation or complete any package.
 
-#### Pre-4.3 visual correction
+#### Pre-4.3 visual correction (2026-10-24 history)
 
 - Shared page headers and responsive spacing now follow the Design System. Large-screen
   breakpoints use the same units as Tailwind's defaults so tablet padding/sidebar rules
@@ -88,6 +93,56 @@ production build, all 122 unit/API tests and all 37 browser regressions. Browser
 isolated test SQLite; no owner data or production resources were changed. Desktop captures
 at 1366px/1600px and 390px mobile were reviewed against the normalized reference direction.
 The next documented implementation step remains package 4.3.
+
+#### FINAL visual polish (owner authorized 2026-10-25)
+
+Scope: implement [FINAL Home](../design/references/home-final.png) through the
+[Design System](../design/DESIGN_SYSTEM.md), preserving current behavior. This is a
+bounded owner-authorized correction before package 4.3, not completion of later milestones.
+
+- [x] Preserve the exact approved reference and add a separate clean runtime room photograph.
+- [x] Replace the sidebar with a shared six-link floating bottom dock and readable room
+  foregrounds on all existing routes; retain visible focus and content/safe-area clearance.
+- [x] Compose clock and quote beside each other, four translucent panels and cream ruled
+  Ideas capture. Align Music/Ideas and College/News/Quick Links stacks at their bottom
+  edges using flexible rows; retain natural expansion and single-column reading order.
+- [x] Preserve existing College context, capture, quick-link and feature-page operations;
+  keep Music/News honest empty states, clearly disabled future music controls and temporary
+  quote behavior. Keep functional text in Inter, display expression in Cormorant Garamond.
+- [x] Run lint, typecheck, formatting, build, relevant unit/API and browser regressions;
+  compare rendered desktop/mobile views and keyboard/loading/empty/error states.
+
+Fresh verification on 2026-10-25 passed: lint, strict typecheck, formatting, production
+build, all 122 unit/API tests and all 41 browser regressions. Dock/sidebar expectations
+were observed failing before implementation; the final room and navigation checks pass.
+Rendered captures were reviewed at 1600×1000, 1366×768, 390×844 and 320×700. The standard
+1600px Home clears the dock on initial view; smaller screens and long content remain
+scrollable above it. Coverage includes keyboard route selection/history, preserved drafts,
+real capture/College/link operations, loading/error recovery, image failure, reduced motion
+and unavailable backdrop blur. Browser writes use isolated test SQLite, never owner data.
+The 251 KB WebP is a clean decorative asset; the approved screenshot is documentation only.
+Music/News integrations and real hourly quotes remain later work. Package 4.3 and
+Milestones 5–6 remain pending; the next documented package after this polish is 4.3.
+
+Owner-authorized follow-up on 2026-10-25: reduce Home panel/interior sizes for laptop
+viewports and add manual hide/show to the shared dock. Four additional browser checks
+cover standard 1366×768 and 1280×720 Home fit, keyboard hide/reopen at desktop/mobile,
+hidden links leaving focus order, retained capture drafts and route navigation afterward.
+This follows the same visual-only boundary; long real content remains scrollable.
+Follow-up verification passed: all 122 unit/API tests, all 45 browser regressions,
+lint, strict typecheck, formatting and production build. The four new checks failed
+on the previous dimensions/missing toggle and passed after the compact layout and
+accessible visibility control were implemented. Desktop/mobile captures were reviewed.
+
+The owner's subsequent review restored the taller Home proportions: remove the
+height-constrained laptop compression, restore panel padding, cover size and interior
+spacing, and allow natural vertical scrolling. Manual dock hide/show remains intact.
+The two laptop checks now require roomier panels, aligned column bottoms and clear
+access above the dock after scrolling. These checks failed against the compressed
+Music height (196px) and passed after restoration. Fresh verification passed all
+122 unit/API tests and 45 browser regressions, lint, strict typecheck, formatting and
+production build. Desktop and mobile captures were reviewed; the authorized boundary
+and next package 4.3 are unchanged.
 
 ### Legacy numbering
 
@@ -625,6 +680,9 @@ Build:
 
 **Goal:** Create persistent app layout.
 
+The original sidebar implementation in this completed package is superseded by the
+2026-10-25 FINAL visual polish; use the shared bottom dock for current work.
+
 **Tasks**
 
 - create `AppShell`
@@ -749,7 +807,7 @@ Build preview shells for:
 
 **Goal:** Compare actual Home against approved design concept.
 
-Use the primary [Home reference](../design/references/home.png) and the normalized
+Use the primary [FINAL Home reference](../design/references/home-final.png) and the normalized
 [Home composition](../design/DESIGN_SYSTEM.md#home-composition), including their required
 V1 adjustments. The browser frame and reference-only controls are not acceptance targets.
 
@@ -762,7 +820,7 @@ Review:
 - spacing
 - card radius
 - hero balance
-- sidebar proportion
+- bottom dock proportion and content clearance
 - cozy atmosphere
 
 Do not proceed if Home already feels like a generic SaaS dashboard.
@@ -1705,7 +1763,7 @@ Review:
 
 **Tasks**
 
-- collapse sidebar where appropriate
+- keep the six-link bottom dock usable with content and safe-area clearance
 - stack grids
 - preserve player usability
 
