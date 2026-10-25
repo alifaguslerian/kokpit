@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.6 | **Status:** V1 structure reference | **Updated:** 2026-10-24
+**Version:** 0.7 | **Status:** V1 structure reference | **Updated:** 2026-10-25
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -14,8 +14,12 @@ Home, College, Ideas and Library have feature implementations. `worker/api/`,
 the College hierarchy APIs (package 4.1). `tests/integration/college-api.test.ts`
 covers College lifecycle, ownership, validation, ordering and rollback behavior.
 The schema and reviewed initial migration already include all 17 V1 tables.
-`src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms and
-mobile navigation. College pages, editors, types and data hooks stay in
+`src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms.
+`src/components/layout/BottomNavigation.tsx` owns the shared six-link floating dock
+and navigation items; `AppShell` owns the room backdrop and content clearance.
+The clean runtime photo is `public/images/room-background.webp`; the exact approved
+Home image stays in `docs/design/references/home-final.png` for review, not runtime UI.
+College pages, editors, types and data hooks stay in
 `src/features/college/`; Home imports only its data hooks. The audit and College
 suites in `tests/e2e/` exercise rendered UI against Hono and isolated in-memory
 SQLite. R2, material handling, playback and content pipelines remain pending.
@@ -48,7 +52,7 @@ kokpit/
 │   ├── app/                     # composition, providers, shell, routing
 │   ├── components/
 │   │   ├── ui/                  # reusable primitives
-│   │   ├── layout/              # sidebar and page containers
+│   │   ├── layout/              # BottomNavigation and page containers
 │   │   └── shared/              # genuinely reused presentation
 │   ├── features/
 │   │   ├── home/
@@ -122,7 +126,7 @@ helpers, and state where needed. These are placement examples, not required empt
 | Library | QuickLink card/grid/form/group, Library page, `useQuickLinks`, `library.api.ts`. |
 
 - Reusable primitives include Button, IconButton, Input, Textarea, Card, Badge,
-  Chip, Skeleton, EmptyState, ErrorState. Layout owns Sidebar/Nav/NavItem/PageContainer.
+  Chip, Skeleton, EmptyState, ErrorState. Layout owns BottomNavigation and PageContainer.
 - `src/hooks/` is for hooks actually reused across unrelated features, such as
   media queries, debounce, and document title. Feature hooks stay in their feature.
 - `src/lib/` owns API/query clients and focused helpers such as `format-time.ts`,
