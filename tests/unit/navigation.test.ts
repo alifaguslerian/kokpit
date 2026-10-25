@@ -1,6 +1,6 @@
 import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { navItems } from '../../src/components/layout/Sidebar';
+import { navItems } from '../../src/components/layout/BottomNavigation';
 import { routes } from '../../src/app/routes';
 import { cn } from '../../src/lib/cn';
 
