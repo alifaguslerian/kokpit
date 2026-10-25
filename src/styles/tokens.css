@@ -16,6 +16,18 @@
   --kokpit-surface-hover: #292421;
   --kokpit-surface-active: #302821;
 
+  /* Approved room backdrop, translucent panels and paper capture. */
+  --kokpit-room-panel: rgba(26, 21, 17, 0.88);
+  --kokpit-room-glass: rgba(26, 21, 17, 0.78);
+  --kokpit-room-border: rgba(215, 160, 109, 0.44);
+  --kokpit-room-dock: rgba(24, 19, 16, 0.94);
+  --kokpit-room-shade: rgba(13, 11, 11, 0.3);
+  --kokpit-paper: #eedfc1;
+  --kokpit-paper-ink: #35251a;
+  --kokpit-paper-muted: #665342;
+  --kokpit-paper-rule: rgba(80, 54, 30, 0.19);
+  --kokpit-paper-accent: #85451d;
+
   /* Text Colors */
   --kokpit-text-primary: #f3ebdd;
   --kokpit-text-secondary: #d7c8b6;
@@ -90,10 +102,11 @@
 
   /* Layout Dimensions */
   --sidebar-width: 280px;
-  --page-padding-x: 40px;
-  --page-padding-y: 32px;
-  --content-gap: 24px;
-  --section-gap: 24px;
+  --page-padding-x: 32px;
+  --page-padding-y: 20px;
+  --content-gap: 18px;
+  --section-gap: 20px;
+  --dock-clearance: 120px;
 
   /* Elevation Shadows */
   --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.18);
