@@ -1,4 +1,4 @@
-/* global document, innerWidth, getComputedStyle */
+/* global document, innerWidth, getComputedStyle, window */
 import test, { before, after } from 'node:test';
 import process from 'node:process';
 import assert from 'node:assert/strict';
@@ -16,6 +16,109 @@ const outputDirectory = process.env.KOKPIT_TEST_SCREENSHOTS;
 const previewNames = ['music', 'college', 'ideas', 'news', 'links'];
 const previewSelector = (name) => `section[aria-labelledby="home-${name}-title"]`;
 let browser;
+
+for (const [width, height] of [
+  [1366, 768],
+  [1280, 720],
+]) {
+  test(`room panels retain generous proportions and scroll clear of the dock at ${width}x${height}`, async () => {
+    await fixture(
+      async ({ page, create, go, screenshot }) => {
+        await create('/api/ideas', {
+          title: 'A small thought',
+          content: 'Leave room for reading.',
+        });
+        await create('/api/quick-links', { name: 'Campus', url: 'https://example.com' });
+        const semester = await create('/api/college/semesters', {
+          name: 'Semester 1',
+          isActive: true,
+        });
+        const course = await create(`/api/college/semesters/${semester.id}/courses`, {
+          name: 'Interaction Design',
+        });
+        await create(`/api/college/courses/${course.id}/weeks`, {
+          weekNumber: 1,
+          title: 'Understanding people',
+        });
+        await go('/home');
+        const musicBox = await page.locator(previewSelector('music')).boundingBox();
+        const ideasBox = await page.locator(previewSelector('ideas')).boundingBox();
+        assert.ok(musicBox.height >= 240, `Music needs vertical room: ${musicBox.height}px`);
+        assert.ok(ideasBox.height >= 260, `Ideas needs vertical room: ${ideasBox.height}px`);
+        await screenshot(`roomy-home-${width}x${height}`, { fullPage: false });
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        const dockBox = await page.locator('.navigation-dock').boundingBox();
+        const linksBox = await page.locator(previewSelector('links')).boundingBox();
+        const scrolledIdeas = await page.locator(previewSelector('ideas')).boundingBox();
+        const bottom = Math.max(
+          linksBox.y + linksBox.height,
+          scrolledIdeas.y + scrolledIdeas.height,
+        );
+        assert.ok(
+          Math.abs(linksBox.y + linksBox.height - scrolledIdeas.y - scrolledIdeas.height) < 2,
+        );
+        assert.ok(
+          bottom <= dockBox.y - 12,
+          `Scrolled Home ends at ${bottom}px; dock starts at ${dockBox.y}px`,
+        );
+        await screenshot(`roomy-home-bottom-${width}x${height}`, {
+          fullPage: false,
+          resetScroll: false,
+        });
+        await assertFits(page);
+      },
+      { width, height },
+    );
+  });
+}
+
+for (const width of [1366, 390]) {
+  test(`dock can hide and reopen with keyboard without losing a draft at ${width}px`, async () => {
+    await fixture(
+      async ({ page, go, screenshot }) => {
+        await go('/home');
+        const draft = page.getByLabel('Quick thought', { exact: true });
+        await draft.fill('Keep this draft while hiding the dock.');
+        const hide = page.getByRole('button', { name: 'Hide navigation', exact: true });
+        await hide.focus();
+        await page.keyboard.press('Enter');
+        const show = page.getByRole('button', { name: 'Show navigation', exact: true });
+        assert.equal(await show.getAttribute('aria-expanded'), 'false');
+        assert.equal(
+          await page.getByRole('navigation', { name: 'Main Navigation', exact: true }).count(),
+          0,
+        );
+        assert.equal(await show.evaluate((element) => element === document.activeElement), true);
+        await page.keyboard.press('Tab');
+        assert.equal(
+          await page.evaluate(() =>
+            Boolean(document.activeElement?.closest('nav.bottom-navigation')),
+          ),
+          false,
+        );
+        await screenshot(`compact-dock-hidden-${width}`, { fullPage: false });
+        await show.focus();
+        await page.keyboard.press('Enter');
+        assert.equal(await hide.getAttribute('aria-expanded'), 'true');
+        assert.equal(await draft.inputValue(), 'Keep this draft while hiding the dock.');
+        const nav = page.getByRole('navigation', { name: 'Main Navigation', exact: true });
+        assert.equal(await nav.getByRole('link').count(), 6);
+        await page.keyboard.press('Shift+Tab');
+        assert.equal(
+          await nav
+            .getByRole('link', { name: 'Library', exact: true })
+            .evaluate((element) => element === document.activeElement),
+          true,
+        );
+        await page.keyboard.press('Enter');
+        await page.waitForURL('**/library');
+        await nav.locator('a[href="/library"][aria-current="page"]').waitFor();
+        await assertFits(page);
+      },
+      { width, height: 844 },
+    );
+  });
+}
 
 before(async () => {
   browser = await chromium.launch({
@@ -79,10 +182,17 @@ async function fixture(run, viewport = { width: 1366, height: 900 }) {
   const go = async (route) => {
     await page.goto(baseUrl + route);
     await page.waitForLoadState('networkidle');
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
   };
-  const screenshot = async (name) => {
+  const screenshot = async (name, { fullPage = true, resetScroll = true } = {}) => {
     if (outputDirectory) {
-      await page.screenshot({ path: path.join(outputDirectory, `${name}.png`), fullPage: true });
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+      });
+      if (resetScroll) await page.evaluate(() => window.scrollTo(0, 0));
+      await page.screenshot({ path: path.join(outputDirectory, `${name}.png`), fullPage });
     }
   };
   try {
@@ -105,73 +215,177 @@ async function assertFits(page) {
   assert.deepEqual(overflowing, [], 'Rendered content must fit the viewport');
 }
 
-for (const width of [1366, 1600]) {
-  test(`Home columns follow their own content height at ${width}px`, async () => {
+for (const [width, height] of [
+  [1600, 1000],
+  [1366, 768],
+  [390, 844],
+  [320, 700],
+]) {
+  test(`the room grid and bottom dock remain usable at ${width}x${height}`, async () => {
     await fixture(
-      async ({ page, go, screenshot }) => {
+      async ({ page, create, go, screenshot }) => {
+        await create('/api/ideas', {
+          title: 'A room for reading',
+          content: 'Keep one thought close while reading.',
+          tags: ['reading'],
+        });
+        await create('/api/quick-links', {
+          name: 'MDN Web Docs',
+          url: 'https://developer.mozilla.org/',
+          isFavorite: true,
+        });
+        const semester = await create('/api/college/semesters', {
+          name: 'Semester 1',
+          isActive: true,
+        });
+        const course = await create(`/api/college/semesters/${semester.id}/courses`, {
+          name: 'Interaction Design',
+        });
+        const week = await create(`/api/college/courses/${course.id}/weeks`, {
+          weekNumber: 1,
+          title: 'Understanding people',
+        });
         await go('/home');
-        await screenshot(`stitch-home-${width}`);
-        for (const [musicHeight, collegeHeight] of [
-          [430, 270],
-          [260, 470],
-        ]) {
-          await page.locator(previewSelector('music')).evaluate((element, height) => {
-            element.style.minHeight = `${height}px`;
-          }, musicHeight);
-          await page.locator(previewSelector('college')).evaluate((element, height) => {
-            element.style.minHeight = `${height}px`;
-          }, collegeHeight);
-          // ResizeObserver must respond to real content changes in either column.
-          await page.waitForFunction(
-            ({ names, expectedGap }) => {
-              const boxes = Object.fromEntries(
-                names.map((name) => [
-                  name,
-                  document
-                    .querySelector(`section[aria-labelledby="home-${name}-title"]`)
-                    .getBoundingClientRect(),
-                ]),
-              );
-              return [
-                ['music', 'ideas'],
-                ['college', 'news'],
-                ['news', 'links'],
-              ].every(([above, below]) => {
-                const gap = boxes[below].top - boxes[above].bottom;
-                return gap >= expectedGap - 1 && gap <= expectedGap + 2;
-              });
-            },
-            { names: previewNames, expectedGap: width < 1440 ? 16 : 24 },
-          );
-          const boxes = await Promise.all(
+        await page.locator(`a[href="/college/weeks/${week.id}"]`).waitFor();
+        const dock = page.getByRole('navigation', { name: 'Main Navigation', exact: true });
+        assert.equal(await dock.count(), 1);
+        assert.equal(await dock.getByRole('link').count(), 6);
+        assert.equal(await page.locator('aside').count(), 0);
+        assert.equal(await page.getByRole('button', { name: /navigation menu/i }).count(), 0);
+        assert.deepEqual(
+          await page
+            .locator('.home-preview-grid > section')
+            .evaluateAll((elements) =>
+              elements.map((element) => element.getAttribute('aria-labelledby')),
+            ),
+          previewNames.map((name) => `home-${name}-title`),
+        );
+        const boxes = Object.fromEntries(
+          await Promise.all(
             previewNames.map(async (name) => [
               name,
               await page.locator(previewSelector(name)).boundingBox(),
             ]),
+          ),
+        );
+        if (width >= 1024) {
+          const hero = page.getByRole('region', { name: 'Your room', exact: true });
+          const clock = await hero.locator('time').boundingBox();
+          const quote = await hero.locator('[aria-live="polite"]').boundingBox();
+          assert.ok(
+            quote.x > clock.x + clock.width,
+            'The desktop quote belongs alongside the clock',
           );
-          const byName = Object.fromEntries(boxes);
-          assert.ok(Math.abs(byName.music.y - byName.college.y) <= 2);
-          assert.ok(Math.abs(byName.music.x - byName.ideas.x) <= 2);
-          assert.ok(Math.abs(byName.college.x - byName.news.x) <= 2);
-          assert.ok(byName.music.x + byName.music.width < byName.college.x);
-          for (let index = 0; index < boxes.length; index++) {
-            for (const [, other] of boxes.slice(index + 1)) {
-              const [, box] = boxes[index];
-              const overlaps =
-                box.x < other.x + other.width - 1 &&
-                box.x + box.width > other.x + 1 &&
-                box.y < other.y + other.height - 1 &&
-                box.y + box.height > other.y + 1;
-              assert.equal(overlaps, false, 'Preview cards must not overlap');
-            }
+          assert.ok(
+            quote.y < clock.y + clock.height && quote.y + quote.height > clock.y,
+            'Clock and quote share a visual row',
+          );
+          assert.ok(
+            Math.abs(boxes.music.y - boxes.college.y) <= 2,
+            'Both room columns start together',
+          );
+          assert.ok(
+            Math.abs(boxes.ideas.y + boxes.ideas.height - boxes.links.y - boxes.links.height) <= 3,
+            'Both room columns end together',
+          );
+          assert.ok(boxes.music.x + boxes.music.width < boxes.college.x);
+          assert.ok(boxes.ideas.y >= boxes.music.y + boxes.music.height);
+          assert.ok(boxes.news.y >= boxes.college.y + boxes.college.height);
+          assert.ok(boxes.links.y >= boxes.news.y + boxes.news.height);
+        } else {
+          for (let index = 1; index < previewNames.length; index++) {
+            const current = boxes[previewNames[index]];
+            const previous = boxes[previewNames[index - 1]];
+            assert.ok(
+              current.y >= previous.y + previous.height,
+              'Mobile cards follow the reading order',
+            );
           }
         }
+        for (const [index, box] of Object.values(boxes).entries()) {
+          for (const other of Object.values(boxes).slice(index + 1)) {
+            assert.equal(
+              box.x < other.x + other.width - 1 &&
+                box.x + box.width > other.x + 1 &&
+                box.y < other.y + other.height - 1 &&
+                box.y + box.height > other.y + 1,
+              false,
+              'Room panels must not overlap',
+            );
+          }
+        }
+        assert.equal(await page.locator('.home-ideas').count(), 1);
+        assert.equal(await page.locator('.home-preview-grid > .room-panel').count(), 4);
+        if (width === 1600) {
+          const initialDock = await dock.boundingBox();
+          const finalCardBottom = Math.max(
+            boxes.ideas.y + boxes.ideas.height,
+            boxes.links.y + boxes.links.height,
+          );
+          await screenshot('final-home-1600x1000-initial-clearance', { fullPage: false });
+          assert.ok(
+            finalCardBottom <= initialDock.y - 16,
+            `The standard desktop room fits above the dock before scrolling: cards end at ${finalCardBottom.toFixed(1)}, dock starts at ${initialDock.y.toFixed(1)}`,
+          );
+        }
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        const dockBox = await dock.boundingBox();
+        const finalBox = await page.locator(previewSelector('links')).boundingBox();
+        assert.ok(
+          finalBox.y + finalBox.height <= dockBox.y - 8,
+          'The bottom dock must not cover the final card at maximum scroll',
+        );
+        assert.ok(dockBox.x >= 0 && dockBox.x + dockBox.width <= width + 1);
+        assert.ok(dockBox.y + dockBox.height <= height + 1);
         await assertFits(page);
+        await screenshot(`final-home-${width}x${height}-bottom-viewport`, {
+          fullPage: false,
+          resetScroll: false,
+        });
+        await screenshot(`final-home-${width}x${height}`);
+        await screenshot(`final-home-${width}x${height}-viewport`, { fullPage: false });
+        if (width === 1600 || width === 390) {
+          await go('/college');
+          await page.locator(`a[href="/college/courses/${course.id}"]`).first().waitFor();
+          await screenshot(`final-college-saved-${width}`);
+        }
       },
-      { width, height: 1000 },
+      { width, height },
     );
   });
 }
+
+test('every dock destination selects its active route without losing browser history', async () => {
+  await fixture(async ({ page, go, screenshot }) => {
+    await go('/home');
+    const dock = page.getByRole('navigation', { name: 'Main Navigation', exact: true });
+    for (const name of ['College', 'Music', 'News', 'Ideas', 'Library', 'Home']) {
+      await dock.getByRole('link', { name, exact: true }).click();
+      await page.waitForURL(`**/${name.toLowerCase()}`);
+      await dock.locator(`a[href="/${name.toLowerCase()}"][aria-current="page"]`).waitFor();
+      assert.equal(await dock.locator('[aria-current="page"]').count(), 1);
+      assert.equal(
+        await dock.getByRole('link', { name, exact: true }).getAttribute('aria-current'),
+        'page',
+      );
+      if (name === 'Music' || name === 'News') {
+        assert.match(
+          await page.locator('main').innerText(),
+          /will be implemented in Milestone [56]/,
+          'Unimplemented integrations remain honest',
+        );
+        await screenshot(`final-${name.toLowerCase()}-placeholder`);
+      }
+    }
+    await page.goBack();
+    await page.waitForURL('**/library');
+    await dock.locator('a[href="/library"][aria-current="page"]').waitFor();
+    assert.equal(
+      await dock.getByRole('link', { name: 'Library', exact: true }).getAttribute('aria-current'),
+      'page',
+    );
+  });
+});
 
 test('Home retains its real draft, mobile reading order, and keyboard order through resizing', async () => {
   await fixture(async ({ page, api, go, screenshot }) => {
@@ -215,41 +429,48 @@ test('Home retains its real draft, mobile reading order, and keyboard order thro
       previewNames.map((name) => `home-${name}-title`),
     );
     await input.focus();
-    await page.keyboard.press('Tab');
+    for (const name of ['Idea', 'Question', 'To-do', 'Random', 'Save thought']) {
+      await page.keyboard.press('Tab');
+      assert.equal(
+        await page
+          .getByRole('button', { name, exact: true })
+          .evaluate((element) => element === document.activeElement),
+        true,
+        'Composer tags and save remain reachable in keyboard order',
+      );
+      if (name === 'Idea') await page.keyboard.press('Space');
+    }
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => document.querySelector('#home-quick-thought')?.value === '');
     assert.equal(
       (await api('/api/ideas')).body.data[0].content,
       'A draft kept while the room changes width',
     );
+    assert.deepEqual((await api('/api/ideas')).body.data[0].tags, ['Idea']);
     await screenshot('stitch-home-mobile');
   });
 });
 
-test('Home artwork is local and a failed image leaves the room usable', async () => {
+test('local room decoration can fail without hiding the clock, content, or dock', async () => {
   await fixture(
     async ({ page, go, screenshot }) => {
+      const requested = [];
+      page.on('request', (request) => {
+        if (request.resourceType() === 'image') requested.push(request.url());
+      });
       await go('/home');
+      assert.ok(
+        requested.some((url) => new URL(url).pathname === '/images/room-background.webp'),
+        'The shell loads the local approved room background',
+      );
+      await page.waitForFunction(() => {
+        const image = document.querySelector('img[src="/images/room-background.webp"]');
+        return image?.complete && image.naturalWidth > 0;
+      });
+      for (const source of requested) assert.equal(new URL(source).origin, new URL(baseUrl).origin);
       const hero = page.getByRole('region', { name: 'Your room', exact: true });
-      const sources = await hero.evaluate((element) => {
-        const children = [element, ...element.querySelectorAll('*')];
-        return children.flatMap((child) => {
-          const background = getComputedStyle(child).backgroundImage;
-          return [
-            ...(child.tagName === 'IMG' ? [child.getAttribute('src')] : []),
-            ...Array.from(background.matchAll(/url\(["']?([^"')]+)["']?\)/g), (match) => match[1]),
-          ];
-        });
-      });
-      assert.ok(sources.length > 0, 'The desktop hero should render its approved room artwork');
-      for (const source of sources) {
-        assert.equal(new URL(source, page.url()).origin, new URL(baseUrl).origin);
-      }
       const initial = await hero.boundingBox();
-      await page.route('**/*', async (route) => {
-        if (route.request().resourceType() === 'image') await route.abort();
-        else await route.fallback();
-      });
+      await page.route('**/images/room-background.webp', (route) => route.abort());
       await go('/home');
       const failed = await hero.boundingBox();
       assert.ok(
@@ -257,11 +478,61 @@ test('Home artwork is local and a failed image leaves the room usable', async ()
         'Missing decoration must not collapse the hero',
       );
       assert.equal(await hero.getByRole('heading', { level: 1 }).isVisible(), true);
+      assert.equal(
+        await page.getByRole('navigation', { name: 'Main Navigation', exact: true }).isVisible(),
+        true,
+      );
+      const surface = await page.locator('main').evaluate((element) => {
+        const colors = [];
+        for (let node = element; node; node = node.parentElement)
+          colors.push(getComputedStyle(node).backgroundColor);
+        return colors;
+      });
+      assert.ok(
+        surface.some((color) => color !== 'rgba(0, 0, 0, 0)'),
+        'The room retains a solid fallback surface',
+      );
       await page.getByLabel('Quick thought', { exact: true }).fill('The image is optional');
       await assertFits(page);
-      await screenshot('stitch-home-failed-artwork');
+      await screenshot('final-home-failed-artwork');
     },
     { width: 1600, height: 1000 },
+  );
+});
+
+test('reduced motion and unavailable backdrop blur retain usable controls', async () => {
+  await fixture(
+    async ({ page, go, screenshot }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await go('/home');
+      await page.addStyleTag({
+        content:
+          '*, *::before, *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }',
+      });
+      const input = page.getByLabel('Quick thought', { exact: true });
+      await input.fill('Readable without visual effects');
+      const dock = page.getByRole('navigation', { name: 'Main Navigation', exact: true });
+      const motionDurations = await page.locator('main *, nav *').evaluateAll((elements) =>
+        elements.flatMap((element) => {
+          const style = getComputedStyle(element);
+          return [style.animationDuration, style.transitionDuration].flatMap((value) =>
+            value.split(',').map((duration) => parseFloat(duration) * 1000),
+          );
+        }),
+      );
+      assert.ok(
+        motionDurations.every((duration) => duration <= 1),
+        'Reduced motion disables decorative motion and prolonged transitions',
+      );
+      await dock.getByRole('link', { name: 'Ideas', exact: true }).click();
+      await page.waitForURL('**/ideas');
+      assert.equal(await page.getByRole('heading', { level: 1 }).isVisible(), true);
+      await page.goBack();
+      await page.waitForURL('**/home');
+      await assertFits(page);
+      await screenshot('final-home-reduced-motion-no-blur');
+    },
+    { width: 390, height: 844 },
   );
 });
 
@@ -278,34 +549,35 @@ async function titleStyle(page) {
   });
 }
 
-test('Ideas, Library, and College use the same functional title and responsive page spacing', async () => {
+test('Ideas, Library, and College retain consistent functional titles and dock clearance', async () => {
   await fixture(async ({ page, go, screenshot }) => {
-    for (const [width, paddingX, paddingY, gap] of [
-      [1366, 24, 22, 20],
-      [1600, 40, 32, 24],
-      [390, 16, 20, 20],
-    ]) {
+    for (const width of [1366, 1600, 390, 320]) {
       await page.setViewportSize({ width, height: 1000 });
       const styles = [];
       for (const route of ['/ideas', '/library', '/college']) {
         await go(route);
         styles.push(await titleStyle(page));
-        if (width >= 1024) {
-          const sidebar = await page.locator('aside:visible').first().boundingBox();
-          assert.equal(sidebar.width, width < 1440 ? 220 : 280, `Sidebar width at ${width}px`);
-        }
-        const spacing = await page.getByRole('heading', { level: 1 }).evaluate((element) => {
-          const container = element.closest('header').parentElement;
-          const style = getComputedStyle(container);
-          return [
-            parseFloat(style.paddingLeft),
-            parseFloat(style.paddingTop),
-            parseFloat(style.rowGap),
-          ];
-        });
-        assert.deepEqual(spacing, [paddingX, paddingY, gap], `${route} spacing at ${width}px`);
+        assert.equal(await page.locator('aside').count(), 0);
+        const heading = await page.getByRole('heading', { level: 1 }).boundingBox();
+        assert.ok(heading.x >= 12 && heading.x + heading.width <= width - 12);
+        const dock = page.getByRole('navigation', { name: 'Main Navigation', exact: true });
+        assert.equal(
+          await dock.getByRole('link', { name: route.slice(1), exact: false }).count(),
+          1,
+        );
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        const dockBox = await dock.boundingBox();
+        const bottomControl = await page
+          .locator('main button:visible, main input:visible, main textarea:visible')
+          .last()
+          .boundingBox();
+        if (bottomControl)
+          assert.ok(
+            bottomControl.y + bottomControl.height <= dockBox.y - 4,
+            'Page controls remain above the dock',
+          );
         await assertFits(page);
-        await screenshot(`stitch-${route.slice(1)}-empty-${width}`);
+        await screenshot(`final-${route.slice(1)}-empty-${width}`);
       }
       assert.match(styles[0].family, /Inter/i);
       assert.deepEqual(styles[1], styles[0], 'Library title must match Ideas');
@@ -379,8 +651,18 @@ test('Ideas is a readable single stream and a keyboard pin persists through sear
       await item.getByRole('button', { name: 'Unpin thought', exact: true }).waitFor();
       assert.equal((await api(`/api/ideas/${first.id}`)).body.data.isPinned, true);
       const editButtons = stream.getByRole('button', { name: 'Edit thought', exact: true });
-      const firstBox = await cards.nth(0).boundingBox();
-      const secondBox = await cards.nth(1).boundingBox();
+      await page.waitForFunction(
+        () =>
+          document
+            .querySelector('section[aria-label="Ideas list"] article')
+            ?.getAttribute('aria-label') === 'Reading note',
+      );
+      const [firstBox, secondBox] = await cards.evaluateAll((elements) =>
+        elements.map((element) => {
+          const box = element.getBoundingClientRect();
+          return { x: box.x, y: box.y, height: box.height };
+        }),
+      );
       assert.ok(
         secondBox.y >= firstBox.y + firstBox.height,
         'Saved thoughts should read vertically rather than across columns',
