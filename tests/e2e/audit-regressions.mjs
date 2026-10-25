@@ -1,4 +1,4 @@
-/* global document, innerWidth */
+/* global document, innerWidth, window */
 import test, { before, after } from 'node:test';
 import process from 'node:process';
 import assert from 'node:assert/strict';
@@ -76,6 +76,10 @@ async function fixture(run, { width = 1366, height = 900 } = {}) {
   };
   const screenshot = async (name) => {
     if (outputDirectory) {
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+      });
+      await page.evaluate(() => window.scrollTo(0, 0));
       await page.screenshot({ path: path.join(outputDirectory, `${name}.png`), fullPage: true });
     }
   };
@@ -207,26 +211,45 @@ test('shortcut icon choices persist, and Auto-detect follows an edited hostname'
   });
 });
 
-test('mobile navigation is absent from closed focus order and usable when opened', async () => {
+test('the bottom dock exposes all six routes to keyboard users on mobile', async () => {
   await fixture(
     async ({ page, go }) => {
       await go('/library');
-      await page.keyboard.press('Tab');
-      const focused = await page.evaluate(() => {
-        const rect = document.activeElement.getBoundingClientRect();
-        return { x: rect.x, right: rect.right };
-      });
-      assert.ok(focused.x >= 0 && focused.right <= 390, 'Closed navigation must not receive focus');
-      const trigger = page.getByRole('button', { name: 'Open navigation menu', exact: true });
-      await trigger.click();
-      const dialog = page.getByRole('dialog');
-      await dialog.waitFor();
-      await dialog.getByRole('link', { name: 'Ideas', exact: true }).click();
+      const dock = page.getByRole('navigation', { name: 'Main Navigation', exact: true });
+      assert.equal(await dock.count(), 1, 'One common dock serves every screen size');
+      assert.deepEqual(await dock.getByRole('link').allTextContents(), [
+        'Home',
+        'College',
+        'Music',
+        'News',
+        'Ideas',
+        'Library',
+      ]);
+      assert.equal(await page.getByRole('button', { name: /navigation menu/i }).count(), 0);
+      await dock.getByRole('link', { name: 'Home', exact: true }).focus();
+      for (const label of ['Home', 'College', 'Music', 'News', 'Ideas', 'Library']) {
+        const link = dock.getByRole('link', { name: label, exact: true });
+        assert.equal(await link.evaluate((element) => element === document.activeElement), true);
+        assert.equal(await link.evaluate((element) => element.matches(':focus-visible')), true);
+        const box = await link.boundingBox();
+        assert.ok(box.x >= 0 && box.x + box.width <= 390, 'Dock links remain inside the viewport');
+        if (label !== 'Library') await page.keyboard.press('Tab');
+      }
+      await dock.getByRole('link', { name: 'Ideas', exact: true }).focus();
+      await page.keyboard.press('Enter');
       await page.waitForURL('**/ideas');
-      assert.equal(await dialog.isVisible(), false);
-      await trigger.click();
-      await page.keyboard.press('Escape');
-      assert.equal(await trigger.evaluate((element) => element === document.activeElement), true);
+      await dock.locator('a[href="/ideas"][aria-current="page"]').waitFor();
+      assert.equal(
+        await dock.getByRole('link', { name: 'Ideas', exact: true }).getAttribute('aria-current'),
+        'page',
+      );
+      await page.goBack();
+      await page.waitForURL('**/library');
+      await dock.locator('a[href="/library"][aria-current="page"]').waitFor();
+      assert.equal(
+        await dock.getByRole('link', { name: 'Library', exact: true }).getAttribute('aria-current'),
+        'page',
+      );
     },
     { width: 390, height: 600 },
   );
@@ -274,9 +297,12 @@ test('Home shows honest empty states, session thoughts, and the specified mobile
       await go('/home');
       const text = await page.locator('main').innerText();
       assert.doesNotMatch(text, /Spring 2025|midnight drive|Lossless|WARMTH|VINYL|UNKNOWN|3h ago/);
+      const playback = page.getByRole('button', { name: /^play$|previous track|next track/i });
+      assert.equal(await playback.count(), 3);
+      for (const control of await playback.all()) assert.equal(await control.isDisabled(), true);
       assert.equal(
-        await page.getByRole('button', { name: /^play$|previous track|next track/i }).count(),
-        0,
+        await page.getByText('Playback is not available yet.', { exact: true }).isVisible(),
+        true,
       );
       await page.getByRole('button', { name: /another thought/i }).click();
       assert.deepEqual(await page.locator('main h2').allTextContents(), [
