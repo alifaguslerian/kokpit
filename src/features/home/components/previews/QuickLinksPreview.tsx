@@ -13,21 +13,15 @@ export function QuickLinksPreview() {
     .slice(0, 5);
 
   return (
-    <section
-      aria-labelledby="home-links-title"
-      className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-4 sm:p-5 border border-[var(--kokpit-border-subtle)]"
-    >
-      <div className="flex items-center justify-between gap-3 pb-3 border-b border-[var(--kokpit-border-subtle)]">
-        <div className="flex items-center gap-2">
-          <Link2 className="w-4 h-4 text-[var(--kokpit-accent)] shrink-0" aria-hidden="true" />
-          <h2 id="home-links-title" className="font-ui font-semibold text-sm">
+    <section aria-labelledby="home-links-title" className="room-panel home-links">
+      <div className="home-panel-header">
+        <div className="home-panel-title">
+          <Link2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <h2 id="home-links-title" className="font-ui font-medium">
             Quick Links
           </h2>
         </div>
-        <Link
-          to="/library"
-          className="inline-flex items-center gap-1 text-xs text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-accent)]"
-        >
+        <Link to="/library" className="home-panel-link">
           Library <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
         </Link>
       </div>
@@ -50,7 +44,7 @@ export function QuickLinksPreview() {
       ) : !isLoading && displayLinks.length === 0 ? (
         <p className="mt-4 text-xs text-[var(--kokpit-text-muted)]">No links saved yet.</p>
       ) : null}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-4">
+      <div className="mt-3 flex flex-wrap items-stretch gap-2">
         {displayLinks.map((link) => (
           <a
             key={link.id}
@@ -59,15 +53,16 @@ export function QuickLinksPreview() {
             rel="noopener noreferrer"
             aria-label={`${link.name} (opens in a new tab)`}
             title={link.name}
-            className="min-w-0 rounded-xl bg-[var(--kokpit-surface-2)] flex flex-col items-center justify-center gap-2 p-2 border border-[var(--kokpit-border-default)] hover:border-[var(--kokpit-accent-muted)] transition-colors"
+            className="home-link-tile flex min-h-11 min-w-0 max-w-full flex-[0_1_8rem] items-center justify-center gap-2 rounded-lg border border-kokpit-border-default px-3 py-2 text-kokpit-text-secondary hover:border-kokpit-accent-muted"
           >
             <QuickLinkIcon
               iconType={link.iconType}
               iconValue={link.iconValue}
               name={link.name}
               size="md"
+              className="shrink-0"
             />
-            <span className="text-[11px] text-[var(--kokpit-text-secondary)] w-full truncate text-center">
+            <span className="min-w-0 break-words text-xs [overflow-wrap:anywhere]">
               {link.name}
             </span>
           </a>
@@ -76,7 +71,7 @@ export function QuickLinksPreview() {
           to="/library"
           aria-label="Add a link in Library"
           title="Add a link in Library"
-          className="min-h-16 rounded-xl bg-[var(--kokpit-surface-2)] flex items-center justify-center border border-dashed border-[var(--kokpit-border-strong)] hover:border-[var(--kokpit-accent)] transition-colors"
+          className="home-link-tile flex min-h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-kokpit-border-default hover:border-kokpit-accent"
         >
           <Plus className="w-4 h-4 text-[var(--kokpit-text-muted)]" aria-hidden="true" />
         </Link>
