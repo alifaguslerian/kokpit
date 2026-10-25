@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, GraduationCap } from 'lucide-react';
+import { ArrowUpRight, BookOpen, ChevronRight } from 'lucide-react';
 import { useSemesters, useCourses, useWeeks } from '@/features/college/api/use-college';
 
 export function CollegePreview() {
@@ -23,28 +23,19 @@ export function CollegePreview() {
     if (course && weeks.isError) void weeks.refetch();
   };
   return (
-    <section
-      aria-labelledby="home-college-title"
-      className="bg-[var(--kokpit-surface-1)] rounded-[18px] p-4 sm:p-5 border border-[var(--kokpit-border-subtle)]"
-    >
-      <div className="flex items-center justify-between gap-3 pb-3 border-b border-[var(--kokpit-border-subtle)]">
-        <div className="flex items-center gap-2">
-          <GraduationCap
-            className="w-4 h-4 text-[var(--kokpit-accent)] shrink-0"
-            aria-hidden="true"
-          />
-          <h2 id="home-college-title" className="font-ui font-semibold text-sm">
+    <section aria-labelledby="home-college-title" className="room-panel home-college">
+      <div className="home-panel-header">
+        <div className="home-panel-title">
+          <BookOpen className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <h2 id="home-college-title" className="font-ui font-medium">
             College
           </h2>
         </div>
-        <Link
-          to="/college"
-          className="inline-flex items-center gap-1 text-xs text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-accent)]"
-        >
+        <Link to="/college" className="home-panel-link">
           Go to College <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
         </Link>
       </div>
-      <div className="py-5">
+      <div className="pt-3 pb-1">
         {failed && (
           <div role="alert" className="mb-3 text-xs text-kokpit-text-secondary">
             <p>College could not refresh.</p>
@@ -69,31 +60,40 @@ export function CollegePreview() {
             </p>
           </>
         ) : (
-          <div className="space-y-3 min-w-0">
-            <p className="text-xs text-kokpit-text-muted break-words">{semester.name}</p>
+          <div className="min-w-0 space-y-3">
+            <p className="break-words text-xs text-kokpit-text-secondary">{semester.name}</p>
             {course ? (
-              <>
-                <Link
-                  to={`/college/courses/${encodeURIComponent(course.id)}`}
-                  className="block text-sm font-medium break-words hover:text-kokpit-accent"
+              <div className="flex min-w-0 items-start gap-3 rounded-md border border-kokpit-border-default bg-kokpit-accent-bg p-3">
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-kokpit-accent-bg text-kokpit-text-secondary"
+                  aria-hidden="true"
                 >
-                  {course.name}
-                </Link>
-                {week ? (
+                  <BookOpen className="h-5 w-5" strokeWidth={1.4} />
+                </div>
+                <div className="min-w-0 flex-1 space-y-1.5">
                   <Link
-                    to={`/college/weeks/${encodeURIComponent(week.id)}`}
-                    className="block text-xs text-kokpit-text-secondary break-words hover:text-kokpit-accent"
+                    to={`/college/courses/${encodeURIComponent(course.id)}`}
+                    className="flex items-center justify-between gap-2 break-words text-sm font-medium hover:text-kokpit-accent"
                   >
-                    Week {week.weekNumber}
-                    {week.title ? ` · ${week.title}` : ''}{' '}
-                    <ArrowUpRight className="inline h-3 w-3" aria-hidden="true" />
+                    <span className="min-w-0">{course.name}</span>
+                    <ChevronRight className="h-4 w-4 shrink-0" aria-hidden="true" />
                   </Link>
-                ) : weeks.isError ? null : (
-                  <p className="text-xs text-kokpit-text-muted">
-                    No weeks yet. Open this course to add one.
-                  </p>
-                )}
-              </>
+                  {week ? (
+                    <Link
+                      to={`/college/weeks/${encodeURIComponent(week.id)}`}
+                      className="block text-xs text-kokpit-text-secondary break-words hover:text-kokpit-accent"
+                    >
+                      Week {week.weekNumber}
+                      {week.title ? ` · ${week.title}` : ''}{' '}
+                      <ArrowUpRight className="inline h-3 w-3" aria-hidden="true" />
+                    </Link>
+                  ) : weeks.isError ? null : (
+                    <p className="text-xs text-kokpit-text-muted">
+                      No weeks yet. Open this course to add one.
+                    </p>
+                  )}
+                </div>
+              </div>
             ) : courses.isError ? null : (
               <p className="text-sm text-kokpit-text-secondary">
                 No courses yet. Add a course in College.
