@@ -1,21 +1,22 @@
 # Kokpit — Design System
 
-**Version:** 1.2 — Stitch references and refined page compositions
+**Version:** 1.3 — Owner-approved FINAL room composition
 **Status:** V1 design direction locked
 **Theme:** Dark Cozy Editorial Workspace
 **Primary platform:** Desktop web
-**Reference:** Owner-supplied Stitch screens; [reference gallery and interpretation](UI_REFERENCES.md)
-**Last updated:** 2026-10-10
+**Reference:** Owner-approved FINAL Home image; [reference gallery and interpretation](UI_REFERENCES.md)
+**Last updated:** 2026-10-25
 
 This is the source of truth for UI appearance and interaction.
 Product scope belongs in [PRD](../product/PRD.md); execution rules belong in [AGENTS](../../AGENTS.md).
 
-The owner approved using the supplied screens as the visual direction, with cleaner,
-more consistent implementation. Follow their warm atmosphere, shell, hierarchy, and
-page composition through the specifications below. Screenshot labels, example content,
-and extra controls do not independently define product behavior or persisted entities.
-The reference gallery records how each screen maps to V1; DEC-051 in
-[Decisions](../product/DECISIONS.md) records this documentation revision.
+The owner approved the FINAL Home image and its implementation on 2026-10-25.
+It supersedes the earlier sidebar, hero-only imagery and independent-column composition.
+Follow its room atmosphere, floating bottom navigation and Home hierarchy through the
+specifications below. Earlier Stitch screens remain supporting references for dedicated
+pages. Screenshot labels, example content and extra controls do not independently define
+product behavior or persisted entities. DEC-053 in [Decisions](../product/DECISIONS.md)
+records this bounded visual revision; DEC-051 remains historical reference approval.
 
 ## Visual direction
 
@@ -29,9 +30,9 @@ clean functional typography, restrained cards, subtle borders, and soft shadows.
 | Warm, softly separated surfaces | Pure black dominant surfaces; pure white normal text. |
 | Generous whitespace and quiet hierarchy | Admin, SaaS, crypto, gamer, corporate, or widget-wall layouts. |
 | Limited accent on actions and selected states | Entire orange cards or arbitrary pastel card colors. |
-| Optional warm cinematic imagery | Structural imagery, oversized illustrations, saturated assets. |
+| Full-viewport warm room photograph with a solid fallback | UI baked into imagery, oversized illustrations, saturated assets. |
 | Small tactile responses | Neon cyan, purple gradients, RGB glow, cyberpunk decoration. |
-| Simple functional feature pages | Glass panels everywhere, massive blur, heavy floating shadows. |
+| Four readable translucent Home panels and one cream Ideas panel | Excessive blur, unreadable transparency, heavy floating shadows. |
 | Intentional information density | Giant stats, progress charts on Home, spreadsheet-like boxes. |
 
 Never add streaks, XP, engagement badges, AI sparkles everywhere, oversized dashboards,
@@ -44,8 +45,15 @@ Kokpit Workspace Pro, or Kokpit Dashboard without a product revision.
 ## Tokens
 
 Consume semantic tokens rather than arbitrary colors in feature code.
-Color and font-family values preserve the approved V1 specification. Geometry and clock
-sizing below refine the desktop composition around the supplied screens.
+Base color and font-family values preserve the approved V1 specification. The FINAL
+room composition adds semantic room-overlay, translucent-panel, dock and paper roles.
+Their implementation belongs in the shared stylesheet, not raw colors scattered through
+feature code. Paper requires its own readable ink, muted text, rule and focus roles;
+dark-surface text tokens must not be assumed to work on cream. Validate contrast against
+the composed photograph, overlay and panel, including fallback and interaction states.
+Inside translucent room panels, the muted text role resolves to the secondary text color
+to preserve caption contrast over brighter parts of the photograph. The paper surface
+uses its own ink, muted and accent roles rather than those dark-panel overrides.
 
 ### Color reference
 
@@ -59,6 +67,16 @@ sizing below refine the desktop composition around the supplied screens.
 | Surface | `--kokpit-surface-3` | `#25211F` |
 | Surface | `--kokpit-surface-hover` | `#292421` |
 | Surface | `--kokpit-surface-active` | `#302821` |
+| Room panel fallback | `--kokpit-room-panel` | `rgba(26, 21, 17, 0.88)` |
+| Room panel with supported blur | `--kokpit-room-glass` | `rgba(26, 21, 17, 0.78)` |
+| Room border | `--kokpit-room-border` | `rgba(215, 160, 109, 0.44)` |
+| Room dock | `--kokpit-room-dock` | `rgba(24, 19, 16, 0.94)` |
+| Room readability overlay | `--kokpit-room-shade` | `rgba(13, 11, 11, 0.30)` |
+| Paper | `--kokpit-paper` | `#EEDFC1` |
+| Paper ink | `--kokpit-paper-ink` | `#35251A` |
+| Paper secondary text | `--kokpit-paper-muted` | `#665342` |
+| Paper rule | `--kokpit-paper-rule` | `rgba(80, 54, 30, 0.19)` |
+| Paper action and focus | `--kokpit-paper-accent` | `#85451D` |
 | Text | `--kokpit-text-primary` | `#F3EBDD` |
 | Text | `--kokpit-text-secondary` | `#D7C8B6` |
 | Text | `--kokpit-text-muted` | `#A39280` |
@@ -117,12 +135,14 @@ The expanded interface fallback stack may use `system-ui, -apple-system, BlinkMa
 
 | Role | Family | Weight / treatment |
 | --- | --- | --- |
-| Clock | Display serif | 400–500; letter spacing -0.02em; line height 0.95–1.0. |
-| Quote | Display serif | 400 italic; line height 1.35–1.5. |
-| Card heading | UI sans | 600. |
+| Clock | Display serif | 400; letter spacing -0.035em; line height 0.92. |
+| Quote | Display serif | 400 italic; FINAL Home line height 1.05. |
+| Card heading | UI sans | FINAL Home 500; other functional headings may use 600. |
 | Body | UI sans | 400; line height 1.5–1.65. |
 
-Desktop clock may scale from 88px to 128px with the viewport; use 56–80px on narrow screens.
+FINAL Home clock uses `clamp(96px, 8vw, 140px)` on desktop, `clamp(80px, 12vw, 112px)`
+on tablet, and 92px below 640px. `--text-clock` remains the shared 112px baseline;
+the responsive Home treatment controls its rendered size.
 It remains the strongest Home element without clipping or obscuring the date and quote.
 Display serif may also serve large greetings and occasional expressive headings.
 Use UI sans for navigation, cards, buttons, inputs, metadata, body, menus, lists, and settings.
@@ -148,11 +168,11 @@ Never use display serif for dense functional UI.
 | `--space-10` | `40px` |
 | `--space-12` | `48px` |
 | `--space-16` | `64px` |
-| `--sidebar-width` | `280px` |
-| `--page-padding-x` | `40px` |
-| `--page-padding-y` | `32px` |
-| `--content-gap` | `24px` |
-| `--section-gap` | `24px` |
+| `--page-padding-x` | `32px` |
+| `--page-padding-y` | `20px` |
+| `--content-gap` | `18px` |
+| `--section-gap` | `20px` |
+| `--dock-clearance` | `120px` |
 | `--shadow-soft` | `0 4px 16px rgba(0,0,0,0.18)` |
 | `--shadow-card` | `0 8px 28px rgba(0,0,0,0.26)` |
 | `--shadow-float` | `0 12px 36px rgba(0,0,0,0.30)` |
@@ -164,32 +184,49 @@ Never use display serif for dense functional UI.
 Base spacing unit is 4px; avoid arbitrary spacing where the scale fits.
 Recommended radii: input 12–14px, button 12px, small card 14px, main card 18px,
 hero surface 22px, chips pill. Do not use dramatic floating shadows.
-The shell values above target large desktop screens (≥1440px). On constrained desktops,
-override sidebar width to 220px, page padding to 24px horizontally / 22px vertically,
-content gap to 16px, and section gap to 20px. Reduce columns before text becomes cramped.
+The spacing values above target large desktop screens (≥1440px). Brand/main containers
+have a 1440px maximum width, with 32px horizontal padding and an 18px Home grid gap.
+Page vertical padding is 20px, with a 16px top override on large desktops; the Home section
+gap is 20px. On constrained desktops use 24px horizontal padding, 20px page vertical padding
+and a 16px Home grid gap. Mobile horizontal padding is 16px. Reduce columns before text
+becomes cramped. Sidebar widths from
+DEC-051 are historical; the current shell has no sidebar or reserved sidebar space.
+
+The owner reviewed the compact laptop follow-up and restored taller, roomier Home
+proportions. Do not compress the composition based on viewport height to force every
+panel above the fold; natural vertical scrolling is accepted. Desktop panels use 22px
+padding, with a 22px/28px paper inset, and retain flexible minimum rows so real content
+can grow. Desktop quote sizing is `clamp(34px, 3.6vw, 56px)`. Preserve aligned column
+bottoms and sufficient scroll clearance above the dock. The manual dock visibility
+control remains available at every viewport.
 
 ## Layout and navigation
 
 Desktop is primary; target 1366px–1920px while remaining usable on smaller laptops.
-The app shell is a sidebar beside main content. Very large screens may use a comfortable
-maximum readable content width rather than stretching text indefinitely.
-Use a subtle sidebar separator and generous space around the main content. The browser
-tabs, address bar, window controls, and browser avatar in the references are outside the app.
+The shared shell has a full-viewport warm room photograph, a readability overlay and a
+floating bottom dock. No sidebar remains at any viewport. Very large screens use a
+comfortable readable content width rather than stretching text indefinitely.
+The background is decorative: a solid semantic fallback keeps every page usable if it fails.
+The browser tabs, address bar, window controls and browser avatar in references are outside the app.
 
-Sidebar order: Kokpit name/logo → short tagline → Home, College, Music, News, Ideas,
-Library → optional atmospheric visual near the bottom. Do not add destinations outside V1.
-The bottom visual is quiet decoration, not a session indicator or another quote system.
-Use the existing font families and avoid reproducing the reference's handwritten lettering
-or glowing dot. Keep navigation reachable when the viewport is short.
+Dock order: Home, College, Music, News, Ideas, Library. Keep all six labeled links reachable,
+including short viewports and narrow phones. Use a semantic navigation landmark, route-aware
+active state, visible keyboard focus and bottom content clearance of
+`120px + env(safe-area-inset-bottom, 0px)` so
+the dock never obscures controls. It is shared across every route; do not add destinations.
+An adjacent Hide navigation button collapses the six links into a small Show navigation
+handle. The toggle remains reachable, exposes its expanded state and removes hidden links
+from keyboard/screen-reader navigation. Visibility is session UI state, retained across
+routes and reset on page reload; it is not stored as canonical content or a new preference.
 Dedicated-page paths are conceptually `/home`, `/college`, `/music`, `/news`, `/ideas`,
 and `/library`; actual routing belongs in [Architecture](../engineering/ARCHITECTURE.md).
 
-| Sidebar item | Specification |
+| Dock item | Specification |
 | --- | --- |
-| Geometry | Height 44px; inline padding 14px; radius 12px; gap 12px. |
+| Geometry | At least 44px usable target; compact spacing that keeps all six labels readable. |
 | Inactive | Secondary text; transparent background. |
-| Hover | `rgba(255,255,255,0.035)` background; primary text. |
-| Active | Accent-bg background; accent-hover text. |
+| Hover | Surface-hover background; primary text. |
+| Active | Surface-active background; room border; primary text and accent-hover icon. |
 | Icon | Lucide preferred; consistent 1.75–2px stroke; sizes 16, 18, 20, or 22px. |
 
 Avoid oversized icons. Quick Links may use recognizable brand logos.
@@ -199,20 +236,24 @@ Avoid oversized icons. Quick Links may use recognizable brand logos.
 Home is an overview. Full feature implementations stay on dedicated pages.
 
 ```text
-Hero: Clock + Date + Context line + Quote + optional atmospheric visual
+Hero: Clock + Date + Context line beside Quote, over the shared room atmosphere
 Highlights: Music · College · Ideas · News · Quick Links
 ```
 
-Reference-led desktop arrangement, adapted to actual content rather than fixed card heights:
+FINAL desktop arrangement, adapted to actual content rather than fixed screenshot heights:
 
 | Region | Composition |
 | --- | --- |
-| Hero across main content | Clock, date, context, quote on the left; optional subdued room imagery on the right. |
-| Left highlight column | Now Playing, then compact Ideas capture. |
-| Right highlight column | College context, News preview, then Quick Links. |
+| Hero across main content | Large clock/date/context on the left; quote beside it on the right; both over the room atmosphere. |
+| Left highlight stack | Translucent Music panel above cream ruled-paper Ideas capture. |
+| Right highlight stack | Translucent College, News and Quick Links panels. |
 
-Use two balanced columns with independent content heights, as in the Home reference;
-do not force Ideas to align vertically with News or stretch cards to fill empty space.
+Use two balanced columns with shared top and bottom boundaries. CSS grid areas follow
+Music/College, Music/News, Ideas/News, Ideas/Links; flexible minimum rows let real content
+expand naturally while aligning the two stacks' lower edges. Do not clip, hide or shrink
+content to match a fixed image height. The four dark panels are Music, College, News and
+Quick Links; Ideas is the distinct paper surface. Their different treatments distinguish
+passive glances from the immediate capture action.
 On narrow screens, use one column with a coherent reading and keyboard order:
 hero → music → college → ideas → news → quick links. Layout changes must preserve
 labels, usable controls, and the same product hierarchy.
@@ -222,31 +263,23 @@ Hierarchy: **Clock → Quote / atmosphere → Current music → Relevant current
 The hero may merge into a room image; its content is context/greeting, time, date, quote,
 and a source only when one genuinely exists. Quote attribution follows
 [Content Sources](../features/CONTENT_SOURCES.md).
-Use the dark Home reference as the primary atmosphere; the alternate's bright placeholder
-is not an approved image treatment. Reserve a visually secondary **another thought** action.
+Use [the FINAL Home reference](references/home-final.png) as the primary atmosphere.
+Reserve a visually secondary **another thought** action. Until Milestone 6, the existing
+temporary unattributed thought remains explicitly temporary; this polish does not implement
+the D1 quote pool or change the content strategy.
 
 A new feature does not automatically deserve a Home widget. Ask whether it warrants
 attention every time Kokpit opens; otherwise keep it on its own page.
 
 ### Atmospheric imagery
 
-Imagery is optional and must never be structural: the interface works if it is removed.
-Prefer a dark room, warm lamp, desk, books, plant, laptop, city outside, window reflection,
-and soft amber light. Assets should feel warm, cinematic, natural, soft, and slightly muted.
-
-```css
-/* Recommended image treatment and optional readability overlay. */
-filter: brightness(0.68) saturate(0.85) contrast(1.05);
-background: linear-gradient(
-  90deg,
-  rgba(13,11,11,0.98) 0%,
-  rgba(13,11,11,0.78) 45%,
-  rgba(13,11,11,0.15) 100%
-);
-```
-
-Never reduce clock readability. General images use `object-fit: cover` and 12–18px radii.
-Mobile may significantly reduce atmospheric imagery.
+Use the local clean room photograph at `/images/room-background.webp` as the shared
+full-viewport background. It is derived from the approved reference's atmosphere and
+contains no interface text, controls or panels. The exact approved screenshot remains
+a documentation reference, not a flattened interactive app. Prefer warm lamplight, desk,
+books and a muted lived-in room; preserve a solid fallback and responsive cover crop.
+The overlay and panel opacity protect clock, quote and functional text readability.
+The same atmosphere continues behind readable foreground surfaces on feature pages.
 
 ### Highlight patterns
 
@@ -267,17 +300,24 @@ the supplied screen. Use playback progress and real track metadata; do not copy 
 vinyl hardware, or lossless labels as capabilities without corresponding supported behavior.
 Decorative audio bars are optional, must not pretend to measure sound, and must remain quiet.
 Use current College material context rather than inventing a timetable or completion score.
+Before Milestone 5, keep Music's honest empty state and label future playback controls
+clearly as unavailable with native disabled behavior. Do not invent track metadata,
+playback progress or personal records to populate the FINAL image. News likewise keeps
+its honest empty state until its documented ingestion packages. Existing College context,
+Ideas capture and Quick Links remain connected to their current APIs.
 
-Music cover: 96–112px square, radius 12–14px.
-Primary play button: 48px square, pill radius 999px, accent background, inverse text.
+Music cover: `clamp(128px, 12vw, 184px)` square on desktop, 160px on tablet and
+88px on mobile; radius-sm. The current honest empty state uses a neutral music icon.
+Primary play button: 48px square with pill radius; the pre-Milestone-5 treatment is
+disabled, with an accent-bg surface, strong border and accent icon.
 Progress track: `rgba(255,255,255,0.10)`; filled progress: accent.
-Quick Link tile: minimum width 72px, height 68px, radius 12px,
-surface-2 background, 1px subtle border.
+Home Quick Link tiles: at least 44px high, flexible 7rem basis, radius-sm,
+accent-bg surface and a subtle border. The Add link is 44px square.
 
 ## Components and interaction states
 
 Reuse focused components without excessive abstraction. Conceptual names include AppShell,
-Sidebar / SidebarNav / SidebarNavItem, HomeHero / Clock / DynamicQuote,
+BottomNavigation / dock links, HomeHero / Clock / DynamicQuote,
 FeatureCard, MusicPreview / CollegePreview / NewsPreview / IdeaCapture / QuickLinksPreview,
 Button / IconButton, Input / Textarea, Chip / Badge, EmptyState / ErrorState / Skeleton.
 Naming and placement follow [File Structure](../engineering/FILE_STRUCTURE.md).
@@ -329,7 +369,8 @@ large statistic panels, and repeated card-inside-card borders.
 Use Inter for functional page titles, controls, metadata, and article/idea previews;
 reserve Cormorant Garamond for occasional expressive headings. Example text, source names,
 counts, course names, tracks, and link destinations in the references are not production seeds.
-An unsupported control must be omitted rather than displayed as a non-functional promise.
+An unsupported control must be omitted rather than displayed as a non-functional promise,
+except the explicitly approved clearly disabled future music controls in this polish.
 This table describes design patterns, not permission to expand a work package's feature scope.
 
 ## Loading, empty, and error states
@@ -346,9 +387,9 @@ Breakpoints are conceptual guidance, not mandatory framework values.
 
 | Range | Behavior |
 | --- | --- |
-| Mobile: <640px | Prioritize idea capture, quick links, news glance, music controls, college access, and clock. Reduce imagery. |
-| Tablet: 640–1023px | Sidebar may collapse; 2-column grids may become 1 column or an appropriate asymmetric layout. |
-| Desktop: 1024–1439px | Main sidebar and Home composition; remain usable on smaller laptops. |
+| Mobile: <640px | Stack hero, Music, College, Ideas, News, Quick Links; retain draft and reading order. Keep the six-link dock usable and clear of content. |
+| Tablet: 640–1023px | Reduce columns when needed; retain the shared photograph and bottom dock. |
+| Desktop: 1024–1439px | FINAL two-column Home composition and bottom dock; remain usable on smaller laptops. |
 | Large desktop: ≥1440px | Comfortable readable content width and generous space. |
 
 Do not force mobile to reproduce desktop exactly.
@@ -389,7 +430,7 @@ browser chrome, broken assets, fabricated data, or reference-only feature contro
 
 ## Semantic implementation mapping
 
-Tailwind consumes these tokens through semantic names: `bg-app`, `bg-sidebar`, `bg-surface`,
+Tailwind consumes these tokens through semantic names: `bg-app`, `bg-surface`,
 `bg-surface-raised`, `text-primary`, `text-secondary`, `text-muted`, `accent`, `accent-hover`,
 `border-subtle`, and `border-default`.
 Avoid scattered raw palette utilities such as `bg-zinc-950`, `text-stone-200`,
