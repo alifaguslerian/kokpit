@@ -14,21 +14,18 @@ export function DynamicQuote({ initialQuote }: DynamicQuoteProps) {
   const currentQuote = quotes[quoteIndex % quotes.length];
 
   return (
-    <div className="mt-4 pt-4 border-t border-[var(--kokpit-border-subtle)] flex flex-col gap-2 max-w-xl">
-      <p
-        className="font-display italic text-xl sm:text-2xl text-[var(--kokpit-text-primary)] leading-relaxed"
-        aria-live="polite"
-      >
+    <div className="home-quote">
+      <p className="home-quote-text" aria-live="polite">
         “{currentQuote?.content}”
       </p>
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <span className="font-ui text-xs text-[var(--kokpit-text-muted)]">
+      <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
+        <span className="font-ui text-xs text-[var(--kokpit-text-secondary)]">
           Temporary thought · Unattributed
         </span>
         <button
           type="button"
           onClick={() => setQuoteIndex((previous) => (previous + 1) % quotes.length)}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--kokpit-text-secondary)] hover:text-[var(--kokpit-accent)] transition-colors py-1 px-2 rounded-md hover:bg-[var(--kokpit-surface-hover)]"
+          className="home-panel-link min-h-9 rounded-md"
           title="Show another temporary thought for this session"
         >
           <RotateCw className="w-3 h-3" aria-hidden="true" />
