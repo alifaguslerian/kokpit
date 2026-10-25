@@ -83,6 +83,7 @@
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    scroll-padding-bottom: var(--dock-clearance);
   }
 
   body {
@@ -173,6 +174,549 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .room-shell {
+    position: relative;
+    isolation: isolate;
+    min-height: 100svh;
+    padding-bottom: calc(var(--dock-clearance) + env(safe-area-inset-bottom, 0px));
+    background: var(--kokpit-bg-app);
+  }
+
+  .room-background,
+  .room-shade {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .room-background {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .room-background[hidden] {
+    display: none;
+  }
+
+  .room-shade {
+    background: var(--kokpit-room-shade);
+  }
+  .room-shell[data-room='feature'] .room-shade {
+    background: var(--kokpit-room-panel);
+  }
+
+  .room-brand,
+  .page-container {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  .room-brand {
+    padding-top: 20px;
+  }
+  .room-brand > a {
+    display: inline-flex;
+    border-radius: var(--radius-sm);
+  }
+  .page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-block: 20px;
+  }
+  .home-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  .skip-navigation {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 60;
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    background: var(--kokpit-surface-1);
+    transform: translateY(-200%);
+  }
+  .skip-navigation:focus {
+    transform: translateY(0);
+  }
+
+  .navigation-dock {
+    position: fixed;
+    z-index: 40;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: min(680px, calc(100% - 24px));
+    padding: 5px;
+    border: 1px solid var(--kokpit-room-border);
+    border-radius: var(--radius-pill);
+    background: var(--kokpit-room-dock);
+    box-shadow: var(--shadow-float);
+  }
+
+  .bottom-navigation {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+    gap: 4px;
+  }
+  .bottom-navigation[hidden] {
+    display: none;
+  }
+  .navigation-dock[data-collapsed='true'] {
+    width: auto;
+  }
+  .dock-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-shrink: 0;
+    min-height: 44px;
+    min-width: 36px;
+    padding: 6px;
+    border-radius: var(--radius-pill);
+    color: var(--kokpit-text-secondary);
+    font-size: 12px;
+  }
+  .dock-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+  .dock-toggle:hover {
+    background: var(--kokpit-surface-hover);
+  }
+  .navigation-dock[data-collapsed='true'] .dock-toggle {
+    padding-inline: 12px;
+  }
+
+  .bottom-navigation-link {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 10px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    color: var(--kokpit-text-secondary);
+    font-size: 13px;
+    transition:
+      background-color var(--motion-default),
+      color var(--motion-default);
+  }
+  .bottom-navigation-link svg {
+    width: 19px;
+    height: 19px;
+    flex-shrink: 0;
+  }
+  .bottom-navigation-link:hover {
+    background: var(--kokpit-surface-hover);
+    color: var(--kokpit-text-primary);
+  }
+  .bottom-navigation-link.is-active {
+    background: var(--kokpit-surface-active);
+    border-color: var(--kokpit-room-border);
+    color: var(--kokpit-text-primary);
+  }
+  .bottom-navigation-link.is-active svg {
+    color: var(--kokpit-accent-hover);
+  }
+
+  .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.7fr);
+    align-items: center;
+    gap: 48px;
+    min-height: 200px;
+    padding: 0 40px 4px;
+    color: var(--kokpit-text-primary);
+    text-shadow: 0 2px 12px var(--kokpit-bg-base);
+  }
+  .home-time {
+    min-width: 0;
+  }
+  .home-greeting {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+  .home-clock {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .home-clock-time {
+    font-family: var(--font-display);
+    font-size: clamp(96px, 8vw, 140px);
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    white-space: nowrap;
+  }
+  .home-date {
+    margin-top: 8px;
+    color: var(--kokpit-text-secondary);
+    font-size: 14px;
+  }
+  .home-quote {
+    min-width: 0;
+    border-left: 1px solid var(--kokpit-border-strong);
+    padding-left: 48px;
+  }
+  .home-quote-text {
+    max-width: 34ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(34px, 3.6vw, 56px);
+    line-height: 1.05;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .home-preview-grid {
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+  }
+  .home-preview-grid > section {
+    min-width: 0;
+  }
+
+  .room-panel,
+  .paper-panel {
+    padding: 22px;
+    border: 1px solid var(--kokpit-room-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+  }
+  .room-panel {
+    --kokpit-text-muted: var(--kokpit-text-secondary);
+    background: var(--kokpit-room-panel);
+  }
+  .home-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .home-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .home-panel-title h2 {
+    font-size: 18px;
+  }
+  .home-panel-title > svg {
+    color: var(--kokpit-text-secondary);
+  }
+  .home-panel-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 5px;
+    color: var(--kokpit-accent-hover);
+    font-size: 12px;
+  }
+  .home-panel-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .home-music-body {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .home-music-cover {
+    display: flex;
+    width: clamp(128px, 12vw, 184px);
+    aspect-ratio: 1;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--kokpit-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--kokpit-accent-bg);
+  }
+  .home-music-range {
+    display: block;
+    height: 12px;
+    accent-color: var(--kokpit-accent);
+    opacity: 0.6;
+  }
+  .home-music-transport button {
+    opacity: 0.65;
+  }
+  .home-news {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .paper-panel {
+    color: var(--kokpit-paper-ink);
+    background-color: var(--kokpit-paper);
+    background-image: repeating-linear-gradient(
+      transparent 0 27px,
+      var(--kokpit-paper-rule) 27px 28px
+    );
+    background-position: 0 10px;
+    border-color: var(--kokpit-paper-rule);
+    border-radius: 12px 16px 14px 10px;
+    padding: 22px 28px;
+  }
+  .paper-panel ::selection {
+    background: var(--kokpit-paper-rule);
+    color: var(--kokpit-paper-ink);
+  }
+  .paper-panel :focus-visible {
+    outline-color: var(--kokpit-paper-accent);
+  }
+  .paper-panel .home-panel-link {
+    color: var(--kokpit-paper-accent);
+  }
+  .paper-panel .home-panel-title h2 {
+    font-size: 22px;
+  }
+  .paper-input {
+    display: block;
+    min-height: 66px;
+    line-height: 28px;
+    padding: 3px 0;
+    border-radius: 4px;
+  }
+  .paper-tag {
+    border: 1px solid var(--kokpit-paper-rule);
+    border-radius: var(--radius-pill);
+    color: var(--kokpit-paper-ink);
+  }
+  .paper-tag:hover {
+    background: var(--kokpit-paper-rule);
+  }
+  .paper-tag[aria-pressed='true'],
+  .paper-save {
+    background: var(--kokpit-paper-ink);
+    color: var(--kokpit-paper);
+  }
+  .paper-save:not(:disabled):hover {
+    background: var(--kokpit-paper-accent);
+  }
+  .paper-thought {
+    background: var(--kokpit-paper);
+  }
+  .paper-note-link {
+    display: block;
+  }
+  .paper-note-meta {
+    margin-bottom: 6px;
+  }
+  .home-links {
+    padding-block: 16px;
+  }
+  .home-link-tile {
+    border: 1px solid var(--kokpit-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--kokpit-accent-bg);
+  }
+  .home-link-tile:hover {
+    background: var(--kokpit-surface-hover);
+    border-color: var(--kokpit-room-border);
+  }
+
+  @supports (backdrop-filter: blur(8px)) {
+    .room-panel {
+      background: var(--kokpit-room-glass);
+      backdrop-filter: blur(8px);
+    }
+    .navigation-dock {
+      backdrop-filter: blur(12px);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .home-preview-grid {
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      grid-template-rows: minmax(190px, auto) minmax(56px, auto) minmax(144px, auto) minmax(
+          100px,
+          auto
+        );
+      grid-template-areas: 'music college' 'music news' 'ideas news' 'ideas links';
+      align-items: stretch;
+    }
+    .home-music {
+      grid-area: music;
+    }
+    .home-college {
+      grid-area: college;
+    }
+    .home-ideas {
+      grid-area: ideas;
+    }
+    .home-news {
+      grid-area: news;
+    }
+    .home-links {
+      grid-area: links;
+    }
+  }
+
+  @media (min-width: 90rem) {
+    .room-brand,
+    .page-container {
+      padding-inline: 32px;
+    }
+    .page-container {
+      padding-top: 16px;
+    }
+    .home-hero {
+      min-height: 188px;
+    }
+    .home-preview-grid {
+      gap: 18px;
+      grid-template-rows: minmax(208px, auto) minmax(60px, auto) minmax(154px, auto) minmax(
+          108px,
+          auto
+        );
+    }
+    .home-panel-title h2 {
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 63.999rem) {
+    .home-hero {
+      padding-inline: 12px;
+      gap: 24px;
+    }
+    .home-quote {
+      padding-left: 24px;
+    }
+    .home-clock-time {
+      font-size: clamp(80px, 12vw, 112px);
+    }
+    .home-quote-text {
+      font-size: 36px;
+    }
+    .home-music-cover {
+      width: 160px;
+    }
+  }
+
+  @media (max-width: 39.999rem) {
+    .room-brand,
+    .page-container {
+      padding-inline: 16px;
+    }
+    .page-container {
+      gap: 20px;
+      padding-top: 16px;
+    }
+    .room-brand {
+      padding-top: 16px;
+    }
+    .room-background {
+      object-position: 62% center;
+    }
+    .home-hero {
+      grid-template-columns: minmax(0, 1fr);
+      padding: 0 4px 4px;
+      gap: 20px;
+    }
+    .home-greeting {
+      font-size: 24px;
+    }
+    .home-clock-time {
+      font-size: 92px;
+    }
+    .home-quote {
+      border-left: 0;
+      border-top: 1px solid var(--kokpit-border-strong);
+      padding: 16px 0 0;
+    }
+    .home-quote-text {
+      font-size: 32px;
+      max-width: 25ch;
+    }
+    .room-panel,
+    .paper-panel {
+      padding: 18px;
+    }
+    .home-panel-header {
+      gap: 10px;
+    }
+    .home-panel-link {
+      font-size: 11px;
+    }
+    .home-music-body {
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .home-music-cover {
+      width: 88px;
+    }
+    .home-music-transport {
+      gap: 8px;
+    }
+    .navigation-dock {
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      gap: 0;
+      border-radius: 24px;
+      padding: 5px;
+    }
+    .bottom-navigation-link {
+      flex-direction: column;
+      min-height: 54px;
+      gap: 3px;
+      padding: 5px 2px;
+      font-size: 10px;
+      border-radius: 18px;
+    }
+    .bottom-navigation {
+      gap: 0;
+    }
+    .dock-toggle {
+      min-width: 28px;
+      padding: 4px;
+    }
+    .bottom-navigation-link svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .room-panel {
+      background: var(--kokpit-surface-1);
+      backdrop-filter: none;
+    }
+    .navigation-dock {
+      background: var(--kokpit-bg-app);
+      backdrop-filter: none;
     }
   }
 }
