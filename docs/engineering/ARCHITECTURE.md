@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.5 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-24
+**Version:** 0.6 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-25
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -67,7 +67,11 @@ Feature code starts in `src/features/`; shared primitives in `src/components/`;
 application composition in `src/app/`; generic infrastructure in `src/lib/`.
 Move code to shared only after a second genuine use.
 
-React Router keeps the shell, sidebar, providers and music engine mounted across navigation.
+React Router keeps the shell, shared bottom navigation, providers and future music engine
+mounted across navigation. The owner-approved FINAL visual polish replaces the sidebar
+with a six-link floating dock on every route. `AppShell` owns the shared room background,
+readability treatment and content clearance; layout owns `BottomNavigation` and its
+navigation items. Feature routes retain their existing responsibilities and APIs.
 Conceptual page routes (exact supporting route names are implementation details):
 
 | Page | Route |
@@ -94,7 +98,7 @@ Accessibility and loading/empty/error states follow the Design System.
 |---|---|
 | Ideas, links, College, music metadata, playlists, news, quotes, settings | API + D1; TanStack Query fetch/cache/invalidate |
 | Playing track, queue, volume, player events | Persistent client provider above routes |
-| Sidebar, selections, modal/form state | Local React state/context |
+| Selections, modal/form state | Local React state/context |
 | Small non-critical preferences | Browser storage where appropriate |
 
 LocalStorage is not a database for content, files, playlists or news.
