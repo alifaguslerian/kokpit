@@ -190,6 +190,16 @@ materialsRoutes.patch(
 );
 
 export const fileRoutes = new Hono<WorkerEnv>();
+materialsRoutes.delete(
+  '/materials/:id',
+  sameOriginWrite,
+  validateParams(z.object({ id })),
+  validateQuery(z.object({}).strict()),
+  async (c) => {
+    await service(c).delete(c.req.param('id'), c.get('userId'));
+    return c.json({ success: true });
+  },
+);
 fileRoutes.use('*', async (c, next) => {
   c.header('Cache-Control', 'private, no-store');
   await next();
