@@ -1,0 +1,1 @@
+CREATE INDEX `materials_user_updated_idx` ON `materials` (`user_id`,"updated_at" desc,"id" desc);
