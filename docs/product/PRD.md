@@ -1,12 +1,16 @@
 # Kokpit — Product Requirements
 
-**Version:** 0.2 — V1 scope preserved
+**Version:** 0.3 — Owner-approved feature-page scope
 **Status:** V1 product specification
 **Owner:** Single user / workspace owner
-**Last updated:** 2026-10-07
+**Last updated:** 2026-10-25
 
 This document defines what Kokpit is and what V1 must do.
 Implementation, storage, content pipelines, and visual tokens belong to the linked specifications.
+The owner approved the latest feature-page references on 2026-10-25 and requested working
+behavior for every visible control. [Approved UI Features](../features/APPROVED_UI_FEATURES.md)
+defines the interaction contract; [DEC-054](DECISIONS.md#dec-054--approved-feature-pages-and-functional-scope)
+records the scope revision. These requirements include pending implementation work.
 
 ## Product vision
 
@@ -48,10 +52,10 @@ especially quick idea capture. Mobile need not reproduce the desktop layout exac
 | Home | Local clock, date, atmosphere, quote, persistent music access, restrained previews. |
 | Quotes | Dynamic short thoughts on Home; not a separate primary navigation destination. |
 | Music | Personal audio library, playlists, controls, persistent playback. |
-| News | Curated technology and world information relevant to the owner. |
-| College | Semester → Course → Week → Material organization. |
+| News | Curated technology/world information, saved article references and topics derived from its feed. |
+| College | Semester → Course → Week → Material, a recurring class timetable and recent materials. |
 | Library / Quick Links | One-click launchpad for frequently visited websites. |
-| Ideas | Fast freeform capture, retrieval, editing, and search. |
+| Ideas | Fast capture/search, lightweight collections, independent favorites/pins and optional private covers. |
 
 These are seven product areas and six primary navigation destinations.
 Quotes are part of Home rather than an additional module page.
@@ -112,6 +116,9 @@ Core functionality must not depend on a paid music subscription.
 - Control volume and view track information.
 - Create playlists, add tracks, remove tracks, and reorder playlist contents.
 - Continue playback across route navigation.
+- Search real tracks by title, artist or album; switch between library and playlists.
+- Make shuffle, repeat, seek, volume and visible management menus functional.
+- Manage optional private track artwork without blocking audio import/playback.
 
 External media links may be supported through compatible providers or import mechanisms
 where technically and legally supported. They do not replace the core owned-file flow.
@@ -144,6 +151,12 @@ The owner's interests may evolve later without requiring all articles to be disp
 - Preserve source transparency and a readable, curated feed.
 - Ingestion, news listing, original links, and basic relevance continue without AI enrichment.
 - If refresh fails, cached news remains useful and other modules keep working.
+- Save and unsave article references; browse every saved item beyond the short preview.
+  Saved articles survive ordinary cleanup until unsaved, without storing full publisher pages.
+- Show Trending Topics derived from the last seven days of Kokpit's deduplicated cache.
+  Selecting a topic filters the feed; this is not a claim of global popularity.
+- Category and topic filters, original links, bookmark controls and View saved must work
+  without AI enrichment. No reading metrics, goals or digest-settings subsystem is added.
 
 Source lists, refresh schedules, scoring, summaries, and fallback are canonical in
 [Content Sources](../features/CONTENT_SOURCES.md).
@@ -169,6 +182,17 @@ Materials include PDFs, PowerPoint and Word documents, images, text files, code 
 links, and other useful academic files. File handling follows documented validation;
 this list does not bypass security checks or imply every format has an embedded preview.
 
+The overview also provides an owner-maintained weekly class timetable for the selected
+semester: course, weekday, local start/end time and optional room. The owner can add,
+edit and delete entries; blocks open the corresponding course. Use the saved owner
+timezone, include weekend classes and preserve overlapping entries. This is a narrow
+recurring-class schedule, not general calendar management, calendar sync or reminders.
+
+Recent Files & Notes shows the selected semester's most recently updated materials,
+including uploaded Markdown/text notes, and opens the real private file or original link.
+View materials opens a paginated semester-wide list with course/week context. No separate
+notebook or tracking log is needed. Course descriptions are optional editable plain text.
+
 Optional course icons or identifying colors may be considered later where appropriate;
 they are not a required V1 expansion.
 Storage fields and deletion behavior belong in [Data Model](../engineering/DATA_MODEL.md).
@@ -188,7 +212,9 @@ It should feel integrated into Kokpit and remove repeated navigation friction.
 
 Links may point to online tools, documentation, university systems, media, or project resources.
 Examples in specifications are illustrative, not production seed records.
-Visual grouping is optional for V1; see the [Design System](../design/DESIGN_SYSTEM.md).
+Optional group assignment, favorites and group/Favorites filters are part of the approved
+Library layout; groups need not exist before a shortcut can be saved. Keep keyboard-accessible
+ordering and edit/delete actions. See the [Design System](../design/DESIGN_SYSTEM.md).
 
 ## Ideas
 
@@ -203,6 +229,13 @@ Ideas captures spontaneous thoughts before they disappear.
 - Edit and delete existing ideas.
 - Browse saved ideas and search their content.
 - Support optional lightweight tags without requiring categorization before saving.
+- Browse All Ideas as a readable responsive card grid; text-only ideas remain complete.
+- Favorite/unfavorite independently of pinning, with a short favorite preview and full view.
+- Create, rename, order and delete lightweight collections; select one to filter ideas.
+  An idea belongs to zero or one collection; deleting a collection preserves its ideas.
+- Assign/clear a collection and optionally upload/replace/remove a private cover in the
+  edit form. Cover management must not slow quick capture or become a general attachment editor.
+- Combine search, tag, collection and favorite filters; every saved item remains reachable.
 
 Tags may express topics such as project, college, random, design, or minecraft.
 These are examples, not mandatory taxonomy or fake owner data.
@@ -248,6 +281,10 @@ Do not implement these in V1 without an explicit specification revision:
 Do not reshape Kokpit into enterprise software, an admin panel, analytics or cryptocurrency
 dashboard, generic AI SaaS, or a collection of visually competing cards.
 Future reconsideration does not authorize adding any of these now.
+
+The approved recurring College class timetable is the sole exception to calendar management.
+Ideas collections are flat groups rather than notebooks; favorites and saved News are owner
+references rather than social bookmarks, reading trackers or offline publisher archives.
 
 ## V1 success criteria
 
