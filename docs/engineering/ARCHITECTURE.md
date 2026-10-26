@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.8 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-26
+**Version:** 0.9 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-26
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -41,7 +41,8 @@ explicit base styles, without Preflight. Package 4.1 adds owner-scoped College
 hierarchy APIs through routes, a service and a repository using the existing schema.
 Package 4.2 adds lazy College, course and week pages, shared query-backed Home
 context and metadata forms. Package 4.3 adds local private R2, streamed file uploads,
-material metadata/link APIs and owned file delivery. Material UI/deletion, persistent audio,
+material metadata/link APIs and owned file delivery. Package 4.4 adds material UI, recent/full lists
+and coordinated R2/metadata deletion. The class timetable, persistent audio,
 content jobs and production resources remain pending.
 DEC-054 approves feature-page requirements, including class schedule, Ideas collections/
 favorites/covers and News saves/topics. They use the same stack and domain boundaries;
@@ -91,7 +92,7 @@ Conceptual page routes (exact supporting route names are implementation details)
 College may nest semester/course/week paths; Music may nest playlist paths.
 Current College routes are `/college`, `/college/courses/:courseId` and
 `/college/weeks/:weekId`; `?semester=<id>` preserves the overview selection.
-Pending 4.4 adds `?view=materials` to the semester overview; pending News/Ideas views
+Package 4.4 adds `?view=materials` to the semester overview; pending News/Ideas views
 use validated feature-local query parameters from Approved UI Features. These additions
 do not create more primary destinations or an alternate global navigation system.
 Lazy-load deeper feature routes where useful. Home reads lightweight summaries from their
@@ -193,9 +194,13 @@ byte counting, bounded signature/text checks and native FixedLengthStream for R2
 metadata is inserted only after storage; ambiguous D1 failure is resolved before attempting
 compensation. Preserve referenced bytes when metadata recovery is unavailable or ancestry
 becomes inaccessible. Cleanup failures log a safe operation/material ID for reconciliation.
-The concrete protocol, safe download headers, Range behavior and 4.4 boundary are in
+The concrete protocol, safe download headers, Range behavior and deletion lifecycle are in
 [College Materials](../features/COLLEGE_MATERIALS.md). No new storage provider/dependency
-or public bucket URL is introduced; full R2-aware deletion remains 4.4.
+or public bucket URL is introduced. Package 4.4 deletes owned objects before metadata, checks
+inaccessible descendants before hierarchy cleanup, and preserves final SQL guards against
+concurrent file additions. Partial cleanup is explicit and retryable; D1/R2 do not share a transaction.
+Feature-local TanStack Query lists refresh after material writes and failed hierarchy cleanup.
+Native authenticated links stream files without buffering them in React or storing bytes in localStorage.
 
 Ideas covers reuse the private R2 provider and owner-checked byte delivery. Store only cover
 metadata in D1; validate JPEG/PNG/WebP bytes, size and bounded thumbnail dimensions. Cover
