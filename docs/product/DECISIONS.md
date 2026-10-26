@@ -1,6 +1,6 @@
 # Kokpit — Decisions
 
-**Version:** 1.5
+**Version:** 1.6
 **Status:** Active V1 Decision Log
 **Product:** Kokpit · **Type:** Product + Architecture ADRs
 **Last Updated:** 2026-10-25
@@ -399,7 +399,7 @@ Implementation of the next package requires a separate owner instruction.
 
 ### DEC-051 — Stitch visual references and refined V1 layouts
 
-**Accepted · 2026-10-10 · Home composition and sidebar superseded by DEC-053**
+**Accepted · 2026-10-10 · Home/sidebar superseded by DEC-053; remaining visual targets and asset retention superseded by DEC-054**
 
 **Decision:** The owner supplied Home, College, Ideas, Library, Music, and News screens,
 then authorized documentation for a similar UI with cleaner execution. Retain the original
@@ -462,3 +462,39 @@ empty states; future music controls are clearly disabled. Existing unattributed 
 remain temporary until Milestone 6. Reference sample records do not become production data.
 Validate desktop/responsive layouts, keyboard focus, current flows, empty/loading/error
 states, and lint/typecheck/build/tests before claiming visual completion.
+
+### DEC-054 — Approved feature pages and functional scope
+
+**Accepted · 2026-10-25 · Supersedes DEC-051 feature-page targets and reference-only exclusions listed here**
+
+**Decision:** The owner approved College v2, Music, News v2, Ideas v2 and Library, requested
+removal of replaced concepts, and authorized canonical documentation changes so every UI
+feature works when built. The [gallery](../design/UI_REFERENCES.md) lists the five selected
+images plus unchanged FINAL Home. Remove obsolete Stitch PNGs, initial replaced variants
+and proposal-only notes; preserve this decision history and the approved assets.
+
+**Scope:** College adds a recurring course timetable and recent materials, not a general
+calendar or LMS. News adds owner saves and deterministic cached-feed topics, not reading
+metrics or a global trend provider. Ideas adds flat optional collections, favorites distinct
+from pins, an ordered card grid and optional private owner-provided covers. Music and Library
+keep their selected designs with real controls. No public/multi-user behavior, external calendar
+integration, tasks, streaks, full publisher copies or AI assistant is added.
+
+**Persistence:** Retain the implemented 17-table baseline and plan three new tables:
+course_schedule_entries, idea_collections and news_saved_articles (20-table target).
+Add compatible nullable/defaulted course/idea/topic fields in the assigned packages.
+An idea has zero or one collection; deleting a collection preserves its ideas. Saved article
+references restrict cleanup deletion. Covers reuse private R2 with ownership/cleanup rules.
+No schema, applied migration, deployment or provider configuration is changed by this approval.
+
+**Execution:** Keep existing IDs and completed evidence. Next remains 4.3, then 4.4 and new
+4.5, followed by new 3.4–3.5 before Milestone 5. Extend pending News 6.4–6.5 rather than
+implementing those features early. The interaction/API/acceptance map is
+[Approved UI Features](../features/APPROVED_UI_FEATURES.md); Data Model and Content Sources
+own storage and retention/topic rules. Approved tables are expected changes in those packages;
+further entities, provider changes or destructive migrations still require review.
+
+**Authorization:** Reference cleanup and specification/roadmap revision only in this task.
+Later owner instructions authorize implementation packages. No dead or decorative-only
+feature controls may be claimed complete; test their behavior, ownership, errors and responsive
+keyboard usability in the package that ships them.
