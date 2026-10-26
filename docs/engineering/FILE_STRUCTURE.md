@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.7 | **Status:** V1 structure reference | **Updated:** 2026-10-25
+**Version:** 0.8 | **Status:** V1 structure reference | **Updated:** 2026-10-25
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -8,12 +8,13 @@ persisted entities remain in [PRD](../product/PRD.md),
 
 ## Current scaffold and growth
 
-Milestones 1–3 are implemented. `src/app/` owns the routed shell/providers;
+Baseline packages 1.1–3.3 are implemented. `src/app/` owns the routed shell/providers;
 Home, College, Ideas and Library have feature implementations. `worker/api/`,
 `worker/services/` and `worker/db/repositories/` contain Ideas, Quick Links and
 the College hierarchy APIs (package 4.1). `tests/integration/college-api.test.ts`
 covers College lifecycle, ownership, validation, ordering and rollback behavior.
-The schema and reviewed initial migration already include all 17 V1 tables.
+The schema and reviewed initial migration include the 17-table baseline. The approved
+20-table target adds later migrations; no new schema file/module is created by this doc update.
 `src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms.
 `src/components/layout/BottomNavigation.tsx` owns the shared six-link floating dock
 and navigation items; `AppShell` owns the room backdrop and content clearance.
@@ -43,9 +44,9 @@ kokpit/
 ├── .env.example
 ├── docs/
 │   ├── product/                 # PRD.md, DECISIONS.md
-│   ├── design/                  # DESIGN_SYSTEM.md, UI_REFERENCES.md, references/*.png
+│   ├── design/                  # design/gallery, FINAL Home, approved feature images in concepts/
 │   ├── engineering/             # architecture, data, structure, deployment
-│   ├── features/                # CONTENT_SOURCES.md
+│   ├── features/                # CONTENT_SOURCES.md, APPROVED_UI_FEATURES.md
 │   └── planning/                # IMPLEMENTATION_PLAN.md
 ├── public/                      # favicon.svg, static/; public assets only
 ├── src/
@@ -119,10 +120,10 @@ helpers, and state where needed. These are placement examples, not required empt
 | Feature | Representative files and boundary |
 | --- | --- |
 | Home | `HomeHero`, `Clock`, `DynamicQuote`, previews; `useHomeData`, `home.api.ts`. Preview other domains; do not own their logic. |
-| College | Semester/Course/Week pages and lists, `MaterialItem`, `MaterialUpload`, breadcrumbs; hierarchy Semester → Course → Week → Material. |
+| College | Semester/Course/Week pages, materials, breadcrumbs, recurring schedule editor/grid/day list and recent/semester material views; hierarchy remains Semester → Course → Week → Material. |
 | Music | `MusicPlayer`, `MiniPlayer`, track/playlist lists, queue, artwork, upload; MusicLibrary/Playlist pages; `state/MusicProvider.tsx`, reducer, player hooks. Mount provider above routes. |
-| News | `NewsCard`, list, filter, source badge, `WhyItMatters`, News page and hook. RSS parsing remains in Worker. |
-| Ideas | `IdeaComposer`, cards/list/search/tags, Ideas page and hook. Fast capture, not a generic document editor. |
+| News | Article/feed/filter/source components, saved preview/full view and topics list; feature hooks synchronize bookmark state. RSS parsing/topic classification/aggregation remain in Worker. |
+| Ideas | Paper composer, ordered grid/search/tags, collection manager/filter, favorite preview/full view, cover control in editor. Fast capture, not a generic document editor. |
 | Library | QuickLink card/grid/form/group, Library page, `useQuickLinks`, `library.api.ts`. |
 
 - Reusable primitives include Button, IconButton, Input, Textarea, Card, Badge,
@@ -143,7 +144,7 @@ helpers, and state where needed. These are placement examples, not required empt
 | Area | Responsibility and examples |
 | --- | --- |
 | `api/` | `system`, `home`, `quotes`, `news`, `ideas`, `library`, `college`, `music`, `files` route modules: parse, validate, call service, format response |
-| `services/` | Domain operations and coordination: Ideas CRUD, playlist/track deletion, College hierarchy/material deletion |
+| `services/` | Domain operations: Ideas/collections/favorites/covers, College schedule/materials, News saves and retention, playlist/track deletion; keep related operations focused without a layer per table |
 | `db/` | `client.ts`, operational `seed.ts`, schema matching Data Model, domain repositories; avoid a repository per tiny table |
 | `providers/ai/`, `quotes/` | Internal AI/quote contracts and Workers AI adapters |
 | `providers/news/` | Registry, source types, generic RSS, Hacker News, GDELT, normalization/deduplication/relevance |
@@ -197,8 +198,10 @@ service <300, route <200; split by responsibility rather than line count.
 - Review and commit migrations; evolve schema with new migrations, preserving applied history.
 - Ignore `dist/`, `node_modules/`, `coverage/`, `.wrangler/`, local secrets.
   Do not hand-edit build output. Follow [Deployment](DEPLOYMENT.md) for environments.
-- Original Stitch screens live in `docs/design/references/` for documentation and visual
-  comparison, indexed by [UI References](../design/UI_REFERENCES.md). They are not runtime
+- FINAL Home lives in `docs/design/references/home-final.png`; the five approved feature
+  references live in `docs/design/concepts/2026-10-25/`, indexed by
+  [UI References](../design/UI_REFERENCES.md). Superseded images/proposal notes were removed
+  at the owner's request; decision history remains in Decisions. These images are not runtime
   assets; use `public/` only for approved images actually needed by the application.
 
 Read this reference before restructuring. Add only files required by the current
