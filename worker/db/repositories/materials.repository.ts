@@ -14,9 +14,29 @@ export interface MaterialCursor {
   updatedAt: string;
   id: string;
 }
+export type MaterialParent = 'semester' | 'course' | 'week';
 
 export class MaterialsRepository {
   constructor(private readonly db: Database) {}
+
+  async listForDeletion(kind: MaterialParent, id: string, userId: string) {
+    const parent = kind === 'semester' ? semesters.id : kind === 'course' ? courses.id : weeks.id;
+    const rows = await this.query(userId)
+      .where(and(this.scope(userId), eq(parent, id)))
+      .orderBy(asc(materials.id))
+      .limit(100);
+    return rows.map((row) => row.material.id);
+  }
+
+  async hasSharedKey(id: string, key: string) {
+    // Internal deletion guard also detects foreign references; never return them through an API.
+    const rows = await this.db
+      .select({ id: materials.id })
+      .from(materials)
+      .where(and(eq(materials.r2Key, key), sql`${materials.id} <> ${id}`))
+      .limit(1);
+    return rows.length > 0;
+  }
 
   private query(userId: string) {
     return this.db
@@ -171,7 +191,7 @@ export class MaterialsRepository {
   }
 
   async deleteMetadata(id: string, userId: string) {
-    // Package 4.4 must coordinate R2 cleanup before exposing this operation through HTTP.
+    // Call only after R2 cleanup; SQL cascades cannot delete private objects.
     const rows = await this.db
       .delete(materials)
       .where(and(eq(materials.id, id), eq(materials.userId, userId), this.parentOwned(userId)))
