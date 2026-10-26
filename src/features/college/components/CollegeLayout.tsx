@@ -94,6 +94,7 @@ export function CollegeFormDialog({
   children,
   description,
   danger = false,
+  errorMessage,
 }: {
   title: string;
   submitLabel: string;
@@ -102,6 +103,7 @@ export function CollegeFormDialog({
   children?: ReactNode;
   description?: string;
   danger?: boolean;
+  errorMessage?: (error: unknown) => string;
 }) {
   const id = useId();
   const submitting = useRef(false);
@@ -129,13 +131,15 @@ export function CollegeFormDialog({
     } catch (cause) {
       if (!mounted.current) return;
       setError(
-        cause instanceof ApiClientError && cause.status === 409
-          ? danger
-            ? 'This contains stored files or inaccessible content and cannot be deleted yet.'
-            : 'This week number already exists in this course. Choose another number.'
-          : danger
-            ? 'Could not delete this item. It is still saved; please try again.'
-            : 'Could not save this change. Your changes are here; please try again.',
+        errorMessage
+          ? errorMessage(cause)
+          : cause instanceof ApiClientError && cause.status === 409
+            ? danger
+              ? 'This contains inaccessible content or changed during deletion. Refresh and retry.'
+              : 'This week number already exists in this course. Choose another number.'
+            : danger
+              ? 'Deletion did not finish. Some files may already be removed. Retry to complete deletion.'
+              : 'Could not save this change. Your changes are here; please try again.',
       );
     } finally {
       submitting.current = false;
@@ -193,7 +197,7 @@ export function DeleteCollegeDialog({
       onSave={onDelete}
       onClose={onClose}
       danger
-      description={`Delete “${name}”${kind === 'week' ? '' : ' and everything inside it'}? This cannot be undone.`}
+      description={`Delete “${name}” and everything inside it, including stored files? This cannot be undone. If cleanup stops partway, retry to finish.`}
     />
   );
 }
