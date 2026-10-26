@@ -2,6 +2,7 @@ import type { CollegeRepository } from '../db/repositories/college.repository';
 import type {
   MaterialContext,
   MaterialCursor,
+  MaterialParent,
   MaterialsRepository,
 } from '../db/repositories/materials.repository';
 import { AppError, BadRequestError, NotFoundError } from '../utils/errors';
@@ -43,6 +44,72 @@ export class MaterialsService {
     if (!this.bucket)
       throw new AppError('STORAGE_UNAVAILABLE', 'File storage is unavailable.', 503);
     return new R2Storage(this.bucket);
+  }
+
+  async delete(id: string, userId: string) {
+    const material = await this.get(id, userId);
+    if (material.type === 'file' || material.r2Key) {
+      const key = material.r2Key;
+      if (
+        !key ||
+        !key.startsWith(`users/${encodeURIComponent(userId)}/college/`) ||
+        (await this.repository.hasSharedKey(id, key))
+      )
+        throw new AppError(
+          'CONFLICT',
+          'File ownership metadata needs review before deletion.',
+          409,
+        );
+      try {
+        await this.storage().delete(key);
+      } catch (error) {
+        if (error instanceof AppError) throw error;
+        console.error('[Material deletion]', { code: 'FILE_DELETE_FAILED', materialId: id });
+        throw new AppError(
+          'FILE_DELETE_FAILED',
+          'File cleanup failed. Please retry deletion.',
+          503,
+        );
+      }
+    }
+    try {
+      if (!(await this.repository.deleteMetadata(id, userId))) {
+        if (await this.repository.find(id, userId))
+          throw new Error('Metadata deletion did not complete.');
+      }
+    } catch {
+      console.error('[Material deletion]', { code: 'METADATA_DELETE_FAILED', materialId: id });
+      throw new AppError(
+        'METADATA_DELETE_FAILED',
+        'File cleanup may have completed. Retry deletion to finish removing metadata.',
+        503,
+      );
+    }
+  }
+
+  async deleteWithin(kind: MaterialParent, id: string, userId: string) {
+    if (await this.college.hasInaccessibleDescendants(kind, id, userId))
+      throw new AppError(
+        'CONFLICT',
+        'This contains inaccessible content and cannot be deleted.',
+        409,
+      );
+    // Keep each query bounded. Final hierarchy guards reject concurrent file additions.
+    for (;;) {
+      const ids = await this.repository.listForDeletion(kind, id, userId);
+      if (!ids.length) return;
+      for (const materialId of ids) {
+        const current = await this.repository.find(materialId, userId);
+        if (!current) continue;
+        const parentId =
+          kind === 'semester'
+            ? current.semesterId
+            : kind === 'course'
+              ? current.courseId
+              : current.weekId;
+        if (parentId === id) await this.delete(materialId, userId);
+      }
+    }
   }
 
   async upload(
