@@ -1,12 +1,12 @@
 # Kokpit — Content Sources
 
-**Version:** 0.2
+**Version:** 0.3
 **Status:** V1 Content Strategy Draft
 **Product:** Kokpit · **Scope:** Quotes + News
 **Runtime:** Workers · **Scheduling:** Cron Triggers · **Optional AI:** Workers AI
-**Last Updated:** 2026-10-07
+**Last Updated:** 2026-10-25
 
-This is the canonical ingestion contract. [Architecture](../engineering/ARCHITECTURE.md) owns runtime boundaries; [Data Model](../engineering/DATA_MODEL.md) owns persisted fields; [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) owns execution order. This cleanup preserves approved behavior.
+This is the canonical ingestion contract. [Architecture](../engineering/ARCHITECTURE.md) owns runtime boundaries; [Data Model](../engineering/DATA_MODEL.md) owns persisted fields; [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) owns execution order. DEC-054 adds owner saves and derived feed topics; provider strategy and quote behavior remain unchanged.
 
 ## Content flow and failure isolation
 
@@ -135,7 +135,7 @@ flowchart LR
     DB --> API[Kokpit API]
 ```
 
-Provider-independent shape: `title`, `source`, `source_id`, `url`, `image_url`, `published_at`, `fetched_at`, `category`, `summary`, `why_it_matters`, `relevance_score`, `ai_enriched`, `dedup_key`. These are conceptual adapter/API contracts; [Data Model](../engineering/DATA_MODEL.md) defines persisted columns.
+Provider-independent shape: `title`, `source`, `source_id`, `url`, `image_url`, `published_at`, `fetched_at`, `category`, `topic_key`, `summary`, `why_it_matters`, `relevance_score`, `ai_enriched`, `dedup_key`. These are conceptual adapter/API contracts; [Data Model](../engineering/DATA_MODEL.md) defines persisted columns. The UI category filters normalize to `technology`, `research`, `world`, or no category; AI/developer/security topics remain independent primary topic keys.
 
 Deduplicate primarily by canonical/normalized URL, secondarily by normalized headline similarity. Normalize tracking/UTM parameters, mobile variants, trailing slashes. Merge/discard near-identical same-source reposts. Different publishers covering one event are not exact duplicates; retain perspectives when useful. Headline/entity overlap and time proximity reduce repeated Home event cards. Advanced clustering is optional later.
 
@@ -168,12 +168,49 @@ Importance/major events can override quotas. Balance relevance, freshness, topic
 ## Enrichment, links, and media
 
 - AI optionally supplies `summary`, `why_it_matters`, classification refinement after relevance filtering. Example budget: 100 ingested → 25 filtered → top 5–15 enriched; tune to cost. Prioritize Home candidates, high-relevance full-feed items, complex technical stories.
+- Classification suggestions are advisory; deterministic normalized category/topic fields
+  remain authoritative for the filter and Trending contracts, so enabling AI cannot make
+  those views unavailable or silently redefine their taxonomy.
 - Summary: 1–2 short factual, direct sentences. No clickbait, fake certainty, unnecessary opinion, invented details, or lost qualifiers. `why_it_matters`: optional, one concise analytical sentence explaining practical relevance, not sensational claims.
 - Ground AI in headline, source, publication time, source description, known category. V1 needs no full-page scraping; later page extraction requires per-source access/usage review.
 - Store/display headline, small excerpts/descriptions, metadata, brief generated summary, optional relevance explanation, original link. Do not persist full publisher text by default or build republication.
 - Retain original source name, URL, `published_at` when available. Make opening the original easy.
 - Use reliable source-provided thumbnail URLs. Fallback: source icon, category icon, simple Kokpit placeholder. Do not scrape arbitrary article images for decoration.
-- Bookmarking/saving is outside V1. If later approved, saved articles should be exempt from cleanup.
+- Bookmarking/saving is required by DEC-054. Persist owner-scoped article references;
+  saved records are exempt from cleanup and remain openable through the original URL.
+  Save/unsave must not invoke ingestion, AI, page scraping or offline full-article storage.
+
+## Feed topics and saved articles
+
+Trending Topics summarizes this Kokpit feed, not global trend measurement. Use eligible,
+deduplicated articles with effective timestamp `published_at` or fallback `fetched_at`
+inside the trailing seven UTC days; ignore future timestamps for topic ranking.
+Assign at most one primary `topic_key` deterministically during normalization (package 6.4):
+
+1. `world` when the normalized category is world.
+2. `cybersecurity` for security/privacy/vulnerability/malware/ransomware/breach terms.
+3. `ai` for explicit artificial-intelligence/LLM/generative-AI terms, approved model/provider
+   names or AI-qualified agent topics in the keyword registry; generic "model"/"agent" alone is insufficient.
+4. `developer-tools` for programming/engineering/tooling/platform terms in that registry.
+5. No primary key when nothing matches; retain the article in its ordinary category/feed.
+
+Use explicit word/phrase matching rules and fixtures, not ambiguous substring matches
+such as matching "AI" within an unrelated word. Shared category/topic classification never
+uses private ideas, saved-state, music history or class information. Optional AI enrichment
+must not change the primary topic contract or make classification unavailable without AI.
+Rank nonempty topics by unique eligible article count descending, then latest effective
+timestamp descending, then topic key ascending; return at most four. No extra trend provider,
+topic entity, materialized count table or per-click inference is required. Label the scope
+"Topics in your feed · past 7 days"; omit fabricated/global counts and growth percentages.
+Clicking a topic supplies the same server-side topic key to the full feed. Category and topic
+predicates intersect and pagination resets on change; show a clear reset/empty state.
+
+Saved for Later shows the two newest saves; View saved loads the complete bounded list
+by saved_at/article_id descending. Repeated save is idempotent and preserves its first
+timestamp. Unsave affects only the owner's reference and updates all instances of the card.
+Shared article responses add isSaved using the current owner; never share-cache that projection.
+Retained old saves remain outside the fresh feed/topic windows. Missing original pages still
+retain their saved metadata and source link; do not silently scrape a replacement page.
 
 ## Scheduling, retention, and failure
 
@@ -184,7 +221,7 @@ Importance/major events can override quotas. Balance relevance, freshness, topic
 | Official tech feeds / tech journalism | 30–60 minutes; not every source every cycle |
 | `quote_refill` | Daily plus conditional refill |
 | `content_cleanup` | Daily |
-| News retention | Default 45 days; possible range 30–60 days |
+| News retention | Default 45 days; possible range 30–60 days; saved articles exempt |
 
 Cron expressions run in UTC; user-local content uses `user_settings.timezone`. Keep jobs idempotent where practical. Refill: count eligible → stop when count ≥ 72 → otherwise generate batch → validate → deduplicate → store accepted. Keep unused quotes; stop at healthy inventory.
 
@@ -192,14 +229,25 @@ Failed news refresh never clears existing articles. Show cache, optionally last-
 
 Log source failures, fetched counts per source, rejected duplicates, accepted articles, AI failures, generated/rejected quotes, pool size, job duration. Do not log private content unnecessarily.
 
+Cleanup excludes any article referenced by news_saved_articles in the same guarded SQL
+write that deletes stale rows. The article FK restricts deletion while saved. Test save/cleanup
+races: save first retains the article; cleanup first makes a later save safely not-found.
+Unsave makes an already-stale article eligible for the next cleanup. Disable source records
+rather than cascading a hard source deletion into retained saves. Never delete article metadata
+first and reconstruct the saved record from a publisher request afterward.
+
 ## API, privacy, and cost
 
 | Conceptual endpoint | Behavior |
 | --- | --- |
 | `GET /api/quotes/current` | Stable primary; response `id`, `content`, `mood`, `language`, `hourSlot` (e.g. `2026-10-06T05:00:00+07:00`) |
 | `POST /api/quotes/another` | Session alternate; scheduled hourly selection unchanged |
-| `GET /api/news` | Kokpit feed; later `category`, `limit`, `cursor` controls, e.g. `?category=ai&limit=20` |
+| `GET /api/news` | Kokpit feed; category/topic/limit/cursor, e.g. `?category=technology&topic=ai&limit=20`; owner-specific isSaved |
 | `GET /api/news/home` | Small fixed Home limit |
+| `GET /api/news/topics` | Up to four nonempty feed-topic groups and filter keys |
+| `GET /api/news/saved` | Owner-scoped saved list, stable bounded pagination |
+| `PUT /api/news/:articleId/saved` | Idempotent owner save; preserve saved_at on repeat |
+| `DELETE /api/news/:articleId/saved` | Idempotent owner unsave; no immediate publisher/article deletion |
 
 Use cursor-style/stable pagination when the feed grows; never load the full retained 45-day table. Scheduled maintenance needs no manual endpoints; protect admin/debug endpoints.
 
@@ -210,5 +258,5 @@ Cost guardrails: batches, cache, threshold refill, top-N enrichment, scheduled w
 ## Acceptance checks
 
 - Quotes: dynamic primary inventory; stable local-hour rotation; predominantly English; mood variety; cliché/duplicate filters; no fake authors; secondary alternate; cache/emergency resilience during AI failure; no page-load generation.
-- News: independent normalized sources; reduced duplicates; interest relevance plus world awareness; 2–3 diverse Home items, broader full feed; original links; source/refresh isolation; cache fallback; optional summaries; no scraping dependency.
+- News: independent normalized sources; reduced duplicates; interest relevance plus world awareness; 2–3 diverse Home items, broader full feed; original links; source/refresh isolation; cache fallback; optional summaries; no scraping dependency; deterministic feed topics; persistent owner saves; retained saved articles through cleanup and source disabling.
 - Both systems preserve privacy, provider independence, and a calm Home. Content should earn the attention it occupies.
