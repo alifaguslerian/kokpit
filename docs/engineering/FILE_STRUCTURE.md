@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.9 | **Status:** V1 structure reference | **Updated:** 2026-10-26
+**Version:** 1.0 | **Status:** V1 structure reference | **Updated:** 2026-10-26
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -27,7 +27,12 @@ SQLite. Package 4.3 adds materials.routes.ts (including private file routes),
 materials.service.ts, materials.repository.ts, providers/storage/r2.provider.ts and focused
 stream/header utilities. tests/integration/materials-api.test.ts and tests/unit/material-file.test.ts
 cover the new behavior; tests/runtime/materials.test.mjs exercises isolated native Workers/D1/R2.
-Material UI/deletion, playback and content pipelines remain pending.
+Package 4.4 adds feature-local materials-api.ts/use-materials.ts and MaterialWorkspace,
+MaterialList, MaterialEditors and MaterialFileDialog, reusing the existing College dialog
+and private APIs. tests/e2e/materials-regressions.mjs serves isolated Hono/SQLite/R2 fixtures
+over local HTTP to verify actual browser downloads without request interception.
+Material/hierarchy cleanup extends the existing services/repositories, without a new table
+or package. The recurring timetable, playback and content pipelines remain pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their work package needs them; do not pre-create empty modules.
 
