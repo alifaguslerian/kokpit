@@ -1,6 +1,6 @@
 # Kokpit — Data Model
 
-**Version:** 0.4 · **Status:** 17-table baseline; approved feature additions pending · **Updated:** 2026-10-26
+**Version:** 0.5 · **Status:** 17-table baseline; approved feature additions pending · **Updated:** 2026-10-26
 
 Canonical target for private single-user V1: **20 D1 tables**. The implemented baseline
 still has **17 tables**. Three additions and the field changes below are approved
@@ -507,6 +507,13 @@ Audio delivery supports HTTP Range seeking; see [Architecture](ARCHITECTURE.md).
 | News save | Remove the owner's reference only; delete a stale unsaved article in normal cleanup, never publisher content. |
 
 Validate ownership and exact keys before any object deletion; avoid wildcard cleanup.
+Package 4.4 implements this lifecycle using bounded material batches. Reject inaccessible
+descendants before touching objects, and reject missing, foreign-prefix or shared material keys.
+Remove each object before its metadata; a failed object deletion retains that row for retry.
+If metadata fails after object deletion, the row may refer to unavailable bytes until retry
+finishes. Cleanup is irreversible and may complete only partly; the UI explains this explicitly.
+Final hierarchy SQL guards still refuse file-bearing/inaccessible descendants created concurrently.
+No schema migration or new persistent deletion entity is introduced by 4.4.
 Real deletion is V1's default for ideas, links, playlists, courses, materials and tracks.
 Broad soft delete, trash/restore and full revision/audit history are outside V1.
 
