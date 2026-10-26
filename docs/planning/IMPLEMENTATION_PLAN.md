@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.8 | **Status:** V1 implementation plan | **Updated:** 2026-10-25
+**Version:** 0.9 | **Status:** Approved V1 implementation plan | **Updated:** 2026-10-25
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,9 +11,17 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Milestones 1–3 and College packages **4.1–4.2** are complete.
+Baseline packages **1.1–3.3** and College packages **4.1–4.2** are complete.
 Milestone 4 is in progress; the next implementation package is
 **4.3 Private Storage & Material APIs**.
+The owner approved all latest feature-page images on 2026-10-25 and requested functional
+controls plus aligned specifications (DEC-054). New packages 3.4–3.5 and 4.5 are pending;
+News additions join the already-pending 6.4–6.5. This documentation approval does not start
+implementation or change completed baseline evidence. Execution order is:
+**4.3 → 4.4 → 4.5 → 3.4 → 3.5 → 5.1–5.3 → 6.1–6.5 → Milestones 7–8**.
+The return to Milestone 3 keeps existing package IDs stable and reuses private storage
+before optional Ideas covers are built. See [Approved UI Features](../features/APPROVED_UI_FEATURES.md)
+for the control/API contract and [Data Model](../engineering/DATA_MODEL.md) for pending migrations.
 On 2026-10-24 the owner also authorized a visual correction before package 4.3:
 align the shared shell, Home, Ideas, Library and existing College pages with the
 normalized Stitch references. This does not authorize starting storage or later features.
@@ -47,9 +55,10 @@ have active numbers; the unnumbered checklist sections below are implementation 
 
 ### UI reference review
 
-The owner-approved FINAL Home image and supporting Stitch screens are available in the
-[reference gallery](../design/UI_REFERENCES.md). FINAL takes priority for Home and the
-shared shell; earlier feature screens continue to guide feature-page composition.
+The FINAL Home and five approved feature images are available in the
+[reference gallery](../design/UI_REFERENCES.md). College v2, News v2 and Ideas v2 replace
+their initial concepts; Music and Library retain their selected concepts. Earlier Stitch
+images and rejected concepts were removed at the owner's request; decision history remains.
 Use their page composition through the normalized [Design System](../design/DESIGN_SYSTEM.md),
 including its mapping to V1. Raw screenshot controls and example data do not expand a package.
 
@@ -57,11 +66,11 @@ including its mapping to V1. Raw screenshot controls and example data do not exp
 | --- | --- |
 | 2.1–2.2 | Shared palette, typography roles, room background, responsive bottom dock and primitives. |
 | 2.3 | FINAL clock/quote hero and aligned two-column previews; retain the package's placeholder scope. |
-| 3.2–3.3 | Ideas composer/search/saved cards and Library shortcut grid. |
-| 4.2, 4.4 | College course/week/material composition without LMS or calendar workflows. |
+| 3.2–3.3, 3.5 | Existing capture/links plus approved paper composer, Ideas grid, collections/favorites and Library portal grid. |
+| 4.2, 4.4–4.5 | Course/week/material views, recent materials and recurring class schedule without LMS/general calendar workflows. |
 | 5.2–5.3 | Music player/library/playlists, persistent native playback, and Home controls including volume. |
 | 6.2 | Real hourly thought, valid attribution, and the secondary another thought action. |
-| 6.5 | News editorial hierarchy, source transparency and approved coverage. |
+| 6.5 | News editorial hierarchy, source transparency, saved articles and derived feed topics. |
 | 7.1–7.2 | Responsive layouts, keyboard focus, contrast, loading/empty/error states and reduced motion. |
 
 At each applicable UI verification, compare a rendered desktop capture with the relevant
@@ -157,8 +166,8 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | --- | --- | --- | --- |
 | 1 | Foundation | 1.1–1.7 | Complete |
 | 2 | App Shell & Home | 2.1–2.3 | Complete |
-| 3 | Ideas & Library | 3.1–3.3 | Complete |
-| 4 | College | 4.1–4.4 | In progress |
+| 3 | Ideas & Library | 3.1–3.5 | Baseline 3.1–3.3 complete; approved additions 3.4–3.5 pending after 4.5 |
+| 4 | College | 4.1–4.5 | In progress |
 | 5 | Music | 5.1–5.3 | Pending |
 | 6 | Quotes & News | 6.1–6.5 | Pending |
 | 7 | Polish & Hardening | 7.1–7.4 | Pending |
@@ -181,10 +190,13 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 3.1 | Ideas Backend | 5.1–5.3 | Complete |
 | 3.2 | Ideas UI, Home Capture & Verification | 5.4–5.7 | Complete |
 | 3.3 | Library & Quick Links | 6.1–6.5 | Complete |
+| 3.4 | Ideas Collections, Favorites & Private Covers APIs | New DEC-054 package | Pending after 4.5 |
+| 3.5 | Approved Ideas & Library Pages, Integration & Verification | New DEC-054 package | Pending after 3.4 |
 | 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Complete |
 | 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Complete |
 | 4.3 | Private Storage & Material APIs | 8.1–8.6 | Pending |
 | 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Pending |
+| 4.5 | Weekly Schedule & Approved College Overview | New DEC-054 package | Pending after 4.4 |
 | 5.1 | Tracks, Upload & Private Streaming | 9.1–9.3 | Pending |
 | 5.2 | Persistent Playback & Music Library | 9.4–9.6 | Pending |
 | 5.3 | Playlists, Home Player & Verification | 9.7–9.10 | Pending |
@@ -995,9 +1007,56 @@ Test:
 
 </details>
 
+### 3.4 Ideas Collections, Favorites & Private Covers APIs
+
+**Status:** Pending after 4.5 | **Legacy Phase checklist:** None; DEC-054 addition
+
+**Goal:** Extend existing Ideas APIs without breaking capture/search/tags/pins or old records.
+This package executes after College 4.5 so private R2 infrastructure is available.
+
+- [ ] Add reviewed additive migration: idea_collections, optional collection FK, default-false
+  is_favorite and nullable cover metadata. Apply locally and verify existing records survive.
+- [ ] Collection list/create/rename/delete and atomic complete reorder; normalize per-owner
+  name uniqueness. Reject foreign IDs and duplicate/missing reorder IDs without partial writes.
+- [ ] Add optional single collection assignment and desired-state favorite updates to Ideas.
+  Keep pins independent; preserve existing q/tag/pinned/limit/offset clients and response shape.
+- [ ] Support intersecting collection/favorite/search/tag filters and stable ID tie-breakers.
+  Collection delete clears membership and preserves ideas, tags, covers, pins and favorites.
+- [ ] Upload/replace/remove private JPEG/PNG/WebP cover in the existing edit flow, validate
+  actual type/size and bounded dimensions, and deliver through owned private routes.
+- [ ] Cover failure/replace/delete coordinates R2/D1 rollback and cleanup; deleting an idea
+  cleans its cover safely. Never send private content to AI or an external image source.
+- [ ] Test upgrade compatibility, ownership/legacy inconsistent ancestry, filters/pagination,
+  favorite/pin independence, collection delete/reorder rollback, cover privacy/type/size/failures.
+
+**Acceptance:** New state survives reload; old ideas remain usable with no collection/cover
+and favorite=false; no public files, fake folders, lost drafts or unfinished API controls.
+Run relevant unit/API checks, lint, strict typecheck and build; update Data Model implementation status.
+
+### 3.5 Approved Ideas & Library Pages, Integration & Verification
+
+**Status:** Pending after 3.4 | **Legacy Phase checklist:** None; DEC-054 addition
+
+- [ ] Match approved Ideas v2: paper composer, readable ordered card grid, tag/search controls,
+  collection preview/manager, independent pin/star controls and favorite preview/full view.
+- [ ] New/View all/select/edit/delete/reorder/assignment actions must work; full lists are
+  reachable beyond four collection or three favorite preview items and pagination limits.
+- [ ] Optional cover editing stays outside quick capture; image failure falls back to readable
+  text. Preserve composer drafts, error recovery and newer editors during late requests.
+- [ ] Match approved Library appearance while retaining real shortcuts, groups, favorites,
+  one-click opening, edit/delete forms and full-list ordering semantics under filters.
+- [ ] Every drag/menu/star/pencil/Add tile has an accessible real action; keyboard reorder
+  is required. Do not introduce a new link entity, default personal records or a reading shelf.
+- [ ] Check desktop/mobile, focus/reading order, loading/empty/filtered/error states, mutation
+  synchronization, route/history, long text, R2 cover access and existing Home capture/link regressions.
+
+**Acceptance:** Every approved Ideas/Library control works with real data; Home stays a
+lightweight preview; audio provider lifetime is unaffected. Run relevant browser/unit/API tests,
+lint, strict typecheck, format and build; compare captures to the selected references.
+
 ## Milestone 4: College
 
-**Goal:** Implement Semester → Course → Week hierarchy before file uploads. Add private file and link materials to College.
+**Goal:** Implement the hierarchy, private materials, recent materials and the approved recurring class timetable.
 
 ### 4.1 Semester, Course & Week APIs
 
@@ -1204,6 +1263,10 @@ Support:
 - file
 - link
 
+Also support owned semester-wide material queries ordered by updated_at/ID with bounded
+stable pagination. This powers the three-item recent preview and complete materials view;
+include safe course/week context without leaking storage keys.
+
 #### Material Upload API
 
 **Tasks**
@@ -1253,6 +1316,9 @@ Support:
 - rename
 - delete
 - open/download
+- move between owned weeks with validated ancestry and existing R2 metadata ownership
+- recent three materials for selected semester and complete paginated View materials route
+- course/week breadcrumbs and honest first-run/loading/empty/error states
 
 #### Material Deletion Workflow
 
@@ -1273,8 +1339,36 @@ Test:
 - ownership
 - invalid file
 - size limit
+- semester-wide recent/full lists, stable ordering/pagination and foreign-parent isolation
+- material move and safe failure recovery without lost bytes or broken links
 
 </details>
+
+### 4.5 Weekly Schedule & Approved College Overview
+
+**Status:** Pending after 4.4 | **Legacy Phase checklist:** None; DEC-054 addition
+
+- [ ] Add course_schedule_entries and nullable courses.description through a reviewed additive
+  migration; preserve the existing hierarchy, metadata and safe deletion behavior.
+- [ ] Implement selected-semester schedule query and owned entry create/update/delete API;
+  validate weekday/local minute bounds, optional room, semester ancestry and exact duplicates.
+- [ ] Match College v2: retain semester selection/activation and Add semester/Add course;
+  course rows at left, Weekly Schedule and Recent Files & Notes at right.
+- [ ] Edit schedule opens working create/edit/delete forms. Course blocks navigate to their
+  course; all course/menu/reorder/material actions remain keyboard-accessible.
+- [ ] Use saved owner timezone and current Monday-based week; handle weekends, arbitrary
+  saved class hours, multiple intervals and overlapping classes without hiding a record.
+- [ ] Render a readable day list on mobile; do not shrink text to force all columns to fit.
+- [ ] Test CRUD/reload, timezone/date bounds, duplicates/overlaps/weekends, invalid/foreign
+  references, description clear/edit, and course/semester deletion cascading entries only
+  after R2/material deletion safeguards succeed.
+- [ ] Test recent/full material navigation, all exposed actions, states, long metadata,
+  keyboard focus and Home's unchanged first-course/week preview contract.
+
+**Acceptance:** Every College overview section uses real saved data, no fake timetable or
+activity records. General calendar sync/reminders, tasks, study metrics and class joining stay
+out of scope. Run migration checks, unit/API/browser regressions, lint/typecheck/format/build.
+Then return to 3.4, not directly to Milestone 5.
 
 ## Milestone 5: Music
 
@@ -1308,6 +1402,8 @@ Implement:
 - upload to R2
 - extract available metadata if practical
 - persist track record
+- optional validated private cover upload/replace/remove and owned artwork delivery
+- preserve metadata edit/delete/favorite actions used by the approved row menu
 
 **Acceptance Criteria:** uploaded track appears in library
 
@@ -1364,7 +1460,9 @@ State includes:
 - play track
 - favorite
 - delete
-- search if needed
+- required title/artist/album search with bounded stable pagination
+- All tracks/Playlists switching, selected-track state and real track action menus
+- accessible shuffle/repeat controls reflecting the persistent provider state
 
 </details>
 
@@ -1644,6 +1742,8 @@ Implement:
 - home query
 - category query
 - cleanup old articles
+- normalize category filters and deterministic primary topic_key through reviewed migration
+- derive up to four nonempty seven-day feed topics with stable count/recency/key ranking
 
 #### News Refresh Job
 
@@ -1686,12 +1786,18 @@ Conceptual endpoints:
 
 - GET /api/news
 - GET /api/news/home
+- GET /api/news/topics
+- GET /api/news/saved
+- PUT /api/news/:articleId/saved
+- DELETE /api/news/:articleId/saved
 
 Support:
 
 - limit
 - category
 - pagination/cursor if needed
+- stable bounded pagination, topic filter and owner-projected isSaved
+- idempotent saves/unsaves through reviewed news_saved_articles migration and repository
 
 #### News Page
 
@@ -1704,6 +1810,10 @@ Support:
 - why it matters
 - category filtering if useful
 - original article link
+- match approved News v2 with lead/supporting stories, Saved for Later and Trending Topics
+- bookmark actions synchronized across card/preview/full saved views; preserve state on failure
+- two-item saved preview and complete View saved list, not a hard saved-record limit
+- topic click filters actual cached feed; disclose its seven-day Kokpit scope
 
 **Acceptance Criteria:** feed feels curated, not noisy
 
@@ -1718,6 +1828,8 @@ Support:
 **Goal:** Delete stale articles after retention window.
 
 **Acceptance Criteria:** default retention roughly 45 days; cleanup does not affect fresh feed
+or any saved article. Guard deletion in one SQL write, protect retained source metadata, and
+let old unsaved articles become eligible on the next cleanup. Old saves stay outside fresh trends/feed.
 
 #### News Tests
 
@@ -1732,6 +1844,9 @@ Test:
 - source failure isolation
 - cached fallback
 - Home selection
+- topic classification, seven-day window, empty groups, deterministic ranking and filter pagination
+- saved-state ownership, idempotence, full-list reachability and cross-instance synchronization
+- save/cleanup race, saved retention, unsave eligibility and source disabling without data loss
 
 </details>
 
@@ -2092,7 +2207,9 @@ Confirm:
 
 #### Data Model Review
 
-Confirm implementation matches `DATA_MODEL.md`.
+Confirm implementation matches `DATA_MODEL.md`, including the approved 20-table target,
+additive fields/indexes, collection SET NULL semantics and saved-article retention protections.
+Verify all reviewed migrations were applied in order without rewriting the initial migration.
 
 Any real schema deviation must be documented.
 
