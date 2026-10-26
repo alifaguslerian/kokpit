@@ -1,10 +1,10 @@
 # Kokpit — Design System
 
-**Version:** 1.3 — Owner-approved FINAL room composition
+**Version:** 1.4 — Approved Home and feature-page composition
 **Status:** V1 design direction locked
 **Theme:** Dark Cozy Editorial Workspace
 **Primary platform:** Desktop web
-**Reference:** Owner-approved FINAL Home image; [reference gallery and interpretation](UI_REFERENCES.md)
+**Reference:** Approved Home plus five feature pages; [reference gallery and interpretation](UI_REFERENCES.md)
 **Last updated:** 2026-10-25
 
 This is the source of truth for UI appearance and interaction.
@@ -13,10 +13,12 @@ Product scope belongs in [PRD](../product/PRD.md); execution rules belong in [AG
 The owner approved the FINAL Home image and its implementation on 2026-10-25.
 It supersedes the earlier sidebar, hero-only imagery and independent-column composition.
 Follow its room atmosphere, floating bottom navigation and Home hierarchy through the
-specifications below. Earlier Stitch screens remain supporting references for dedicated
-pages. Screenshot labels, example content and extra controls do not independently define
-product behavior or persisted entities. DEC-053 in [Decisions](../product/DECISIONS.md)
-records this bounded visual revision; DEC-051 remains historical reference approval.
+specifications below. On the same date the owner approved College v2, News v2, Ideas v2,
+Music and Library, and requested functional controls through revised requirements.
+[Approved UI Features](../features/APPROVED_UI_FEATURES.md) maps every surface to behavior.
+DEC-054 supersedes earlier dedicated-page references; DEC-051 remains historical, and
+DEC-053 continues to govern Home. Generated sample data, fonts and decorative details
+do not replace semantic tokens, accessible controls or the real data contracts.
 
 ## Visual direction
 
@@ -360,18 +362,25 @@ large statistic panels, and repeated card-inside-card borders.
 
 | Page | Reference-led V1 composition |
 | --- | --- |
-| College | Semester selector and clear Semester → Course → Week → Material navigation. A course grid leads into a selected course's weekly material list; an optional side panel shows selected material details/actions. Include create, rename, archive, move, download, and delete at their documented level. Keep the resource focus of the reference without schedules, deadlines, office-hours panels, or progress scoring. |
-| Ideas | A prominent, low-friction composer above a saved-idea list; optional title and quick tags never block capture. Show readable previews, dates, lightweight tags, and pinned ideas using the documented model. Search is visible; edit and delete are discoverable. An optional compact tag/filter area can occupy the right side when useful; do not create notebooks to fill that column. |
+| College | Semester selector above two aligned columns: course rows on the left; a recurring Weekly Schedule and Recent Files & Notes on the right. Keep Add semester/Add course, real descriptions and accessible edit/reorder controls. Course → Week → Material remains the content hierarchy. Schedule blocks open courses; View materials opens the selected semester's complete materials list. No deadlines, attendance, live class joins or progress scoring. |
+| Ideas | Cream ruled-paper capture above an All Ideas card grid on the left; Collections and Favorite Ideas in a supporting right column. Optional title/tags/collection/cover never block quick capture. Search and tag filters stay visible; pins and favorite stars are distinct and consistent across views. Collection tiles filter ideas; New/View all open complete management views. Optional private covers use real owner images with a text-only fallback. |
 | Library | A prominent shortcut grid with recognizable icon, name, and an Add shortcut tile. Expose editing, deletion, ordering, and Home favorites. Optional groups use the documented quick-link grouping. Search, if included, searches shortcuts locally; a right panel is unnecessary without useful shortcut content. Preserve the portal-grid character without a reading tracker or book vault. |
-| Music | A large player with artwork, track/artist, transport, seek/time, and volume above a playlist/library area. The vinyl motif may be restrained static artwork; it does not imply a codec or DSP engine. Provide file import and track/playlist management within the package scope. Optional queue/search remain secondary; playback stays mounted above route pages. The reference's mixer/grabber areas do not belong to this V1 composition. |
-| News | A restrained lead article may precede a readable feed with useful local category filters. Show headline, source, time, short summary, and original article link. Supporting cards may use two or three columns only when readable. Images come from appropriate source metadata with a neutral fallback; do not attach unrelated atmospheric imagery as documentary evidence. Coverage and AI fallback follow Content Sources. |
+| Music | A large player/artwork on the left and library/search/playlist region on the right with aligned lower edges. File import, track menus, transport, seek/time, shuffle/repeat and volume are functional; All tracks/Playlists and New playlist lead to actual views. Playback stays mounted above routes. No mixer/grabber/DSP controls. |
+| News | Category filters precede a lead article and supporting feed; Saved for Later and Trending Topics form the lower row. All article instances expose consistent bookmark state and original links. View saved opens the complete saved list; topics filter the feed and disclose their seven-day Kokpit-cache scope. Source imagery or neutral fallback only; no reading goals/charts or fabricated global trend statistics. |
 
 Use Inter for functional page titles, controls, metadata, and article/idea previews;
 reserve Cormorant Garamond for occasional expressive headings. Example text, source names,
 counts, course names, tracks, and link destinations in the references are not production seeds.
 An unsupported control must be omitted rather than displayed as a non-functional promise,
 except the explicitly approved clearly disabled future music controls in this polish.
-This table describes design patterns, not permission to expand a work package's feature scope.
+These compositions are approved requirements. Implement only the currently authorized package;
+approval does not mark new persistence, integrations or UI controls as already delivered.
+
+Keep desktop grid DOM/keyboard order stable; decorative masonry must not reorder focus.
+Below desktop width, Ideas support sections follow capture/grid, Music stacks player and
+library, and College converts its timetable into a readable day list. Do not hide weekend
+classes, long filenames or additional collection/favorite/saved records to match a PNG.
+No photo cover is required for an idea, track or publisher article to remain usable.
 
 ## Loading, empty, and error states
 
