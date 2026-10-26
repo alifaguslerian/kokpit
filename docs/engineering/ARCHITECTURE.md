@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.7 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-25
+**Version:** 0.8 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-26
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -40,8 +40,9 @@ Quick Links. The frontend uses Kokpit tokens/fonts with Tailwind utilities and
 explicit base styles, without Preflight. Package 4.1 adds owner-scoped College
 hierarchy APIs through routes, a service and a repository using the existing schema.
 Package 4.2 adds lazy College, course and week pages, shared query-backed Home
-context and metadata forms. R2, material handling, persistent audio, content jobs
-and production resources remain pending.
+context and metadata forms. Package 4.3 adds local private R2, streamed file uploads,
+material metadata/link APIs and owned file delivery. Material UI/deletion, persistent audio,
+content jobs and production resources remain pending.
 DEC-054 approves feature-page requirements, including class schedule, Ideas collections/
 favorites/covers and News saves/topics. They use the same stack and domain boundaries;
 they are not implemented by the documentation approval. The Data Model distinguishes
@@ -186,6 +187,15 @@ File access resolves metadata → verifies ownership → reads R2 → streams by
 A conceptual file route is `GET /api/files/:id`; guessing an object key grants no access.
 Keep replacement and deletion consistent across storage layers; follow canonical lifecycle rules in Data Model.
 SQL cascades cannot remove R2 bytes. Retry partial cleanup safely and avoid orphan accumulation.
+
+Package 4.3 uses raw file request streams with validated filename/declared size plus actual
+byte counting, bounded signature/text checks and native FixedLengthStream for R2. Successful
+metadata is inserted only after storage; ambiguous D1 failure is resolved before attempting
+compensation. Preserve referenced bytes when metadata recovery is unavailable or ancestry
+becomes inaccessible. Cleanup failures log a safe operation/material ID for reconciliation.
+The concrete protocol, safe download headers, Range behavior and 4.4 boundary are in
+[College Materials](../features/COLLEGE_MATERIALS.md). No new storage provider/dependency
+or public bucket URL is introduced; full R2-aware deletion remains 4.4.
 
 Ideas covers reuse the private R2 provider and owner-checked byte delivery. Store only cover
 metadata in D1; validate JPEG/PNG/WebP bytes, size and bounded thumbnail dimensions. Cover
