@@ -194,7 +194,7 @@ test('College deletion mutations remove cached descendants before invalidating p
   assert.deepEqual(client.getQueryData(queryKeys.ideas.all), ['unrelated']);
 });
 
-test('a blocked deletion preserves the cached College tree for recovery', async (t) => {
+test('a failed deletion preserves cached College data and invalidates it for recovery', async (t) => {
   const { db } = await setup(t);
   const client = new QueryClient();
   t.after(() => client.clear());
@@ -225,5 +225,5 @@ test('a blocked deletion preserves the cached College tree for recovery', async 
   );
   assert.deepEqual(client.getQueryData(queryKeys.college.semester(semester.id)), semester);
   assert.deepEqual(client.getQueryData(queryKeys.college.weeks(course.id)), [week]);
-  assert.equal(client.getQueryState(queryKeys.college.semester(semester.id))?.isInvalidated, false);
+  assert.equal(client.getQueryState(queryKeys.college.semester(semester.id))?.isInvalidated, true);
 });
