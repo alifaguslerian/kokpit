@@ -1,8 +1,11 @@
 # Kokpit — Data Model
 
-**Version:** 0.2 · **Status:** V1 Data Model Draft · **Updated:** 2026-10-07
+**Version:** 0.3 · **Status:** Approved V1 target; additions pending migration · **Updated:** 2026-10-25
 
-Canonical persisted schema for private single-user V1: **17 D1 tables**.
+Canonical target for private single-user V1: **20 D1 tables**. The implemented baseline
+still has **17 tables**. Three additions and the field changes below are approved
+requirements, not existing schema or applied migrations; see DEC-054 and
+[Approved UI Features](../features/APPROVED_UI_FEATURES.md).
 D1 stores structured metadata; private R2 stores file bytes.
 Runtime boundaries: [Architecture](ARCHITECTURE.md). Operations: [Deployment](DEPLOYMENT.md).
 Accepted preflight changes: [DEC-048](../product/DECISIONS.md#dec-048--owner-approved-preflight-resolutions).
@@ -13,11 +16,13 @@ Accepted preflight changes: [DEC-048](../product/DECISIONS.md#dec-048--owner-app
 - Timestamps use ISO 8601 UTC strings; display timezone belongs in settings.
 - `Required = yes` means non-null; `no` means nullable. Defaults below retain the original specification's suggested defaults, rather than introducing new ones.
 - SQLite booleans are `INTEGER`: `0` false, `1` true; ORM may expose booleans.
-- Enable real foreign keys. Every FK listed below has `ON DELETE CASCADE`.
+- Enable real foreign keys. FKs use `ON DELETE CASCADE` unless explicitly stated otherwise.
+  Idea collection references use `SET NULL`; saved article references use `RESTRICT`.
 - One seeded owner exists; public registration and account switching are outside V1.
 - Query personal resources with both ID and `user_id`, including nested resources.
 - Validate parent/child ownership; join-table operations must validate both related owners.
 - Quotes and news are shared content pools in V1, without personal `user_id` fields.
+  Personal News saves are separate owner-scoped records; never put their state on shared articles.
 - Explicit `position` orders links, semesters, courses, materials, playlists and memberships; integer spacing such as 100/200 is suggested, algorithm remains an implementation detail.
 - JSON is for tiny flexible state or unqueried provider metadata, never relational collections.
 
@@ -25,6 +30,8 @@ Accepted preflight changes: [DEC-048](../product/DECISIONS.md#dec-048--owner-app
 erDiagram
     users ||--|| user_settings : configures
     users ||--o{ ideas : owns
+    users ||--o{ idea_collections : owns
+    idea_collections o|--o{ ideas : groups
     users ||--o{ idea_tags : owns
     ideas ||--o{ idea_tag_links : tagged
     idea_tags ||--o{ idea_tag_links : joins
@@ -32,12 +39,15 @@ erDiagram
     users ||--o{ semesters : owns
     semesters ||--o{ courses : contains
     courses ||--o{ weeks : contains
+    courses ||--o{ course_schedule_entries : schedules
     weeks ||--o{ materials : contains
     users ||--o{ tracks : owns
     users ||--o{ playlists : owns
     playlists ||--o{ playlist_tracks : contains
     tracks ||--o{ playlist_tracks : joins
     news_sources ||--o{ news_articles : supplies
+    users ||--o{ news_saved_articles : saves
+    news_articles ||--o{ news_saved_articles : referenced
     users ||--o{ app_state : owns
 ```
 
@@ -46,8 +56,9 @@ Quotes form an independent content pool. SQL cascades never delete R2 objects.
 
 ## Table contracts
 
-Every table below preserves its fields, SQL types, nullability, constraints and index definitions.
-Constraints are shown compactly; the global cascade convention applies to each FK.
+Existing fields remain compatible. Sections/fields marked pending describe additive changes
+to implement in their assigned package. Constraints are compact; explicit FK exceptions override
+the cascade convention. No initial migration may be rewritten to make the target appear implemented.
 
 ### `users`
 
@@ -73,7 +84,7 @@ Constraints are shown compactly; the global cascade convention applies to each F
 | `quote_rotation_minutes` | INTEGER | yes | Fixed V1 value: `60`; local clock-hour rotation, not a configurable preference |
 | `news_refresh_preference_minutes` | INTEGER | no | UI preference, not necessarily cron schedule |
 | `music_volume` | REAL | yes | `0.0` to `1.0` |
-| `sidebar_collapsed` | INTEGER | yes | SQLite boolean, `0` or `1` |
+| `sidebar_collapsed` | INTEGER | yes | Legacy unused field; dock visibility stays session-only |
 | `created_at` | TEXT | yes | UTC |
 | `updated_at` | TEXT | yes | UTC |
 
@@ -90,12 +101,43 @@ Constraints are shown compactly; the global cascade convention applies to each F
 | `title` | TEXT | no | Optional idea title |
 | `content` | TEXT | yes | Idea body |
 | `is_pinned` | INTEGER | yes | `0` or `1` |
+| `is_favorite` | INTEGER | yes | Pending 3.4: independent favorite flag, default `0` |
+| `collection_id` | TEXT | no | Pending 3.4: one optional owned collection; FK uses `ON DELETE SET NULL` |
+| `cover_r2_key` | TEXT | no | Pending 3.4: backend-generated private cover key |
+| `cover_mime_type` | TEXT | no | Pending 3.4: validated JPEG/PNG/WebP MIME |
+| `cover_size_bytes` | INTEGER | no | Pending 3.4: actual validated positive cover byte count |
 | `created_at` | TEXT | yes | UTC |
 | `updated_at` | TEXT | yes | UTC |
 
 **Constraints:** `PRIMARY KEY (id) FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`.
 
 **Indexes:** `INDEX ideas_user_created_idx (user_id, created_at DESC) INDEX ideas_user_pinned_idx (user_id, is_pinned, created_at DESC)`.
+
+**Pending 3.4 constraints/indexes:** `FOREIGN KEY (collection_id) REFERENCES idea_collections(id) ON DELETE SET NULL`;
+`CHECK (is_favorite IN (0, 1))`; all three cover metadata fields are null together or valid together.
+Add `ideas_user_favorite_idx (user_id, is_favorite, updated_at DESC, id DESC)` and
+`ideas_user_collection_idx (user_id, collection_id, is_pinned, created_at DESC, id DESC)`.
+Services and reads verify the related collection owner as well as the idea owner, including
+inconsistent legacy rows. Existing ideas migrate to no favorite, no collection and no cover.
+
+### `idea_collections` (pending 3.4)
+
+| Field | Type | Required | Description |
+|---|---|---:|---|
+| `id` | TEXT | yes | Opaque collection ID |
+| `user_id` | TEXT | yes | Owner FK, cascade |
+| `name` | TEXT | yes | Trimmed display name, 1–80 characters |
+| `name_key` | TEXT | yes | Stable normalized case-folded name for per-owner uniqueness |
+| `position` | INTEGER | yes | Explicit nonnegative order |
+| `created_at` | TEXT | yes | UTC |
+| `updated_at` | TEXT | yes | UTC |
+
+**Constraints:** `PRIMARY KEY (id) UNIQUE (user_id, name_key)`;
+`FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`.
+`name_key` uses Unicode NFKC normalization, trim and lowercase; reject an empty result.
+**Indexes:** `idea_collections_user_position_idx (user_id, position, id)`.
+One idea has at most one collection. Deleting it clears membership and retains ideas,
+tags, pins, favorites and cover bytes. A normalized memberships table is unnecessary for this V1 contract.
 
 ### `idea_tags`
 
@@ -165,6 +207,7 @@ Constraints are shown compactly; the global cascade convention applies to each F
 | `name` | TEXT | yes | Course name |
 | `code` | TEXT | no | Course code |
 | `lecturer` | TEXT | no | Lecturer display name |
+| `description` | TEXT | no | Pending 4.5: optional plain text, maximum 2,000 characters |
 | `accent_key` | TEXT | no | Optional restrained UI identifier |
 | `position` | INTEGER | yes | Ordering |
 | `created_at` | TEXT | yes | UTC |
@@ -173,6 +216,28 @@ Constraints are shown compactly; the global cascade convention applies to each F
 **Constraints:** `PRIMARY KEY (id) FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE CASCADE`.
 
 **Indexes:** `INDEX courses_semester_position_idx (semester_id, position) INDEX courses_user_semester_idx (user_id, semester_id)`.
+
+### `course_schedule_entries` (pending 4.5)
+
+| Field | Type | Required | Description |
+|---|---|---:|---|
+| `id` | TEXT | yes | Opaque entry ID |
+| `user_id` | TEXT | yes | Owner FK, cascade |
+| `course_id` | TEXT | yes | Owned course FK, cascade |
+| `weekday` | INTEGER | yes | ISO weekday 1 (Monday) through 7 (Sunday) |
+| `start_minute` | INTEGER | yes | Local minute 0–1439 in saved owner timezone |
+| `end_minute` | INTEGER | yes | Local minute 1–1440, strictly after start |
+| `room` | TEXT | no | Optional trimmed location, maximum 120 characters |
+| `created_at` | TEXT | yes | UTC |
+| `updated_at` | TEXT | yes | UTC |
+
+**Constraints:** `PRIMARY KEY (id)`; owner/course cascading FKs;
+`CHECK (weekday BETWEEN 1 AND 7)`; `CHECK (start_minute >= 0 AND start_minute < end_minute AND end_minute <= 1440)`;
+`UNIQUE (course_id, weekday, start_minute, end_minute)`.
+**Indexes:** `course_schedule_user_day_idx (user_id, weekday, start_minute, id)`;
+`course_schedule_course_idx (course_id, weekday, start_minute, id)`.
+Semester is derived from the course, not duplicated. No dated-event, recurrence engine,
+reminder, attendance or provider entity is introduced. Overlaps are permitted and remain visible.
 
 ### `weeks`
 
@@ -213,6 +278,9 @@ Constraints are shown compactly; the global cascade convention applies to each F
 **Constraints:** `PRIMARY KEY (id) FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE FOREIGN KEY (week_id) REFERENCES weeks(id) ON DELETE CASCADE`.
 
 **Indexes:** `INDEX materials_week_position_idx (week_id, position) INDEX materials_user_week_idx (user_id, week_id) INDEX materials_last_opened_idx (user_id, last_opened_at DESC)`.
+
+**Pending 4.3:** add `materials_user_updated_idx (user_id, updated_at DESC, id DESC)`
+for recent/full semester queries; verify the hierarchy join stays owner-scoped.
 
 ### `tracks`
 
@@ -308,6 +376,7 @@ Constraints are shown compactly; the global cascade convention applies to each F
 | `url` | TEXT | yes | Original article URL |
 | `image_url` | TEXT | no | Remote thumbnail URL |
 | `category` | TEXT | no | Normalized category |
+| `topic_key` | TEXT | no | Pending 6.4: deterministic primary feed-topic key, not personal saved state |
 | `relevance_score` | REAL | yes | Kokpit relevance |
 | `published_at` | TEXT | no | Original publication time |
 | `fetched_at` | TEXT | yes | Ingestion time |
@@ -319,6 +388,26 @@ Constraints are shown compactly; the global cascade convention applies to each F
 **Defaults:** `relevance_score = 0 ai_enriched = 0`.
 
 **Indexes:** `INDEX news_articles_feed_idx (relevance_score DESC, published_at DESC) INDEX news_articles_source_idx (source_id, published_at DESC) INDEX news_articles_category_idx (category, published_at DESC)`.
+
+**Pending 6.4:** nullable `topic_key` is one of `ai`, `developer-tools`, `cybersecurity`, `world`;
+add `news_articles_topic_idx (topic_key, published_at DESC, fetched_at DESC, id)`.
+Trending topic counts/ranks are computed from eligible deduplicated records, not stored as new tables.
+
+### `news_saved_articles` (pending 6.5)
+
+| Field | Type | Required | Description |
+|---|---|---:|---|
+| `user_id` | TEXT | yes | Saving owner FK, cascade |
+| `article_id` | TEXT | yes | Shared article FK, `ON DELETE RESTRICT` |
+| `saved_at` | TEXT | yes | UTC first-save timestamp; repeat save preserves it |
+
+**Constraints:** `PRIMARY KEY (user_id, article_id)`;
+`FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`;
+`FOREIGN KEY (article_id) REFERENCES news_articles(id) ON DELETE RESTRICT`.
+**Indexes:** `news_saved_user_time_idx (user_id, saved_at DESC, article_id DESC)`;
+`news_saved_article_idx (article_id)` for cleanup exclusion.
+Cleanup deletes only stale unsaved articles using a single guarded database write.
+Disable news sources rather than hard-deleting source/article rows that retained saves require.
 
 ### `quotes`
 
@@ -359,12 +448,15 @@ Constraints are shown compactly; the global cascade convention applies to each F
 |---|---|
 | Settings | Suggested defaults: timezone `Asia/Jakarta`, locale `id-ID`, clock `24h`, rotation `60`, volume `0.70`, sidebar `0`. Rotation remains fixed in V1 and uses local clock-hour boundaries, never elapsed minutes after opening. |
 | Ideas | Content must not be empty; title and lightweight tags are optional. |
+| Collections/favorites | Optional single collection, independently stored pin/favorite flags; related records must share owner. No collection delete may delete an idea. |
 | Links | `group_name` is optional; no normalized groups table is needed in V1. Validate destination URLs and icon references. |
 | Semesters | Normally one active semester per user; service-level enforcement is acceptable. |
 | Weeks | Number of weeks is not globally fixed; `(course_id, week_number)` is unique. |
+| Class schedule | Validate owned course and selected semester ancestry, integer weekday/time bounds and exact duplicates; derive display timezone from user settings. |
 | Materials | `file` requires `r2_key`, `original_filename`, `mime_type`, `size_bytes`; `link` requires `external_url`. A record must not behave as both. |
 | Playlists | A track occurs once per playlist due to the composite PK; duplicate occurrences are outside V1. |
 | News | Preserve original article URL/source; enrichment remains optional. |
+| News saves/topics | Saves are personal references; topics are shared deterministic classification. Saved references survive cleanup without retaining full publisher text. |
 | Quotes | Every AI, external or fallback quote carries `language` (`en` or `id`); target approximately 90% English and 10% Indonesian over time, never infer language from UI locale. |
 | Attribution | AI author normally `NULL`; never fabricate authors. External author/source URL are stored only when reliable. |
 | App state | Use sparingly, e.g. `last_opened_course_id`, `last_selected_news_filter`; do not hide ordinary entities here. |
@@ -376,6 +468,8 @@ Suggested quote moods: `calm`, `reflective`, `ambition`, `struggle`, `sad`, `unc
 Different coverage of one event is not automatically duplicate content; event clustering is outside V1.
 News retention is configurable within the suggested **30–60 days** window;
 [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) uses roughly **45 days** as the initial default.
+Saved articles are exempt from deletion but do not re-enter the fresh feed/trend window merely
+because they are retained. After unsave, ordinary cleanup may delete an already-stale article.
 
 ## Files and deletion
 
@@ -389,6 +483,7 @@ users/{userId}/music/audio/{trackId}/{filename}
 users/{userId}/music/covers/{trackId}/{filename}
 users/{userId}/college/{courseId}/{weekId}/{materialId}/{filename}
 users/{userId}/playlist-covers/{playlistId}/{filename}
+users/{userId}/ideas/covers/{ideaId}/{filename}
 ```
 
 Uploads have the approved **50 MB per file** limit; persist actual `size_bytes` / `audio_size_bytes`.
@@ -403,6 +498,10 @@ Audio delivery supports HTTP Range seeking; see [Architecture](ARCHITECTURE.md).
 | Track | Delete audio, uniquely owned optional cover and row; memberships cascade. |
 | Playlist | Delete playlist, memberships and playlist-specific cover where applicable; retain tracks. |
 | Replace file | Delete old object only after replacement is safely committed. |
+| Idea / idea cover | Delete owned cover bytes and metadata safely; replacement commits the new cover before cleaning the old key, and failed writes roll back new objects. |
+| Idea collection | Clear idea membership, then remove the collection; preserve all idea/cover data. |
+| Course / semester schedule | Cascade class entries only after normal hierarchy/material deletion checks succeed. |
+| News save | Remove the owner's reference only; delete a stale unsaved article in normal cleanup, never publisher content. |
 
 Validate ownership and exact keys before any object deletion; avoid wildcard cleanup.
 Real deletion is V1's default for ideas, links, playlists, courses, materials and tracks.
@@ -421,6 +520,20 @@ Broad soft delete, trash/restore and full revision/audit history are outside V1.
 - Never seed fake ideas, courses, tracks, playlists or personal files; isolate development fixtures.
 
 ## Schema change workflow
+
+### Approved additive migration sequence
+
+| Package | Pending change | Compatibility requirement |
+|---|---|---|
+| 4.3 | Add materials_user_updated_idx for recent/full material queries | No record shape/data loss; retain last_opened_at as optional existing metadata. |
+| 4.5 | Add `course_schedule_entries` and nullable `courses.description` | Existing semesters/courses/weeks/materials remain readable and unchanged. |
+| 3.4 (after 4.5) | Add `idea_collections`, optional idea membership/cover metadata and default-false `is_favorite` | Preserve every existing idea, tag and pin; no sample collections or covers. |
+| 6.4 | Add nullable `news_articles.topic_key` and topic index | Classify/backfill existing cached items safely; leave unclassified items readable. |
+| 6.5 | Add `news_saved_articles` with guarded article retention | Existing feed and unsaved cleanup remain valid; test concurrent save/cleanup and disabled sources. |
+
+Target table count after these additions is 20 (17 baseline + 3). No migration is generated,
+applied locally or applied to production by this documentation approval. Verify each intermediate
+schema in its implementation package, including preservation of existing records and FK behavior.
 
 Follow [AGENTS.md](../../AGENTS.md) and [Deployment](DEPLOYMENT.md):
 Drizzle schema → generated migration → SQL review → local apply → tests → deliberate production apply.
