@@ -45,17 +45,21 @@ session thoughts. Music and News previews have honest empty states.
 **Packages 4.1–4.2 are complete:** owner-scoped Semester, Course and Week APIs,
 College pages, semester selection/activation, course ordering, metadata forms and
 confirmed hierarchy deletion. Home shows a saved course/week from the active semester.
-Week pages have a material placeholder; uploads and material links are not available yet.
-The next documented package is **4.3: Private Storage & Material APIs**.
+**Package 4.3 is complete:** local private R2, streamed file uploads, link/metadata APIs,
+owned GET/HEAD/Range delivery and paginated material queries. Week pages still have the
+material placeholder; frontend material forms/lists and public deletion are package 4.4.
+The next documented package is **4.4: Material UI, Deletion & Verification**.
 The approved feature designs add pending College 4.5 and Ideas 3.4–3.5 work; the order is
-4.3 → 4.4 → 4.5 → 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
+4.4 → 4.5 → 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
 The target schema is now 20 tables, while the implemented baseline still has 17; new tables,
 fields and private cover handling are requirements, not delivered migrations/features.
-R2 file handling, real playback, hourly D1 quotes, News ingestion and private production
+Full material UI/deletion, real playback, hourly D1 quotes, News ingestion and private production
 deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
 
 The Worker currently exposes `/api/system/health`, `/api/ideas`, `/api/quick-links`
-and `/api/college`. The [package 4.1 contract](docs/planning/IMPLEMENTATION_PLAN.md#41-semester-course--week-apis)
+and `/api/college` (including materials) plus `/api/files/:id`. The
+[College materials contract](docs/features/COLLEGE_MATERIALS.md) documents the upload protocol,
+type/size validation, privacy, pagination and recovery. The [package 4.1 contract](docs/planning/IMPLEMENTATION_PLAN.md#41-semester-course--week-apis)
 documents College routes, response shapes and temporary file-deletion guards.
 See the [pre-College audit fixes](docs/planning/AUDIT_FIXES.md) for regression coverage
 and validation limits.
@@ -98,6 +102,7 @@ The dev server normally opens at `http://localhost:5173`.
 | `npm run build` | Typecheck, then client and Worker build |
 | `npm test` | Run unit/API tests, ownership and failure-rollback regressions via tsx and node:test |
 | `npm run test:browser` | Run audit and College browser regressions against a running local app; setup below |
+| `npm run test:storage:runtime` | Build and test native Workers/D1/R2 with unique local fixtures, including a 50 MB streamed upload |
 | `npm run preview` | Serve the production build in the local Workers runtime |
 | `npm run db:generate` | Generate SQL migration from Drizzle schema |
 | `npm run db:migrate:local` | Apply pending migrations to local D1 database |
@@ -114,7 +119,8 @@ SPA navigation falls back to `index.html`; `/api/*` reaches the Hono Worker.
 Open `http://localhost:5173/api/system/health` to check the local health response.
 Build output lives in `dist/client/` and `dist/kokpit/`; Vite generates the output Wrangler configuration.
 The configured D1 binding uses a placeholder remote ID for local development.
-No production resources, private R2 binding or Access deployment are configured here.
+R2 is bound as local-only `R2` with private metadata-controlled routes; no production
+resources, public bucket, Access deployment or remote migration is configured by 4.3.
 Local Cloudflare setup and deployment belong in the [deployment runbook](docs/engineering/DEPLOYMENT.md).
 
 ### Browser regressions
@@ -143,6 +149,7 @@ These tests do not verify production Cloudflare Access or remote storage.
 | [Design system](docs/design/DESIGN_SYSTEM.md) | Tokens, typography, layout, and interaction rules |
 | [UI references](docs/design/UI_REFERENCES.md) | Selected approved Home/feature images and their interpretation |
 | [Approved UI features](docs/features/APPROVED_UI_FEATURES.md) | Every visible control, new behavior, API additions and acceptance coverage |
+| [College materials](docs/features/COLLEGE_MATERIALS.md) | Implemented 4.3 upload/link/file protocol, limits, safety and verification |
 | [Architecture](docs/engineering/ARCHITECTURE.md) | Runtime, services, security, and failure boundaries |
 | [Data model](docs/engineering/DATA_MODEL.md) | Tables, constraints, relationships, and lifecycle |
 | [Content sources](docs/features/CONTENT_SOURCES.md) | Quotes, news sources, ranking, and refresh behavior |
