@@ -28,6 +28,23 @@ function semesterRecord(row: typeof semesters.$inferSelect): SemesterRecord {
 export class CollegeRepository {
   constructor(private readonly db: Database) {}
 
+  async hasInaccessibleDescendants(
+    kind: 'semester' | 'course' | 'week',
+    id: string,
+    userId: string,
+  ) {
+    const query =
+      kind === 'semester'
+        ? sql`SELECT c.id FROM courses c LEFT JOIN weeks w ON w.course_id = c.id
+          LEFT JOIN materials m ON m.week_id = w.id WHERE c.semester_id = ${id}
+          AND (c.user_id <> ${userId} OR w.user_id <> ${userId} OR m.user_id <> ${userId}) LIMIT 1`
+        : kind === 'course'
+          ? sql`SELECT w.id FROM weeks w LEFT JOIN materials m ON m.week_id = w.id
+            WHERE w.course_id = ${id} AND (w.user_id <> ${userId} OR m.user_id <> ${userId}) LIMIT 1`
+          : sql`SELECT id FROM materials WHERE week_id = ${id} AND user_id <> ${userId} LIMIT 1`;
+    return (await this.db.all(query)).length > 0;
+  }
+
   async listSemesters(userId: string): Promise<SemesterRecord[]> {
     return (
       await this.db
