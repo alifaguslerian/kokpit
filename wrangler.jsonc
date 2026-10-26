@@ -15,4 +15,11 @@
       "migrations_dir": "drizzle/migrations",
     },
   ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "kokpit-files",
+      "remote": false,
+    },
+  ],
 }
