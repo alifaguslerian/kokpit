@@ -1,16 +1,25 @@
 # Kokpit — Deployment
 
-**Version:** 0.4 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-24
+**Version:** 0.5 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-25
 
 Operational runbook for one Cloudflare Worker + Static Assets, private Access gate,
 D1 metadata, private R2 files, Cron jobs and Workers AI content.
 [Architecture](ARCHITECTURE.md) owns system choices; [Data Model](DATA_MODEL.md) owns schema;
 [Implementation Plan](../planning/IMPLEMENTATION_PLAN.md) controls when this runbook is implemented.
 
-> Current boundary: Milestones 1–3 include the app shell/Home, Ideas and Quick Links
+> Current boundary: baseline packages 1.1–3.3 include the app shell/Home, Ideas and Quick Links
 > APIs/UI, D1 schema and local migration. Package 4.1 adds College hierarchy APIs
 > using the existing schema and D1 binding. The configured remote D1 ID is a placeholder.
 > Private R2, Access, scheduled content and production deployment remain future work.
+
+DEC-054 is a documentation/requirement approval, not a deployment. The current 17-table
+baseline evolves toward 20 through the additive migrations in Data Model (4.5, 3.4,
+6.4–6.5). Do not rewrite/apply the initial migration or create remote resources for this approval.
+Existing private R2 also serves optional Ideas covers; no public image bucket or new binding
+is needed. Include those keys and new metadata in backup/recovery and deletion smoke checks.
+Before release, verify saved News survives retention/source disabling, collection deletion
+preserves ideas, cover operations leave no normal orphans, and saved owner timezone drives
+the weekly class view. Bindings and scheduled cadence otherwise remain unchanged.
 
 ## 1. Environments and prerequisites
 
