@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.6 · **Status:** V1 Architecture Draft · **Updated:** 2026-10-25
+**Version:** 0.7 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-25
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -34,7 +34,7 @@ This document owns system boundaries; it does not redefine product or visual req
 | Content AI | Workers AI; cached/batched, optional to basic functionality |
 | Deployment | Workers + Static Assets through Cloudflare Vite integration |
 
-Milestones 1–3 are implemented: Cloudflare Vite integration, the D1 schema/local
+Baseline packages 1.1–3.3 are implemented: Cloudflare Vite integration, the D1 schema/local
 migration, owner context, safe Hono APIs, the responsive shell/Home, Ideas and
 Quick Links. The frontend uses Kokpit tokens/fonts with Tailwind utilities and
 explicit base styles, without Preflight. Package 4.1 adds owner-scoped College
@@ -42,6 +42,10 @@ hierarchy APIs through routes, a service and a repository using the existing sch
 Package 4.2 adds lazy College, course and week pages, shared query-backed Home
 context and metadata forms. R2, material handling, persistent audio, content jobs
 and production resources remain pending.
+DEC-054 approves feature-page requirements, including class schedule, Ideas collections/
+favorites/covers and News saves/topics. They use the same stack and domain boundaries;
+they are not implemented by the documentation approval. The Data Model distinguishes
+the existing 17-table baseline from the 20-table target.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
@@ -86,6 +90,9 @@ Conceptual page routes (exact supporting route names are implementation details)
 College may nest semester/course/week paths; Music may nest playlist paths.
 Current College routes are `/college`, `/college/courses/:courseId` and
 `/college/weeks/:weekId`; `?semester=<id>` preserves the overview selection.
+Pending 4.4 adds `?view=materials` to the semester overview; pending News/Ideas views
+use validated feature-local query parameters from Approved UI Features. These additions
+do not create more primary destinations or an alternate global navigation system.
 Lazy-load deeper feature routes where useful. Home reads lightweight summaries from their
 own modules; it must not import complete College management or Music library functionality.
 
@@ -96,13 +103,18 @@ Accessibility and loading/empty/error states follow the Design System.
 
 | State | Owner |
 |---|---|
-| Ideas, links, College, music metadata, playlists, news, quotes, settings | API + D1; TanStack Query fetch/cache/invalidate |
+| Ideas/collections/favorites, links, College/class schedule, music, playlists, news/saves, quotes, settings | API + D1; TanStack Query fetch/cache/invalidate |
 | Playing track, queue, volume, player events | Persistent client provider above routes |
 | Selections, modal/form state | Local React state/context |
 | Small non-critical preferences | Browser storage where appropriate |
 
 LocalStorage is not a database for content, files, playlists or news.
 No Redux is needed. Do not continuously persist audio position or clock ticks.
+
+The shared dock's visibility remains session-only React state. Schedule entries, collection
+membership, favorites and article saves survive reload through D1, not localStorage.
+Invalidate related feature queries/previews after writes; never reset an unrelated draft or
+remount the audio provider when switching filters, collections or saved views.
 
 ## HTTP and business logic
 
@@ -160,7 +172,8 @@ Future public accounts would require a separate authentication review; data read
 ## D1, R2 and uploads
 
 D1 stores metadata and relationships. R2 stores audio, artwork, College PDFs/slides/documents/images.
-The [Data Model](DATA_MODEL.md) is the precise 17-table contract.
+The [Data Model](DATA_MODEL.md) defines the implemented 17-table baseline and approved
+20-table target. New fields/tables require later additive migrations, not edits to applied SQL.
 
 - Keep R2 private; no unrestricted browser bucket access or public file URLs.
 - Generate object keys in the backend; never trust complete keys supplied by clients.
@@ -173,6 +186,29 @@ File access resolves metadata → verifies ownership → reads R2 → streams by
 A conceptual file route is `GET /api/files/:id`; guessing an object key grants no access.
 Keep replacement and deletion consistent across storage layers; follow canonical lifecycle rules in Data Model.
 SQL cascades cannot remove R2 bytes. Retry partial cleanup safely and avoid orphan accumulation.
+
+Ideas covers reuse the private R2 provider and owner-checked byte delivery. Store only cover
+metadata in D1; validate JPEG/PNG/WebP bytes, size and bounded thumbnail dimensions. Cover
+replace/remove/delete uses the same rollback and partial-cleanup discipline as material files.
+No private cover URL, object key or idea content goes to quote/news AI or an image provider.
+
+## Approved feature extensions
+
+The interaction/API checklist is [Approved UI Features](../features/APPROVED_UI_FEATURES.md).
+
+| Domain | Service/repository responsibility |
+|---|---|
+| College schedule | Owned recurring class entries under courses; validate semester ancestry, local weekday/time bounds, duplicates and deletion. Render in saved owner timezone; no external calendar service or recurrence engine. |
+| Recent materials | Bounded query joining materials → weeks → courses → selected semester with ownership at every level. Sort by updated time/ID; reuse authenticated file/link access. No view-tracking job or new activity table. |
+| Ideas collections/favorites | Flat optional collection FK and independent isFavorite/isPinned flags; collection delete clears membership without deleting ideas or covers. Atomic reorder and safe cross-owner relationship checks. |
+| News saves | Owner-scoped reference relation; project isSaved for the current owner without mutating the shared article or leaking private state through a shared HTTP cache. |
+| Feed topics | Deterministic primary topic during normalization, then aggregate eligible seven-day cache on the server. No new trend provider, per-load AI or count table. |
+
+Article cleanup performs a guarded delete excluding saved references; restrictive FKs protect
+retained records. Disable sources rather than hard-delete rows still needed by saves.
+Keep cache-only feed/topic reads usable during provider failure. Use bounded lists and stable
+ID tie-breakers, with complete managers beyond preview limits. Existing Ideas limit/offset
+APIs remain compatible when new filters are added.
 
 ## Persistent music
 
