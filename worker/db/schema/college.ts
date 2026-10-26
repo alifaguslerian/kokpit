@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
 import { users } from './users';
 
 export const semesters = sqliteTable(
@@ -95,5 +96,10 @@ export const materials = sqliteTable(
     index('materials_week_position_idx').on(table.weekId, table.position),
     index('materials_user_week_idx').on(table.userId, table.weekId),
     index('materials_last_opened_idx').on(table.userId, table.lastOpenedAt),
+    index('materials_user_updated_idx').on(
+      table.userId,
+      sql`${table.updatedAt} desc`,
+      sql`${table.id} desc`,
+    ),
   ],
 );
