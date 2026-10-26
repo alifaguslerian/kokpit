@@ -4,6 +4,8 @@ import type { WorkerEnv } from '../env';
 import { createDb } from '../db/client';
 import { CollegeRepository } from '../db/repositories/college.repository';
 import { CollegeService } from '../services/college.service';
+import { MaterialsService } from '../services/materials.service';
+import { MaterialsRepository } from '../db/repositories/materials.repository';
 import { validateJson, validateParams, validateQuery } from '../utils/validator';
 
 const id = z.string().min(1).max(128);
@@ -44,8 +46,14 @@ const courseUpdate = courseCreate
 const weekUpdate = weekCreate.partial().refine(hasChanges, 'Provide at least one field to update.');
 const reorder = z.object({ ids: z.array(id) }).strict();
 
-const service = (c: Context<WorkerEnv>) =>
-  new CollegeService(new CollegeRepository(createDb(c.env.DB)));
+const service = (c: Context<WorkerEnv>) => {
+  const db = createDb(c.env.DB);
+  const repository = new CollegeRepository(db);
+  return new CollegeService(
+    repository,
+    new MaterialsService(new MaterialsRepository(db), repository, c.env.R2),
+  );
+};
 const body = <T>(c: Context<WorkerEnv>) => c.get('validatedJson' as never) as T;
 
 export const collegeRoutes = new Hono<WorkerEnv>();
