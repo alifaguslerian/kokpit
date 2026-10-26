@@ -1,6 +1,6 @@
 # Kokpit — Data Model
 
-**Version:** 0.3 · **Status:** Approved V1 target; additions pending migration · **Updated:** 2026-10-25
+**Version:** 0.4 · **Status:** 17-table baseline; approved feature additions pending · **Updated:** 2026-10-26
 
 Canonical target for private single-user V1: **20 D1 tables**. The implemented baseline
 still has **17 tables**. Three additions and the field changes below are approved
@@ -279,8 +279,10 @@ reminder, attendance or provider entity is introduced. Overlaps are permitted an
 
 **Indexes:** `INDEX materials_week_position_idx (week_id, position) INDEX materials_user_week_idx (user_id, week_id) INDEX materials_last_opened_idx (user_id, last_opened_at DESC)`.
 
-**Pending 4.3:** add `materials_user_updated_idx (user_id, updated_at DESC, id DESC)`
-for recent/full semester queries; verify the hierarchy join stays owner-scoped.
+**Implemented 4.3:** `materials_user_updated_idx (user_id, updated_at DESC, id DESC)`
+supports recent/full semester queries with owner-scoped hierarchy joins. Generated migration
+0001_sloppy_phil_sheldon.sql adds this index only, applied locally on 2026-10-26;
+the initial migration and 17 tables remain unchanged. See [College Materials](../features/COLLEGE_MATERIALS.md).
 
 ### `tracks`
 
@@ -486,7 +488,8 @@ users/{userId}/playlist-covers/{playlistId}/{filename}
 users/{userId}/ideas/covers/{ideaId}/{filename}
 ```
 
-Uploads have the approved **50 MB per file** limit; persist actual `size_bytes` / `audio_size_bytes`.
+Uploads have the approved **50 MB per file** limit (50 × 1,024 × 1,024 = 52,428,800 bytes);
+persist actual validated `size_bytes` / `audio_size_bytes`, not an unchecked client claim.
 Validate owner, allowed type, declared and actual size, destination and metadata.
 Files remain private and are resolved through authenticated metadata routes.
 Audio delivery supports HTTP Range seeking; see [Architecture](ARCHITECTURE.md).
@@ -525,7 +528,7 @@ Broad soft delete, trash/restore and full revision/audit history are outside V1.
 
 | Package | Pending change | Compatibility requirement |
 |---|---|---|
-| 4.3 | Add materials_user_updated_idx for recent/full material queries | No record shape/data loss; retain last_opened_at as optional existing metadata. |
+| 4.3 (complete) | Added materials_user_updated_idx for recent/full material queries | Applied locally; no record shape/data loss, last_opened_at remains optional. |
 | 4.5 | Add `course_schedule_entries` and nullable `courses.description` | Existing semesters/courses/weeks/materials remain readable and unchanged. |
 | 3.4 (after 4.5) | Add `idea_collections`, optional idea membership/cover metadata and default-false `is_favorite` | Preserve every existing idea, tag and pin; no sample collections or covers. |
 | 6.4 | Add nullable `news_articles.topic_key` and topic index | Classify/backfill existing cached items safely; leave unclassified items readable. |
