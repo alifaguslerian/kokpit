@@ -73,8 +73,13 @@ test(
     };
     child.stdout.on('data', capture);
     child.stderr.on('data', capture);
+    // Miniflare can reset a reused connection after rejecting an unread upload body.
     const request = (route, init = {}) =>
-      fetch(base + route, { ...init, signal: AbortSignal.timeout(60000) });
+      fetch(base + route, {
+        ...init,
+        headers: { Connection: 'close', ...init.headers },
+        signal: AbortSignal.timeout(60000),
+      });
     try {
       let ready = false;
       for (let attempt = 0; attempt < 120; attempt++) {
@@ -147,6 +152,14 @@ test(
         externalUrl: 'https://example.com/reading',
       });
       assert.equal((await request(`/api/files/${link.id}`)).status, 404);
+      const probe = await create(`/weeks/${week.id}/materials`, {
+        title: 'Delete probe',
+        externalUrl: 'https://example.com',
+      });
+      const probeDeleted = await request(`/api/college/materials/${probe.id}`, {
+        method: 'DELETE',
+      });
+      assert.equal(probeDeleted.status, 200, await probeDeleted.text());
       const first = await request(`/api/college/semesters/${semester.id}/materials?limit=1`);
       const page = await first.json();
       assert.equal(page.data[0].courseName, 'Runtime course');
@@ -178,6 +191,20 @@ test(
       assert.equal(await tail.text(), 'AAAAAAAA');
       const over = await upload('oversized.txt', new Uint8Array([65]), length + 1, 'text/plain');
       assert.equal(over.status, 413, await over.text());
+      const removed = await request(`/api/college/materials/${file.id}`, { method: 'DELETE' });
+      assert.equal(removed.status, 200, await removed.text());
+      assert.equal((await request(file.fileUrl)).status, 404);
+      const hierarchyRemoved = await request(`/api/college/courses/${course.id}`, {
+        method: 'DELETE',
+      });
+      assert.equal(hierarchyRemoved.status, 200, await hierarchyRemoved.text());
+      assert.equal((await request(largeResult.data.fileUrl)).status, 404);
+      assert.equal((await request(`/api/college/materials/${link.id}`)).status, 404);
+      const afterRejectedUpload = await request('/api/system/health');
+      assert.equal(afterRejectedUpload.status, 200, await afterRejectedUpload.text());
+    } catch (error) {
+      process.stderr.write(`\nIsolated runtime diagnostics:\n${output}\n`);
+      throw error;
     } finally {
       if (process.platform === 'win32' && child.pid) {
         try {
