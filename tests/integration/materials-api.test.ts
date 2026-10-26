@@ -51,6 +51,117 @@ async function setup() {
   return { DB, env, storage, request, create, semester, course, week, upload };
 }
 
+test('file deletion keeps metadata on R2 failure and is safe to retry', async () => {
+  const ctx = await setup();
+  const uploaded = await ctx.upload(
+    'note.txt',
+    new TextEncoder().encode('Private note'),
+    'text/plain',
+  );
+  const { data } = (await uploaded.json()) as { data: { id: string; fileUrl: string } };
+  ctx.storage.failures.delete = true;
+  const failed = await ctx.request(`/materials/${data.id}`, 'DELETE');
+  assert.equal(failed.status, 503);
+  assert.equal((await ctx.request(`/materials/${data.id}`)).status, 200);
+  assert.equal(ctx.storage.objects.size, 1);
+  ctx.storage.failures.delete = false;
+  assert.equal((await ctx.request(`/materials/${data.id}`, 'DELETE')).status, 200);
+  assert.equal(ctx.storage.objects.size, 0);
+  assert.equal((await app.request(data.fileUrl, {}, ctx.env)).status, 404);
+});
+
+test('a metadata failure after R2 cleanup retains the row and finishes on retry', async () => {
+  const ctx = await setup();
+  const uploaded = await ctx.upload('note.txt', new TextEncoder().encode('Note'), 'text/plain');
+  const { data } = (await uploaded.json()) as { data: { id: string } };
+  const prepare = ctx.DB.prepare.bind(ctx.DB);
+  ctx.DB.prepare = (query: string) => {
+    if (/^delete from "materials"/i.test(query)) throw new Error('private SQL failure');
+    return prepare(query);
+  };
+  const response = await ctx.request(`/materials/${data.id}`, 'DELETE');
+  assert.equal(response.status, 503);
+  assert.doesNotMatch(await response.text(), /private SQL|r2Key|users\//);
+  assert.equal(ctx.storage.objects.size, 0);
+  assert.equal((await ctx.request(`/materials/${data.id}`)).status, 200);
+  ctx.DB.prepare = prepare;
+  assert.equal((await ctx.request(`/materials/${data.id}`, 'DELETE')).status, 200);
+  assert.equal((await ctx.request(`/materials/${data.id}`)).status, 404);
+});
+
+test('foreign descendants are rejected before deleting any owned bytes', async () => {
+  const ctx = await setup();
+  await ctx.upload('note.txt', new TextEncoder().encode('Note'), 'text/plain');
+  const link = await ctx.create(`/weeks/${ctx.week.id}/materials`, {
+    title: 'Foreign',
+    externalUrl: 'https://example.com',
+  });
+  await ctx.DB.prepare(
+    "INSERT INTO users VALUES ('other', 'other@example.com', 'Other', 'member', 'now', 'now')",
+  ).run();
+  await ctx.DB.prepare('UPDATE materials SET user_id = ? WHERE id = ?')
+    .bind('other', link.id)
+    .run();
+  const before = ctx.storage.calls.length;
+  for (const path of [
+    `/materials/${link.id}`,
+    `/weeks/${ctx.week.id}`,
+    `/courses/${ctx.course.id}`,
+    `/semesters/${ctx.semester.id}`,
+  ])
+    assert.equal(
+      (await ctx.request(path, 'DELETE')).status,
+      path.startsWith('/materials') ? 404 : 409,
+    );
+  assert.equal(ctx.storage.calls.length, before);
+  assert.equal(ctx.storage.objects.size, 1);
+});
+
+test('shared or foreign storage keys cannot delete another object', async () => {
+  const ctx = await setup();
+  const upload = await ctx.upload('note.txt', new TextEncoder().encode('Note'), 'text/plain');
+  const { data } = (await upload.json()) as { data: { id: string } };
+  const key = [...ctx.storage.objects.keys()][0]!;
+  const link = await ctx.create(`/weeks/${ctx.week.id}/materials`, {
+    title: 'Corrupt',
+    externalUrl: 'https://example.com',
+  });
+  await ctx.DB.prepare('UPDATE materials SET r2_key = ? WHERE id = ?').bind(key, link.id).run();
+  assert.equal((await ctx.request(`/materials/${data.id}`, 'DELETE')).status, 409);
+  await ctx.DB.prepare('UPDATE materials SET r2_key = NULL WHERE id = ?').bind(link.id).run();
+  await ctx.DB.prepare('UPDATE materials SET r2_key = ? WHERE id = ?')
+    .bind('users/other/college/secret', data.id)
+    .run();
+  assert.equal((await ctx.request(`/materials/${data.id}`, 'DELETE')).status, 409);
+  assert.equal(ctx.storage.objects.size, 1);
+  assert.equal(ctx.storage.calls.filter((call) => call.operation === 'delete').length, 0);
+});
+
+test('hierarchy deletion handles material batches beyond the first hundred', async () => {
+  const ctx = await setup();
+  for (let index = 0; index < 103; index++)
+    await ctx.create(`/weeks/${ctx.week.id}/materials`, {
+      title: `Link ${index}`,
+      externalUrl: 'https://example.com',
+    });
+  assert.equal((await ctx.request(`/semesters/${ctx.semester.id}`, 'DELETE')).status, 200);
+  const count = await ctx.DB.prepare('SELECT COUNT(*) AS total FROM materials').first<{
+    total: number;
+  }>();
+  assert.equal(count?.total, 0);
+});
+
+for (const kind of ['semesters', 'courses', 'weeks']) {
+  test(`${kind} deletion removes owned R2 bytes before cascading metadata`, async () => {
+    const ctx = await setup();
+    await ctx.upload('note.txt', new TextEncoder().encode('Private note'), 'text/plain');
+    const parent = kind === 'semesters' ? ctx.semester : kind === 'courses' ? ctx.course : ctx.week;
+    assert.equal((await ctx.request(`/${kind}/${parent.id}`, 'DELETE')).status, 200);
+    assert.equal(ctx.storage.objects.size, 0);
+    assert.equal((await ctx.request(`/weeks/${ctx.week.id}`)).status, 404);
+  });
+}
+
 test('material links are scoped to an owned week and expose safe metadata', async () => {
   const ctx = await setup();
   const created = await ctx.request(`/weeks/${ctx.week.id}/materials`, 'POST', {
@@ -339,15 +450,16 @@ test('text and code are validated as UTF-8 and never served as executable inline
   assert.equal(invalidUtf8.status, 415);
 });
 
-test('stored files retain hierarchy deletion guards until package 4.4 cleanup is implemented', async () => {
+test('failed hierarchy cleanup preserves the parent and remaining material for retry', async () => {
   const ctx = await setup();
   assert.equal((await ctx.upload('reading.pdf', pdf)).status, 201);
+  ctx.storage.failures.delete = true;
   for (const path of [
     `/weeks/${ctx.week.id}`,
     `/courses/${ctx.course.id}`,
     `/semesters/${ctx.semester.id}`,
   ]) {
-    assert.equal((await ctx.request(path, 'DELETE')).status, 409);
+    assert.equal((await ctx.request(path, 'DELETE')).status, 503);
   }
   assert.equal(ctx.storage.objects.size, 1);
 });
@@ -486,7 +598,7 @@ test('uncertain D1 recovery retains bytes rather than deleting a potentially com
   assert.equal(ctx.storage.calls.filter((call) => call.operation === 'delete').length, 0);
 });
 
-test('metadata repository deletion is owner scoped while public file deletion stays deferred', async () => {
+test('metadata repository and public material deletion are owner scoped', async () => {
   const ctx = await setup();
   const link = await ctx.create(`/weeks/${ctx.week.id}/materials`, {
     title: 'Reading',
@@ -494,8 +606,8 @@ test('metadata repository deletion is owner scoped while public file deletion st
   });
   const repository = new MaterialsRepository(createDb(ctx.DB));
   assert.equal(await repository.deleteMetadata(link.id, 'other'), false);
-  assert.equal((await ctx.request(`/materials/${link.id}`, 'DELETE')).status, 404);
-  assert.equal(await repository.deleteMetadata(link.id, ownerId), true);
+  assert.equal((await ctx.request(`/materials/${link.id}`, 'DELETE')).status, 200);
+  assert.equal(await repository.deleteMetadata(link.id, ownerId), false);
   assert.equal((await ctx.request(`/materials/${link.id}`)).status, 404);
 });
 
