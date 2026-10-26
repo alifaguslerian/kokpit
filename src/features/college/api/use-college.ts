@@ -85,6 +85,7 @@ export function useDeleteSemester() {
   const invalidate = useInvalidateCollege();
   return useMutation({
     mutationFn: (id: string) => api.deleteSemester(id),
+    onError: invalidate,
     onSuccess: async (_result, id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.college.all });
       queryClient.removeQueries({ queryKey: queryKeys.college.semester(id) });
@@ -130,6 +131,7 @@ export function useDeleteCourse() {
   const invalidate = useInvalidateCollege();
   return useMutation({
     mutationFn: (id: string) => api.deleteCourse(id),
+    onError: invalidate,
     onSuccess: async (_result, id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.college.all });
       queryClient.removeQueries({ queryKey: queryKeys.college.course(id) });
@@ -174,6 +176,7 @@ export function useDeleteWeek() {
   const invalidate = useInvalidateCollege();
   return useMutation({
     mutationFn: (id: string) => api.deleteWeek(id),
+    onError: invalidate,
     onSuccess: async (_result, id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.college.all });
       queryClient.removeQueries({ queryKey: queryKeys.college.week(id) });
