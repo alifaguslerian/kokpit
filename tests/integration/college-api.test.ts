@@ -607,7 +607,7 @@ for (const resource of ['semesters', 'courses', 'weeks'] as const) {
     assert.deepEqual(await ctx.data(`/weeks/${untouched.week.id}`), untouched.week);
   });
 
-  test(`${resource} deletion refuses file or R2-backed descendants before removing metadata`, async () => {
+  test(`${resource} deletion preserves stored descendants when storage is unavailable or metadata is broken`, async () => {
     const ctx = await setup();
     const target = await hierarchy(ctx);
     const materialId = await material(ctx.db, target.week.id, { file: true });
@@ -617,9 +617,9 @@ for (const resource of ['semesters', 'courses', 'weeks'] as const) {
         : resource === 'courses'
           ? target.course.id
           : target.week.id;
-    await error(await ctx.request(`/${resource}/${id}`, 'DELETE'), 409);
+    await error(await ctx.request(`/${resource}/${id}`, 'DELETE'), 503);
     await ctx.db.prepare("UPDATE materials SET type = 'link' WHERE id = ?").bind(materialId).run();
-    await error(await ctx.request(`/${resource}/${id}`, 'DELETE'), 409);
+    await error(await ctx.request(`/${resource}/${id}`, 'DELETE'), 503);
     await ctx.db
       .prepare("UPDATE materials SET type = 'file', r2_key = NULL WHERE id = ?")
       .bind(materialId)
