@@ -1,6 +1,6 @@
 # Kokpit — Deployment
 
-**Version:** 0.5 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-25
+**Version:** 0.6 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-26
 
 Operational runbook for one Cloudflare Worker + Static Assets, private Access gate,
 D1 metadata, private R2 files, Cron jobs and Workers AI content.
@@ -10,7 +10,8 @@ D1 metadata, private R2 files, Cron jobs and Workers AI content.
 > Current boundary: baseline packages 1.1–3.3 include the app shell/Home, Ideas and Quick Links
 > APIs/UI, D1 schema and local migration. Package 4.1 adds College hierarchy APIs
 > using the existing schema and D1 binding. The configured remote D1 ID is a placeholder.
-> Private R2, Access, scheduled content and production deployment remain future work.
+> Package 4.3 configures local private R2 and material APIs. Access, scheduled content,
+> remote R2 creation and production deployment remain future work.
 
 DEC-054 is a documentation/requirement approval, not a deployment. The current 17-table
 baseline evolves toward 20 through the additive migrations in Data Model (4.5, 3.4,
@@ -50,7 +51,11 @@ npm run preview
 This health endpoint checks HTTP routing only; it does not probe D1, R2, or AI.
 `build` prepares `dist/client/` and `dist/kokpit/` as one deployment unit.
 Tailwind compiles frontend utilities into the client CSS assets; preview must serve them with the SPA.
-Local D1 is configured; R2 and its binding remain later work.
+Local D1 and private R2 are configured. The R2 binding explicitly uses remote=false;
+no bucket was created on Cloudflare by package 4.3. The generated index-only migration
+was applied to development D1 and isolated runtime fixtures; the initial migration is unchanged.
+Run npm run test:storage:runtime to build and verify native bindings using a unique ignored
+local state directory and its own port, without seeding the owner's normal database.
 Preview must exercise SPA routes, API routing, assets and changed UI; it does not replace production smoke tests.
 
 ## 2. Configuration and secrets
@@ -58,7 +63,7 @@ Preview must exercise SPA routes, API routing, assets and changed UI; it does no
 Use one `wrangler.jsonc`, not mixed Wrangler formats. The current config uses
 `worker/index.ts`, tested compatibility date `2026-10-09`, SPA fallback and
 `assets.run_worker_first = ["/api/*"]` and a local D1 binding with a placeholder
-remote database ID; no R2, AI or production secrets.
+remote database ID and a local-only R2 binding; no AI or production secrets.
 The example below is a structural future template;
 the actual config must match the Cloudflare Vite plugin and tested project setup.
 Never assume this date or binding declaration has been validated by the current scaffold.
