@@ -1,6 +1,6 @@
 # Kokpit agent rules
 
-**Version:** 1.3 | **Status:** Active V1 Agent Rules | **Updated:** 2026-10-23
+**Version:** 1.4 | **Status:** Active V1 Agent Rules | **Updated:** 2026-10-25
 
 Applies to all AI coding agents working in this repository.
 
@@ -26,6 +26,8 @@ In the first session, read all documents in this order:
 
 Later sessions must read the documents relevant to the requested work.
 Search the docs before coding when it is unclear which document controls a decision.
+Feature-page work must also read [Approved UI Features](docs/features/APPROVED_UI_FEATURES.md),
+which maps the accepted 2026-10-25 images to controls, APIs and pending packages.
 
 ## Source of truth and conflicts
 
@@ -56,10 +58,18 @@ Do not guess new workflows, auth, public behavior, infrastructure, providers, en
 
 V1 is a private, single-owner personal room with Home, College, Music, News, Ideas, and Library.
 It must remain calm, warm, lightweight, editorial, and personal.
-No task manager, Kanban, calendar, Pomodoro/focus timer, habit tracking, productivity scores,
+No task manager, Kanban, general calendar management, Pomodoro/focus timer, habit tracking, productivity scores,
 streaks/XP, AI chatbot/panel, team features, public profiles/accounts, social features,
 analytics dashboard, universal command palette, or global semantic search without an explicit PRD revision.
 The complete non-goals are in the PRD.
+
+The owner-approved 2026-10-25 feature references explicitly add a recurring College
+class timetable, recent course materials, News saves/feed topics, and Ideas collections,
+favorites and optional private covers. Follow the PRD, Data Model and
+[approved UI feature contract](docs/features/APPROVED_UI_FEATURES.md).
+The timetable is the narrow calendar exception; it does not authorize reminders,
+calendar sync, arbitrary events or task/study tracking. Approval of specifications
+does not authorize implementing the next package without the owner's instruction.
 
 ## Architecture and dependencies
 
