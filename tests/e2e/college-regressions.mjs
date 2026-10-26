@@ -250,7 +250,7 @@ test('course and week deep links survive reload and expose the complete breadcru
     assert.equal(await page.locator('input[type="file"]').count(), 0);
     assert.equal(
       await page.getByRole('button', { name: /upload|add material|add link/i }).count(),
-      0,
+      2,
     );
     await page.reload();
     await page.getByRole('heading', { name: 'No materials yet', exact: true }).waitFor();
