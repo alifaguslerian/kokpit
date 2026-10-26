@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { WeekMaterials } from '../components/MaterialWorkspace';
 import {
   CollegeBreadcrumbs,
   CollegeLoading,
@@ -79,18 +79,7 @@ function WeekWorkspace({ weekId }: { weekId: string }) {
                 {week.notes}
               </p>
             )}
-            <section
-              aria-labelledby="week-materials-title"
-              className="border-t border-kokpit-border-subtle pt-6 space-y-4"
-            >
-              <h2 id="week-materials-title" className="text-lg font-semibold">
-                Materials
-              </h2>
-              <EmptyState
-                title="No materials yet"
-                description="This week's space is ready. Private files and material links will be available here soon."
-              />
-            </section>
+            <WeekMaterials weekId={weekId} />
             {editing && (
               <WeekEditor
                 week={week}
