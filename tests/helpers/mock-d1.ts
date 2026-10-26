@@ -4,12 +4,13 @@ import path from 'path';
 
 export function createTestD1(seedUserId = 'user-owner-1'): D1Database {
   const db = new DatabaseSync(':memory:');
-  const migrationPath = path.resolve(
-    process.cwd(),
-    'drizzle/migrations/0000_overjoyed_warpath.sql',
-  );
-  const migrationSql = fs.readFileSync(migrationPath, 'utf8');
-  db.exec(migrationSql);
+  const migrationDirectory = path.resolve(process.cwd(), 'drizzle/migrations');
+  for (const filename of fs
+    .readdirSync(migrationDirectory)
+    .filter((name) => /^\d+.*\.sql$/.test(name))
+    .sort()) {
+    db.exec(fs.readFileSync(path.join(migrationDirectory, filename), 'utf8'));
+  }
 
   // Insert seed owner
   db.prepare(
