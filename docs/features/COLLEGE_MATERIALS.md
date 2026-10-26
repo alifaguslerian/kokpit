@@ -1,10 +1,10 @@
 # College materials API
 
-**Version:** 1.0 | **Status:** Package 4.3 implemented locally | **Updated:** 2026-10-26
+**Version:** 1.1 | **Status:** Packages 4.3–4.4 implemented locally | **Updated:** 2026-10-26
 
 The backend supports private file materials and HTTP(S) link materials under owned weeks.
-The frontend material list/forms, public deletion and R2-aware hierarchy deletion belong to
-4.4. Existing file-bearing hierarchy deletion guards remain active until that package.
+Package 4.4 supplies the material UI and R2-aware material/hierarchy deletion. Final hierarchy
+guards still reject inaccessible descendants and file additions not covered by completed cleanup.
 No production bucket, Access deployment, Music API or timetable is introduced here.
 
 ## Routes
@@ -20,6 +20,7 @@ legacy parent rows. Missing/foreign personal IDs return safe 404 responses.
 | POST /api/college/weeks/:weekId/materials/upload | Raw streamed file body; filename, sizeBytes and optional title query parameters. |
 | GET /api/college/materials/:id | Safe metadata with course/week/semester context. |
 | PATCH /api/college/materials/:id | Nonempty JSON patch: title, link externalUrl, or owned destination weekId. |
+| DELETE /api/college/materials/:id | Owned object cleanup before metadata removal; returns success=true. |
 | GET /api/college/semesters/:semesterId/materials | Updated-time/ID descending list; limit default 20, cap 100; optional cursor and sort=updated. |
 | GET /api/files/:id | Owned private bytes, never a bucket/key URL. Optional download=true forces attachment. |
 | HEAD /api/files/:id | Owned metadata/headers without reading a response body. |
@@ -33,8 +34,52 @@ File materials cannot acquire an externalUrl through a patch.
 
 Moves validate both old and new ancestry and append to the destination week's ordering.
 The existing R2 key stays unchanged; key prefixes are not the authorization source.
-The low-level owner-scoped repository metadata deletion is available for 4.4 coordination;
-no public DELETE material endpoint is exposed in 4.3.
+The low-level owner-scoped metadata deletion is called only after coordinated object cleanup.
+Public DELETE is implemented in 4.4, using the same origin/ownership validation as other writes.
+
+## Material UI (4.4)
+
+- Week pages offer Upload file and Add link with labeled, keyboard-contained forms. A pending
+  save locks inputs/submission and dismissal to prevent duplicate writes. Upload status is
+  indeterminate; it never invents a byte percentage. Failed uploads preserve the selected file/title.
+- Edit material renames the title, edits an HTTP(S) link, or moves it to an owned destination
+  semester/course/week. Destination failures have a local retry; moves preserve the storage key.
+- File titles open a metadata dialog that checks private HEAD before showing Open file and
+  Download file. Errors/missing bytes are local and retryable. Authenticated browser links
+  stream bytes directly; React never fetches the complete file into a Blob for download.
+- Link titles open validated external URLs with noopener/noreferrer. Course/week context links
+  return to the existing hierarchy, including from the semester-wide view.
+- The selected semester shows three recent files/links. View materials opens
+  /college?semester=<id>&view=materials, with a complete cursor-paginated list. Week lists use
+  bounded offset pages. Load more keeps later records reachable; selection/back/forward/reload
+  retain the normal College routing. No tracking, fake records or extra primary route is added.
+- Material actions refresh all College material/preview queries. Hierarchy failures also
+  refresh reads because some child deletions may already have completed. Authoritative missing
+  material lists hide cached rows. Existing room typography/tokens, native dialog focus and
+  dock clearance apply. The recurring schedule and final overview composition remain 4.5.
+
+## Deletion and retry (4.4)
+
+Destructive UI actions explicitly confirm removal of stored files and explain irreversible,
+possibly partial cleanup. The same material service coordinates DELETE material and the
+existing semester/course/week DELETE routes:
+
+1. Verify the owned target and all descendant ownership before hierarchy cleanup. Missing or
+   foreign targets return 404; inconsistent descendants block with 409 before touching objects.
+2. Read at most 100 material IDs per cleanup batch and recheck current ownership/parent context.
+3. For each stored object, require a server-generated owner College prefix and reject any
+   shared-key reference. Delete only the exact metadata key; never delete a wildcard/prefix.
+4. Await R2 deletion, then remove owned metadata. Link-only deletion needs no R2 binding.
+5. Finish hierarchy deletion with the existing SQL ownership/file guards. A concurrent file
+   addition cannot be silently cascaded without R2 cleanup; retry starts from remaining rows.
+
+If R2 fails, the material row remains. If metadata fails after R2 succeeds, bytes may already
+be gone while metadata remains. The API returns a safe 503 and the UI explains partial
+completion; retrying R2's idempotent delete then removes the remaining metadata. A successful
+hierarchy deletion leaves no ordinary child file orphan. D1/R2 have no shared transaction;
+this workflow does not promise rollback of already deleted files, a trash can or a background job.
+Unexpected failures log only operation codes and opaque material IDs. No new table/migration
+or dependency was required for 4.4.
 
 ## Upload protocol and validation
 
@@ -117,7 +162,8 @@ HEAD returns full-file headers. Unknown/broken storage objects produce safe loca
 Exceptional D1 recovery/R2 cleanup failures may require operator reconciliation: resolve the
 logged material ID against owned D1 metadata and inventory before retrying/removing an object.
 Do not blindly delete a prefix or assume an error implies metadata never committed. No new
-cleanup table/background job is introduced by 4.3. Full delete/retry UI remains 4.4 work.
+cleanup table/background job is introduced. Package 4.4 supplies the explicit delete/retry UI
+and the coordinated lifecycle described above.
 
 ## Migration and verification
 
@@ -126,7 +172,7 @@ The generated 0001_sloppy_phil_sheldon.sql adds only materials_user_updated_idx 
 Reviewed/applied to local development D1 and isolated runtime D1; no production migration ran.
 The test D1 helper applies all migration SQL in order.
 
-Checks on 2026-10-26:
+Package 4.3 baseline checks on 2026-10-26:
 
 - 152 unit/API tests, including 30 new material/stream/ownership/recovery/migration/origin checks.
 - 45 existing browser regressions using Hono and isolated SQLite.
@@ -139,6 +185,19 @@ The runtime test chooses its own local port and unique ignored .wrangler persist
 applies migrations/owner seed only there, and shuts down its own process tree. It never seeds
 the owner's normal database or contacts production. Ignored runtime fixture directories are
 retained for diagnosis. Cloudflare Access/remote R2/production behavior remains unverified.
+
+Package 4.4 verification includes 160 unit/API tests, 56 browser regressions (11 new material
+flows), and the extended native Workers/D1/R2 test covering individual/hierarchy deletion
+as well as upload, private delivery and the 50 MB boundary. Desktop/mobile captures at
+1366, 390 and 320 px were compared with the approved College reference within the 4.4 scope.
+The browser fixture uses real local HTTP for download filename/byte checks: Chromium
+request interception can cancel attachment downloads ([Playwright issue #28253](https://github.com/microsoft/playwright/issues/28253)).
+The native test closes client connections and verifies rejected upload → deletion → healthy
+response. Miniflare produced intermittent plain-text Network connection lost responses during
+parallel browser/native verification, including after connection closing was added. The final
+isolated native run passed without request retries. Run native storage verification separately
+from the browser suite; these results do not establish the underlying Miniflare reset cause.
+No production Access/remote storage assertion follows from these local checks.
 
 Implementation references: [R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/),
 [Wrangler local development](https://developers.cloudflare.com/workers/local-development/),
