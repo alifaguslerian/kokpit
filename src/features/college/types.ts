@@ -59,3 +59,27 @@ export interface CreateWeekInput {
 }
 
 export type UpdateWeekInput = Partial<CreateWeekInput>;
+
+export interface Material {
+  id: string;
+  weekId: string;
+  type: 'file' | 'link';
+  title: string;
+  originalFilename: string | null;
+  mimeType: string | null;
+  sizeBytes: number | null;
+  externalUrl: string | null;
+  fileUrl: string | null;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+  courseId: string;
+  courseName: string;
+  semesterId: string;
+  weekNumber: number;
+}
+export interface MaterialChanges {
+  title?: string;
+  externalUrl?: string;
+  weekId?: string;
+}
