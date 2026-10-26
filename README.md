@@ -14,20 +14,20 @@ Kokpit should feel like a room to return to, without the pressure of a productiv
 The application has a responsive shell, Home, College, Ideas and Library. A runtime screenshot
 is not committed yet; the reference gallery below contains design concepts.
 
-The owner-supplied Stitch concepts for all six pages are saved in the
+The owner-approved Home and five feature-page images are saved in the
 [UI reference gallery](docs/design/UI_REFERENCES.md). They guide the planned interface;
 the [Design System](docs/design/DESIGN_SYSTEM.md) specifies its refined V1 layouts.
-These concepts are separate from the implemented-app preview above.
+These approved references are design targets, not screenshots proving shipped features.
 
 ## Core features
 
 | Area | V1 experience |
 | --- | --- |
 | Home | Live clock, hourly thought, and lightweight feature previews |
-| College | Semester → Course → Week → Material, with private files and links |
+| College | Academic hierarchy, private materials, recurring class timetable and recent files/notes |
 | Music | Personal audio library, playlists, and playback that persists across navigation |
-| News | Curated technology and world news, with original source links |
-| Ideas | Fast text capture, optional titles/tags, search, editing, and pinning |
+| News | Curated source-linked feed, saved article references and derived feed topics |
+| Ideas | Fast capture/search, optional titles/tags, pins, favorites, collections and private covers |
 | Library | Personal quick links with icons, favorites, and ordering |
 
 These describe the planned V1, not features already shipped.
@@ -35,7 +35,7 @@ Public registration, team workspaces, task management, and embedded AI chat are 
 
 ## Project status
 
-**Milestones 1–3 are complete (packages 1.1–3.3).** Foundation includes the 17-table
+**Baseline packages 1.1–3.3 are complete.** Foundation includes the 17-table
 Drizzle schema and local migration, explicit owner context, Zod boundaries and safe
 API errors. Ideas supports capture, search, tags, pinning, editing, deletion and
 paginated browsing. Library supports shortcuts, icons, favorites and persistent ordering.
@@ -47,6 +47,10 @@ College pages, semester selection/activation, course ordering, metadata forms an
 confirmed hierarchy deletion. Home shows a saved course/week from the active semester.
 Week pages have a material placeholder; uploads and material links are not available yet.
 The next documented package is **4.3: Private Storage & Material APIs**.
+The approved feature designs add pending College 4.5 and Ideas 3.4–3.5 work; the order is
+4.3 → 4.4 → 4.5 → 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
+The target schema is now 20 tables, while the implemented baseline still has 17; new tables,
+fields and private cover handling are requirements, not delivered migrations/features.
 R2 file handling, real playback, hourly D1 quotes, News ingestion and private production
 deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
 
@@ -137,7 +141,8 @@ These tests do not verify production Cloudflare Access or remote storage.
 | --- | --- |
 | [PRD](docs/product/PRD.md) | Product vision, requirements, and V1 boundaries |
 | [Design system](docs/design/DESIGN_SYSTEM.md) | Tokens, typography, layout, and interaction rules |
-| [UI references](docs/design/UI_REFERENCES.md) | Original Stitch screens, visual analysis, and their mapping to V1 |
+| [UI references](docs/design/UI_REFERENCES.md) | Selected approved Home/feature images and their interpretation |
+| [Approved UI features](docs/features/APPROVED_UI_FEATURES.md) | Every visible control, new behavior, API additions and acceptance coverage |
 | [Architecture](docs/engineering/ARCHITECTURE.md) | Runtime, services, security, and failure boundaries |
 | [Data model](docs/engineering/DATA_MODEL.md) | Tables, constraints, relationships, and lifecycle |
 | [Content sources](docs/features/CONTENT_SOURCES.md) | Quotes, news sources, ranking, and refresh behavior |
