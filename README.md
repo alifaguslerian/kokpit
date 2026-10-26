@@ -46,21 +46,23 @@ session thoughts. Music and News previews have honest empty states.
 College pages, semester selection/activation, course ordering, metadata forms and
 confirmed hierarchy deletion. Home shows a saved course/week from the active semester.
 **Package 4.3 is complete:** local private R2, streamed file uploads, link/metadata APIs,
-owned GET/HEAD/Range delivery and paginated material queries. Week pages still have the
-material placeholder; frontend material forms/lists and public deletion are package 4.4.
-The next documented package is **4.4: Material UI, Deletion & Verification**.
+owned GET/HEAD/Range delivery and paginated material queries.
+**Package 4.4 is complete:** week upload/link forms, rename/move/delete, private open/download,
+three recent semester materials and a complete paginated materials view. Confirmed material
+and hierarchy deletion coordinates R2 cleanup with metadata and supports partial-failure retry.
+The next documented package is **4.5: Weekly Schedule & Approved College Overview**.
 The approved feature designs add pending College 4.5 and Ideas 3.4–3.5 work; the order is
-4.4 → 4.5 → 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
+4.5 → 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
 The target schema is now 20 tables, while the implemented baseline still has 17; new tables,
 fields and private cover handling are requirements, not delivered migrations/features.
-Full material UI/deletion, real playback, hourly D1 quotes, News ingestion and private production
+The recurring class schedule, real playback, hourly D1 quotes, News ingestion and private production
 deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
 
 The Worker currently exposes `/api/system/health`, `/api/ideas`, `/api/quick-links`
 and `/api/college` (including materials) plus `/api/files/:id`. The
 [College materials contract](docs/features/COLLEGE_MATERIALS.md) documents the upload protocol,
 type/size validation, privacy, pagination and recovery. The [package 4.1 contract](docs/planning/IMPLEMENTATION_PLAN.md#41-semester-course--week-apis)
-documents College routes, response shapes and temporary file-deletion guards.
+documents College routes and response shapes; final deletion guards still protect inaccessible descendants and concurrent file additions.
 See the [pre-College audit fixes](docs/planning/AUDIT_FIXES.md) for regression coverage
 and validation limits.
 See the [implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) for the remaining work.
@@ -149,7 +151,7 @@ These tests do not verify production Cloudflare Access or remote storage.
 | [Design system](docs/design/DESIGN_SYSTEM.md) | Tokens, typography, layout, and interaction rules |
 | [UI references](docs/design/UI_REFERENCES.md) | Selected approved Home/feature images and their interpretation |
 | [Approved UI features](docs/features/APPROVED_UI_FEATURES.md) | Every visible control, new behavior, API additions and acceptance coverage |
-| [College materials](docs/features/COLLEGE_MATERIALS.md) | Implemented 4.3 upload/link/file protocol, limits, safety and verification |
+| [College materials](docs/features/COLLEGE_MATERIALS.md) | Implemented 4.3–4.4 API/UI contracts, limits, private delivery, deletion and verification |
 | [Architecture](docs/engineering/ARCHITECTURE.md) | Runtime, services, security, and failure boundaries |
 | [Data model](docs/engineering/DATA_MODEL.md) | Tables, constraints, relationships, and lifecycle |
 | [Content sources](docs/features/CONTENT_SOURCES.md) | Quotes, news sources, ranking, and refresh behavior |
