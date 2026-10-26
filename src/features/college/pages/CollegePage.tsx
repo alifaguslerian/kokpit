@@ -12,6 +12,7 @@ import {
   useCollegeActionGuard,
 } from '../components/CollegeLayout';
 import { SemesterEditor, CourseEditor } from '../components/CollegeEditors';
+import { RecentMaterials, SemesterMaterials } from '../components/MaterialWorkspace';
 import {
   useSemesters,
   useCourses,
@@ -176,102 +177,109 @@ export function CollegePage() {
               {actionError}
             </p>
           )}
-          <section aria-labelledby="college-courses-title" className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 id="college-courses-title" className="text-lg font-semibold">
-                Courses
-              </h2>
-              <Button
-                onClick={() => setEditor('course')}
-                leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
-              >
-                Add course
-              </Button>
-            </div>
-            {coursesQuery.isPending ? (
-              <CollegeLoading label="Loading courses…" />
-            ) : coursesQuery.isError && !coursesQuery.data ? (
-              <CollegeUnavailable
-                error={coursesQuery.error}
-                retry={() => void coursesQuery.refetch()}
-              />
-            ) : (
-              <>
-                {coursesQuery.isError && (
+          {params.get('view') === 'materials' ? (
+            <SemesterMaterials key={selected.id} semesterId={selected.id} />
+          ) : (
+            <div className="grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+              <section aria-labelledby="college-courses-title" className="min-w-0 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2 id="college-courses-title" className="text-lg font-semibold">
+                    Courses
+                  </h2>
+                  <Button
+                    onClick={() => setEditor('course')}
+                    leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
+                  >
+                    Add course
+                  </Button>
+                </div>
+                {coursesQuery.isPending ? (
+                  <CollegeLoading label="Loading courses…" />
+                ) : coursesQuery.isError && !coursesQuery.data ? (
                   <CollegeUnavailable
                     error={coursesQuery.error}
                     retry={() => void coursesQuery.refetch()}
                   />
-                )}
-                {courses.length === 0 ? (
-                  <EmptyState
-                    icon={<BookOpen className="h-5 w-5" aria-hidden="true" />}
-                    title="No courses yet"
-                    description="Add a course to start organizing its weekly materials."
-                  />
                 ) : (
-                  <ul className="grid list-none grid-cols-1 gap-4 xl:grid-cols-2 min-[90rem]:gap-6">
-                    {courses.map((course, index) => (
-                      <li
-                        key={course.id}
-                        className="min-w-0 rounded-lg border border-kokpit-border-default bg-kokpit-surface-1 p-5 sm:p-6"
-                      >
-                        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-md bg-kokpit-accent-bg text-kokpit-accent">
-                          <BookOpen className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        {course.code && (
-                          <p className="text-xs text-kokpit-text-muted break-all mb-1">
-                            {course.code}
-                          </p>
-                        )}
-                        <h3 className="text-base font-semibold break-words">
-                          <Link
-                            to={`/college/courses/${encodeURIComponent(course.id)}`}
-                            className="hover:text-kokpit-accent"
+                  <>
+                    {coursesQuery.isError && (
+                      <CollegeUnavailable
+                        error={coursesQuery.error}
+                        retry={() => void coursesQuery.refetch()}
+                      />
+                    )}
+                    {courses.length === 0 ? (
+                      <EmptyState
+                        icon={<BookOpen className="h-5 w-5" aria-hidden="true" />}
+                        title="No courses yet"
+                        description="Add a course to start organizing its weekly materials."
+                      />
+                    ) : (
+                      <ul className="grid list-none grid-cols-1 gap-4 min-[90rem]:gap-6">
+                        {courses.map((course, index) => (
+                          <li
+                            key={course.id}
+                            className="min-w-0 rounded-lg border border-kokpit-border-default bg-kokpit-surface-1 p-5 sm:p-6"
                           >
-                            {course.name}
-                          </Link>
-                        </h3>
-                        {course.lecturer && (
-                          <p className="mt-2 text-sm text-kokpit-text-secondary break-words">
-                            {course.lecturer}
-                          </p>
-                        )}
-                        <div className="mt-5 flex items-center justify-between gap-2 border-t border-kokpit-border-subtle pt-3">
-                          <Link
-                            to={`/college/courses/${encodeURIComponent(course.id)}`}
-                            className="inline-flex min-h-9 items-center gap-1 text-xs text-kokpit-accent"
-                          >
-                            Open course <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                          </Link>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              aria-label={`Move ${course.name} up`}
-                              disabled={index === 0 || reorder.isPending}
-                              onClick={() => void move(index, index - 1)}
-                            >
-                              <ArrowUp className="h-4 w-4" aria-hidden="true" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              aria-label={`Move ${course.name} down`}
-                              disabled={index === courses.length - 1 || reorder.isPending}
-                              onClick={() => void move(index, index + 1)}
-                            >
-                              <ArrowDown className="h-4 w-4" aria-hidden="true" />
-                            </Button>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                            <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-md bg-kokpit-accent-bg text-kokpit-accent">
+                              <BookOpen className="h-5 w-5" aria-hidden="true" />
+                            </div>
+                            {course.code && (
+                              <p className="text-xs text-kokpit-text-muted break-all mb-1">
+                                {course.code}
+                              </p>
+                            )}
+                            <h3 className="text-base font-semibold break-words">
+                              <Link
+                                to={`/college/courses/${encodeURIComponent(course.id)}`}
+                                className="hover:text-kokpit-accent"
+                              >
+                                {course.name}
+                              </Link>
+                            </h3>
+                            {course.lecturer && (
+                              <p className="mt-2 text-sm text-kokpit-text-secondary break-words">
+                                {course.lecturer}
+                              </p>
+                            )}
+                            <div className="mt-5 flex items-center justify-between gap-2 border-t border-kokpit-border-subtle pt-3">
+                              <Link
+                                to={`/college/courses/${encodeURIComponent(course.id)}`}
+                                className="inline-flex min-h-9 items-center gap-1 text-xs text-kokpit-accent"
+                              >
+                                Open course <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                              </Link>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  aria-label={`Move ${course.name} up`}
+                                  disabled={index === 0 || reorder.isPending}
+                                  onClick={() => void move(index, index - 1)}
+                                >
+                                  <ArrowUp className="h-4 w-4" aria-hidden="true" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  aria-label={`Move ${course.name} down`}
+                                  disabled={index === courses.length - 1 || reorder.isPending}
+                                  onClick={() => void move(index, index + 1)}
+                                >
+                                  <ArrowDown className="h-4 w-4" aria-hidden="true" />
+                                </Button>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </section>
+              </section>
+              <RecentMaterials key={selected.id} semesterId={selected.id} />
+            </div>
+          )}
         </>
       )}
       {(editor === 'semester' || (editor === 'edit-semester' && selected)) && (
