@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 0.9 | **Status:** Approved V1 implementation plan | **Updated:** 2026-10-25
+**Version:** 1.0 | **Status:** Approved V1 implementation plan | **Updated:** 2026-10-26
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,9 +11,9 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Baseline packages **1.1–3.3** and College packages **4.1–4.2** are complete.
+Baseline packages **1.1–3.3** and College packages **4.1–4.3** are complete.
 Milestone 4 is in progress; the next implementation package is
-**4.3 Private Storage & Material APIs**.
+**4.4 Material UI, Deletion & Verification**.
 The owner approved all latest feature-page images on 2026-10-25 and requested functional
 controls plus aligned specifications (DEC-054). New packages 3.4–3.5 and 4.5 are pending;
 News additions join the already-pending 6.4–6.5. This documentation approval does not start
@@ -194,7 +194,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 3.5 | Approved Ideas & Library Pages, Integration & Verification | New DEC-054 package | Pending after 3.4 |
 | 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Complete |
 | 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Complete |
-| 4.3 | Private Storage & Material APIs | 8.1–8.6 | Pending |
+| 4.3 | Private Storage & Material APIs | 8.1–8.6 | Complete |
 | 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Pending |
 | 4.5 | Weekly Schedule & Approved College Overview | New DEC-054 package | Pending after 4.4 |
 | 5.1 | Tracks, Upload & Private Streaming | 9.1–9.3 | Pending |
@@ -1229,7 +1229,23 @@ were introduced. Private storage and production verification remain later work.
 
 ### 4.3 Private Storage & Material APIs
 
-**Status:** Pending | **Legacy Phase checklist:** 8.1–8.6
+**Status:** Complete | **Legacy Phase checklist:** 8.1–8.6
+
+Implemented 2026-10-26: local-only private R2 binding/provider, streamed validated uploads,
+link/metadata APIs, owned file delivery with HEAD/single Range, and bounded week/semester
+queries. [College Materials](../features/COLLEGE_MATERIALS.md) records the exact API,
+allowlist, limits, recovery behavior and remaining 4.4 deletion/UI boundary.
+The one-index additive migration was generated, reviewed and applied to development and
+isolated test D1; initial migration/table count (17) are unchanged. Generated binding types
+derive the Worker environment from Wrangler. No remote resources/deployment or dependency was added.
+
+Verification passed: 152 unit/API tests (30 new), 45 existing browser regressions,
+one native Workers/D1/R2 test including exactly 50 MB, lint, strict typecheck,
+formatting and build. Missing endpoints/index and recovery/size/title regressions were
+observed failing before their fixes. Tests use isolated SQLite/R2 fixtures; production
+Access/remote storage remains unverified. Existing file-bearing hierarchy delete guards
+remain until 4.4; compensation failure is logged safely for reconciliation rather than
+deleting bytes when a D1 write may already have committed. Next package is 4.4.
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
