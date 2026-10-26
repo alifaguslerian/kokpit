@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 0.8 | **Status:** V1 structure reference | **Updated:** 2026-10-25
+**Version:** 0.9 | **Status:** V1 structure reference | **Updated:** 2026-10-26
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -14,7 +14,7 @@ Home, College, Ideas and Library have feature implementations. `worker/api/`,
 the College hierarchy APIs (package 4.1). `tests/integration/college-api.test.ts`
 covers College lifecycle, ownership, validation, ordering and rollback behavior.
 The schema and reviewed initial migration include the 17-table baseline. The approved
-20-table target adds later migrations; no new schema file/module is created by this doc update.
+20-table target adds later migrations. Package 4.3 adds only the generated recent-material index.
 `src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms.
 `src/components/layout/BottomNavigation.tsx` owns the shared six-link floating dock
 and navigation items; `AppShell` owns the room backdrop and content clearance.
@@ -23,7 +23,11 @@ Home image stays in `docs/design/references/home-final.png` for review, not runt
 College pages, editors, types and data hooks stay in
 `src/features/college/`; Home imports only its data hooks. The audit and College
 suites in `tests/e2e/` exercise rendered UI against Hono and isolated in-memory
-SQLite. R2, material handling, playback and content pipelines remain pending.
+SQLite. Package 4.3 adds materials.routes.ts (including private file routes),
+materials.service.ts, materials.repository.ts, providers/storage/r2.provider.ts and focused
+stream/header utilities. tests/integration/materials-api.test.ts and tests/unit/material-file.test.ts
+cover the new behavior; tests/runtime/materials.test.mjs exercises isolated native Workers/D1/R2.
+Material UI/deletion, playback and content pipelines remain pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their work package needs them; do not pre-create empty modules.
 
@@ -46,7 +50,7 @@ kokpit/
 │   ├── product/                 # PRD.md, DECISIONS.md
 │   ├── design/                  # design/gallery, FINAL Home, approved feature images in concepts/
 │   ├── engineering/             # architecture, data, structure, deployment
-│   ├── features/                # CONTENT_SOURCES.md, APPROVED_UI_FEATURES.md
+│   ├── features/                # content, approved UI, COLLEGE_MATERIALS.md API contract
 │   └── planning/                # IMPLEMENTATION_PLAN.md
 ├── public/                      # favicon.svg, static/; public assets only
 ├── src/
@@ -91,6 +95,7 @@ kokpit/
 └── tests/
     ├── unit/
     ├── integration/
+    ├── runtime/                # native Workers/D1/R2 integration with isolated state
     └── e2e/
 ```
 
