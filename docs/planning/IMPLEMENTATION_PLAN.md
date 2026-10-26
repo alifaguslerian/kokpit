@@ -11,9 +11,9 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Baseline packages **1.1–3.3** and College packages **4.1–4.3** are complete.
+Baseline packages **1.1–3.3** and College packages **4.1–4.4** are complete.
 Milestone 4 is in progress; the next implementation package is
-**4.4 Material UI, Deletion & Verification**.
+**4.5 Weekly Schedule & Approved College Overview**.
 The owner approved all latest feature-page images on 2026-10-25 and requested functional
 controls plus aligned specifications (DEC-054). New packages 3.4–3.5 and 4.5 are pending;
 News additions join the already-pending 6.4–6.5. This documentation approval does not start
@@ -195,7 +195,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Complete |
 | 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Complete |
 | 4.3 | Private Storage & Material APIs | 8.1–8.6 | Complete |
-| 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Pending |
+| 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Complete |
 | 4.5 | Weekly Schedule & Approved College Overview | New DEC-054 package | Pending after 4.4 |
 | 5.1 | Tracks, Upload & Private Streaming | 9.1–9.3 | Pending |
 | 5.2 | Persistent Playback & Music Library | 9.4–9.6 | Pending |
@@ -1316,7 +1316,22 @@ include safe course/week context without leaking storage keys.
 
 ### 4.4 Material UI, Deletion & Verification
 
-**Status:** Pending | **Legacy Phase checklist:** 8.7–8.9
+**Status:** Complete | **Legacy Phase checklist:** 8.7–8.9
+
+Implemented 2026-10-26: week upload/link forms, file/link rows, rename and cross-semester
+week moves, checked private open/download, three recent semester materials and complete
+paginated semester/week lists. All material and hierarchy deletions coordinate R2 cleanup
+before metadata, reject foreign/inconsistent ancestry and shared keys, and expose retry for
+partial failure. Existing final hierarchy guards remain for concurrent file additions.
+No schema, dependency, production resource or schedule change was introduced.
+See [College Materials](../features/COLLEGE_MATERIALS.md) for the lifecycle and validation.
+Verification passed: 160 unit/API tests, 56 browser regressions (11 new material flows), lint,
+formatting, strict typecheck/build, and the native Workers/D1/R2 test in an isolated final run.
+Desktop/mobile captures cover 1366/390/320 px, keyboard focus, real download filename/bytes,
+loading/empty/error recovery and partial hierarchy deletion. Miniflare's intermittent transport
+resets during parallel verification and the unverified production boundary are recorded in
+the material contract. The authorized package stops here; production/Access was not changed.
+Next package: 4.5, separately authorized by the owner.
 
 <details>
 <summary>Checklist, acceptance criteria, and constraints</summary>
