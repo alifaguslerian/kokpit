@@ -1,6 +1,6 @@
 # Approved UI feature contract
 
-**Version:** 1.0 | **Status:** Owner-approved V1 requirements; implementation pending | **Updated:** 2026-10-25
+**Version:** 1.1 | **Status:** Owner-approved V1 requirements; package-specific delivery | **Updated:** 2026-10-26
 
 The owner approved the five feature-page references in [UI References](../design/UI_REFERENCES.md)
 and requested working behavior for their controls. This document maps that approval to concrete
@@ -22,11 +22,13 @@ as authorization to reveal another owner's data.
 
 - Home and the shared room/dock remain as implemented. Keep hide/show, six destinations,
   keyboard focus, safe-area clearance and persistent playback across routes.
-- Packages 3.1–3.3 and 4.1–4.2 remain completed baseline work. The approved additions are
+- Packages 3.1–3.3 and 4.1–4.3 are completed baseline work. The approved additions are
   new pending work, not a reason to mark unfinished features complete.
-- Next: 4.3, then 4.4, then 4.5; return to 3.4–3.5 for approved Ideas/Library work,
+- Next: 4.4, then 4.5; return to 3.4–3.5 for approved Ideas/Library work,
   then continue Milestones 5–8 in order. New package numbers preserve existing references.
-- No application/schema/migration/provider/deployment changes are part of this documentation task.
+- The 2026-10-25 approval itself changed documentation only. Package 4.3 subsequently
+  implemented material/file APIs and local R2, documented in [College Materials](COLLEGE_MATERIALS.md).
+  Material UI/full deletion remains 4.4; schedule, Ideas additions and News are still pending.
 - Populate production views from real data. Sample names, times, files, counts and photographs
   in the images are not records, defaults or mandatory seed content.
 
@@ -186,7 +188,8 @@ Package 3.5 applies the approved appearance while preserving existing APIs and r
 
 ## Required API additions
 
-These are future routes, not claims about the current Worker. Keep the existing safe
+The 4.3 material list route is implemented; its frontend remains 4.4. Other additions in
+this table are pending their listed package, not claims about the current Worker. Keep the existing safe
 JSON data/error conventions, Zod boundary validation and explicit owner context.
 
 | Package | Route/contract | Purpose |
