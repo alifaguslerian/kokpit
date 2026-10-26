@@ -1,5 +1,6 @@
 import type { CollegeRepository } from '../db/repositories/college.repository';
 import { AppError, NotFoundError } from '../utils/errors';
+import type { MaterialsService } from './materials.service';
 
 export interface SemesterInput {
   name: string;
@@ -24,7 +25,10 @@ const textOrNull = (value: string | null | undefined) => value?.trim() || null;
 const conflict = (message: string) => new AppError('CONFLICT', message, 409);
 
 export class CollegeService {
-  constructor(private readonly repository: CollegeRepository) {}
+  constructor(
+    private readonly repository: CollegeRepository,
+    private readonly materials: MaterialsService,
+  ) {}
 
   listSemesters(userId: string) {
     return this.repository.listSemesters(userId);
@@ -65,6 +69,7 @@ export class CollegeService {
 
   async deleteSemester(id: string, userId: string) {
     await this.getSemester(id, userId);
+    await this.materials.deleteWithin('semester', id, userId);
     if (!(await this.repository.deleteSemester(id, userId))) {
       throw conflict('Semester contains stored files or inaccessible descendants.');
     }
@@ -118,6 +123,7 @@ export class CollegeService {
 
   async deleteCourse(id: string, userId: string) {
     await this.getCourse(id, userId);
+    await this.materials.deleteWithin('course', id, userId);
     if (!(await this.repository.deleteCourse(id, userId))) {
       throw conflict('Course contains stored files or inaccessible descendants.');
     }
@@ -177,6 +183,7 @@ export class CollegeService {
 
   async deleteWeek(id: string, userId: string) {
     await this.getWeek(id, userId);
+    await this.materials.deleteWithin('week', id, userId);
     if (!(await this.repository.deleteWeek(id, userId))) {
       throw conflict('Week contains stored files or inaccessible descendants.');
     }
