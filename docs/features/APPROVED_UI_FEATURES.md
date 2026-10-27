@@ -1,6 +1,6 @@
 # Approved UI feature contract
 
-**Version:** 1.2 | **Status:** Owner-approved V1 requirements; package-specific delivery | **Updated:** 2026-10-26
+**Version:** 1.3 | **Status:** Owner-approved V1 requirements; package-specific delivery | **Updated:** 2026-10-27
 
 The owner approved the five feature-page references in [UI References](../design/UI_REFERENCES.md)
 and requested working behavior for their controls. This document maps that approval to concrete
@@ -22,13 +22,15 @@ as authorization to reveal another owner's data.
 
 - Home and the shared room/dock remain as implemented. Keep hide/show, six destinations,
   keyboard focus, safe-area clearance and persistent playback across routes.
-- Packages 3.1–3.3 and 4.1–4.4 are completed baseline work. The remaining approved additions are
+- Packages 3.1–3.3 and 4.1–4.5 are completed locally. The remaining approved additions are
   new pending work, not a reason to mark unfinished features complete.
-- Next: 4.5; return to 3.4–3.5 for approved Ideas/Library work,
+- Next: 3.4–3.5 for approved Ideas/Library work,
   then continue Milestones 5–8 in order. New package numbers preserve existing references.
 - The 2026-10-25 approval itself changed documentation only. Package 4.3 subsequently
   implemented material/file APIs and local R2, documented in [College Materials](COLLEGE_MATERIALS.md).
-  Package 4.4 adds material UI, recent/full lists and R2-aware deletion. Schedule, Ideas additions and News are still pending.
+  Package 4.4 adds material UI, recent/full lists and R2-aware deletion. Package 4.5 adds
+  owned recurring schedule CRUD, descriptions and the approved College overview, documented
+  in [College Schedule](COLLEGE_SCHEDULE.md). Ideas additions and News remain pending.
 - Populate production views from real data. Sample names, times, files, counts and photographs
   in the images are not records, defaults or mandatory seed content.
 
@@ -183,13 +185,15 @@ Package 3.5 applies the approved appearance while preserving existing APIs and r
 - Test schedule CRUD/reload/timezone/weekend/overlap/delete; saved-article cleanup/save races;
   topic filtering; collection delete without idea loss; favorite/pin independence; cover access/cleanup;
   audio queue continuity; and all collection/favorite/saved lists beyond preview limits.
-- Implement through additive reviewed migrations and local verification. Existing 17-table data
-  and prior APIs must remain readable; do not rewrite the initial migration.
+- Implement through additive reviewed migrations and local verification. The original 17-table
+  data and prior APIs must remain readable; 4.5 now brings the local schema to 18 tables.
+  Do not rewrite the initial migration.
 
 ## Required API additions
 
-The 4.3 material list route and its 4.4 frontend are implemented. Other additions in
-this table are pending their listed package, not claims about the current Worker. Keep the existing safe
+The 4.3 material list route, its 4.4 frontend and the 4.5 schedule/description routes are
+implemented locally. Other additions in this table are pending their listed package, not
+claims about the current Worker. Keep the existing safe
 JSON data/error conventions, Zod boundary validation and explicit owner context.
 
 | Package | Route/contract | Purpose |
