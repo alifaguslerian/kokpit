@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index, uniqueIndex, check } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
 
@@ -36,6 +36,7 @@ export const courses = sqliteTable(
     name: text('name').notNull(),
     code: text('code'),
     lecturer: text('lecturer'),
+    description: text('description'),
     accentKey: text('accent_key'),
     position: integer('position').notNull(),
     createdAt: text('created_at').notNull(),
@@ -44,6 +45,50 @@ export const courses = sqliteTable(
   (table) => [
     index('courses_semester_position_idx').on(table.semesterId, table.position),
     index('courses_user_semester_idx').on(table.userId, table.semesterId),
+  ],
+);
+
+export const courseScheduleEntries = sqliteTable(
+  'course_schedule_entries',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    courseId: text('course_id')
+      .notNull()
+      .references(() => courses.id, { onDelete: 'cascade' }),
+    weekday: integer('weekday').notNull(),
+    startMinute: integer('start_minute').notNull(),
+    endMinute: integer('end_minute').notNull(),
+    room: text('room'),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (table) => [
+    check('course_schedule_weekday_check', sql`${table.weekday} BETWEEN 1 AND 7`),
+    check(
+      'course_schedule_minutes_check',
+      sql`${table.startMinute} >= 0 AND ${table.startMinute} < ${table.endMinute} AND ${table.endMinute} <= 1440`,
+    ),
+    uniqueIndex('course_schedule_interval_unique').on(
+      table.courseId,
+      table.weekday,
+      table.startMinute,
+      table.endMinute,
+    ),
+    index('course_schedule_user_day_idx').on(
+      table.userId,
+      table.weekday,
+      table.startMinute,
+      table.id,
+    ),
+    index('course_schedule_course_idx').on(
+      table.courseId,
+      table.weekday,
+      table.startMinute,
+      table.id,
+    ),
   ],
 );
 
