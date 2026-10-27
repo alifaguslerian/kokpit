@@ -26,6 +26,7 @@ const courseFields = {
   name,
   code: optionalText(50),
   lecturer: optionalText(200),
+  description: optionalText(2000),
   accentKey: optionalText(64),
 };
 const weekFields = {
