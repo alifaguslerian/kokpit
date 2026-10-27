@@ -72,6 +72,11 @@ function CourseWorkspace({ courseId }: { courseId: string }) {
                 </>
               }
             />
+            {course.description && (
+              <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-kokpit-text-secondary">
+                {course.description}
+              </p>
+            )}
             <section
               aria-labelledby="course-weeks-title"
               className="space-y-4 border-t border-kokpit-border-subtle pt-6"
