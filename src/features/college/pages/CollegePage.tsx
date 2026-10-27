@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowDown, ArrowUp, ArrowUpRight, BookOpen, Plus } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { BookOpen, Plus } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
@@ -13,6 +13,8 @@ import {
 } from '../components/CollegeLayout';
 import { SemesterEditor, CourseEditor } from '../components/CollegeEditors';
 import { RecentMaterials, SemesterMaterials } from '../components/MaterialWorkspace';
+import { CourseRow } from '../components/CourseRow';
+import { WeeklySchedule } from '../components/WeeklySchedule';
 import {
   useSemesters,
   useCourses,
@@ -180,10 +182,13 @@ export function CollegePage() {
           {params.get('view') === 'materials' ? (
             <SemesterMaterials key={selected.id} semesterId={selected.id} />
           ) : (
-            <div className="grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-              <section aria-labelledby="college-courses-title" className="min-w-0 space-y-4">
+            <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+              <section
+                aria-labelledby="college-courses-title"
+                className="room-panel min-w-0 space-y-4"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h2 id="college-courses-title" className="text-lg font-semibold">
+                  <h2 id="college-courses-title" tabIndex={-1} className="text-lg font-semibold">
                     Courses
                   </h2>
                   <Button
@@ -217,67 +222,35 @@ export function CollegePage() {
                     ) : (
                       <ul className="grid list-none grid-cols-1 gap-4 min-[90rem]:gap-6">
                         {courses.map((course, index) => (
-                          <li
+                          <CourseRow
                             key={course.id}
-                            className="min-w-0 rounded-lg border border-kokpit-border-default bg-kokpit-surface-1 p-5 sm:p-6"
-                          >
-                            <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-md bg-kokpit-accent-bg text-kokpit-accent">
-                              <BookOpen className="h-5 w-5" aria-hidden="true" />
-                            </div>
-                            {course.code && (
-                              <p className="text-xs text-kokpit-text-muted break-all mb-1">
-                                {course.code}
-                              </p>
-                            )}
-                            <h3 className="text-base font-semibold break-words">
-                              <Link
-                                to={`/college/courses/${encodeURIComponent(course.id)}`}
-                                className="hover:text-kokpit-accent"
-                              >
-                                {course.name}
-                              </Link>
-                            </h3>
-                            {course.lecturer && (
-                              <p className="mt-2 text-sm text-kokpit-text-secondary break-words">
-                                {course.lecturer}
-                              </p>
-                            )}
-                            <div className="mt-5 flex items-center justify-between gap-2 border-t border-kokpit-border-subtle pt-3">
-                              <Link
-                                to={`/college/courses/${encodeURIComponent(course.id)}`}
-                                className="inline-flex min-h-9 items-center gap-1 text-xs text-kokpit-accent"
-                              >
-                                Open course <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                              </Link>
-                              <div className="flex gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  aria-label={`Move ${course.name} up`}
-                                  disabled={index === 0 || reorder.isPending}
-                                  onClick={() => void move(index, index - 1)}
-                                >
-                                  <ArrowUp className="h-4 w-4" aria-hidden="true" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  aria-label={`Move ${course.name} down`}
-                                  disabled={index === courses.length - 1 || reorder.isPending}
-                                  onClick={() => void move(index, index + 1)}
-                                >
-                                  <ArrowDown className="h-4 w-4" aria-hidden="true" />
-                                </Button>
-                              </div>
-                            </div>
-                          </li>
+                            course={course}
+                            first={index === 0}
+                            last={index === courses.length - 1}
+                            moving={reorder.isPending}
+                            onMove={(direction) => void move(index, index + direction)}
+                            onDeleted={() =>
+                              requestAnimationFrame(() => {
+                                if (canNavigate())
+                                  document.getElementById('college-courses-title')?.focus();
+                              })
+                            }
+                          />
                         ))}
                       </ul>
                     )}
                   </>
                 )}
               </section>
-              <RecentMaterials key={selected.id} semesterId={selected.id} />
+              <div className="min-w-0 space-y-4">
+                <WeeklySchedule
+                  key={selected.id}
+                  semesterId={selected.id}
+                  courses={courses}
+                  canEdit={!coursesQuery.isPending && !coursesQuery.isError}
+                />
+                <RecentMaterials key={selected.id} semesterId={selected.id} />
+              </div>
             </div>
           )}
         </>
