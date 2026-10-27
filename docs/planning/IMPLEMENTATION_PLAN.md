@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 1.0 | **Status:** Approved V1 implementation plan | **Updated:** 2026-10-26
+**Version:** 1.1 | **Status:** Approved V1 implementation plan | **Updated:** 2026-10-27
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,11 +11,11 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Baseline packages **1.1–3.3** and College packages **4.1–4.4** are complete.
-Milestone 4 is in progress; the next implementation package is
-**4.5 Weekly Schedule & Approved College Overview**.
+Baseline packages **1.1–3.3** and College packages **4.1–4.5** are complete locally.
+Milestone 4 is complete; the next implementation package is
+**3.4 Ideas Collections, Favorites & Private Covers APIs**.
 The owner approved all latest feature-page images on 2026-10-25 and requested functional
-controls plus aligned specifications (DEC-054). New packages 3.4–3.5 and 4.5 are pending;
+controls plus aligned specifications (DEC-054). Packages 3.4–3.5 remain pending;
 News additions join the already-pending 6.4–6.5. This documentation approval does not start
 implementation or change completed baseline evidence. Execution order is:
 **4.3 → 4.4 → 4.5 → 3.4 → 3.5 → 5.1–5.3 → 6.1–6.5 → Milestones 7–8**.
@@ -196,7 +196,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Complete |
 | 4.3 | Private Storage & Material APIs | 8.1–8.6 | Complete |
 | 4.4 | Material UI, Deletion & Verification | 8.7–8.9 | Complete |
-| 4.5 | Weekly Schedule & Approved College Overview | New DEC-054 package | Pending after 4.4 |
+| 4.5 | Weekly Schedule & Approved College Overview | New DEC-054 package | Complete locally |
 | 5.1 | Tracks, Upload & Private Streaming | 9.1–9.3 | Pending |
 | 5.2 | Persistent Playback & Music Library | 9.4–9.6 | Pending |
 | 5.3 | Playlists, Home Player & Verification | 9.7–9.10 | Pending |
@@ -1377,29 +1377,40 @@ Test:
 
 ### 4.5 Weekly Schedule & Approved College Overview
 
-**Status:** Pending after 4.4 | **Legacy Phase checklist:** None; DEC-054 addition
+**Status:** Complete locally (2026-10-27) | **Legacy Phase checklist:** None; DEC-054 addition
 
-- [ ] Add course_schedule_entries and nullable courses.description through a reviewed additive
+- [x] Add course_schedule_entries and nullable courses.description through a reviewed additive
   migration; preserve the existing hierarchy, metadata and safe deletion behavior.
-- [ ] Implement selected-semester schedule query and owned entry create/update/delete API;
+- [x] Implement selected-semester schedule query and owned entry create/update/delete API;
   validate weekday/local minute bounds, optional room, semester ancestry and exact duplicates.
-- [ ] Match College v2: retain semester selection/activation and Add semester/Add course;
+- [x] Match College v2: retain semester selection/activation and Add semester/Add course;
   course rows at left, Weekly Schedule and Recent Files & Notes at right.
-- [ ] Edit schedule opens working create/edit/delete forms. Course blocks navigate to their
+- [x] Edit schedule opens working create/edit/delete forms. Course blocks navigate to their
   course; all course/menu/reorder/material actions remain keyboard-accessible.
-- [ ] Use saved owner timezone and current Monday-based week; handle weekends, arbitrary
+- [x] Use saved owner timezone and current Monday-based week; handle weekends, arbitrary
   saved class hours, multiple intervals and overlapping classes without hiding a record.
-- [ ] Render a readable day list on mobile; do not shrink text to force all columns to fit.
-- [ ] Test CRUD/reload, timezone/date bounds, duplicates/overlaps/weekends, invalid/foreign
+- [x] Render a readable day list on mobile; do not shrink text to force all columns to fit.
+- [x] Test CRUD/reload, timezone/date bounds, duplicates/overlaps/weekends, invalid/foreign
   references, description clear/edit, and course/semester deletion cascading entries only
   after R2/material deletion safeguards succeed.
-- [ ] Test recent/full material navigation, all exposed actions, states, long metadata,
+- [x] Test recent/full material navigation, all exposed actions, states, long metadata,
   keyboard focus and Home's unchanged first-course/week preview contract.
 
 **Acceptance:** Every College overview section uses real saved data, no fake timetable or
 activity records. General calendar sync/reminders, tasks, study metrics and class joining stay
 out of scope. Run migration checks, unit/API/browser regressions, lint/typecheck/format/build.
 Then return to 3.4, not directly to Milestone 5.
+
+**Delivery:** Owned schedule CRUD, saved-timezone current week, description save/clear and
+the approved two-column College overview are implemented. Desktop uses readable timetable
+columns with panel-local scrolling when needed; narrow panels use a day agenda. Existing
+material/R2 deletion safeguards precede class cascades. Reviewed additive migration
+`0002_closed_mister_sinister.sql` is applied locally, preserving earlier rows and migration
+history; the schema now has 18 tables. Validation passed: 173 unit/API/migration tests,
+67 browser regressions, one isolated native Workers/D1/R2 runtime test, lint, strict
+typecheck, format and build. See [College Schedule](../features/COLLEGE_SCHEDULE.md)
+for contracts and verification. No production migration, Access verification or deployment
+is included. Stop here until the owner authorizes 3.4.
 
 ## Milestone 5: Music
 
