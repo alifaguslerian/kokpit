@@ -1,6 +1,6 @@
 # Kokpit — Deployment
 
-**Version:** 0.6 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-26
+**Version:** 0.7 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-27
 
 Operational runbook for one Cloudflare Worker + Static Assets, private Access gate,
 D1 metadata, private R2 files, Cron jobs and Workers AI content.
@@ -10,12 +10,15 @@ D1 metadata, private R2 files, Cron jobs and Workers AI content.
 > Current boundary: baseline packages 1.1–3.3 include the app shell/Home, Ideas and Quick Links
 > APIs/UI, D1 schema and local migration. Package 4.1 adds College hierarchy APIs
 > using the existing schema and D1 binding. The configured remote D1 ID is a placeholder.
-> Package 4.3 configures local private R2 and material APIs. Access, scheduled content,
+> Package 4.3 configures local private R2 and material APIs; 4.4 adds their UI. Package 4.5
+> adds recurring class schedules, descriptions and a locally applied additive migration.
+> Access, scheduled content,
 > remote R2 creation and production deployment remain future work.
 
-DEC-054 is a documentation/requirement approval, not a deployment. The current 17-table
-baseline evolves toward 20 through the additive migrations in Data Model (4.5, 3.4,
-6.4–6.5). Do not rewrite/apply the initial migration or create remote resources for this approval.
+DEC-054 was a documentation/requirement approval, not a deployment. Package 4.5 subsequently
+grew the implemented local schema from 17 to 18 tables. The remaining additive migrations
+in Data Model (3.4, 6.4–6.5) target 20. Do not rewrite applied migration history or create
+remote resources merely because a requirement is approved.
 Existing private R2 also serves optional Ideas covers; no public image bucket or new binding
 is needed. Include those keys and new metadata in backup/recovery and deletion smoke checks.
 Before release, verify saved News survives retention/source disabling, collection deletion
@@ -148,6 +151,13 @@ npx wrangler secret put SOME_SECRET
 Canonical flow: Data Model → Drizzle schema → generated migration → SQL inspection → local apply → tests → remote apply.
 Configure Wrangler's migration directory/pattern to discover the generated files.
 Use version-controlled migrations; do not edit production tables manually or rewrite applied history.
+
+Package 4.5 generated, reviewed and locally applied `0002_closed_mister_sinister.sql`:
+it creates `course_schedule_entries` and adds nullable `courses.description`. Existing
+course/week/material records are preserved; the local schema has 18 tables. Compatibility
+tests apply the older migrations first and verify the new checks, uniqueness and cascades.
+No remote migration or owner demo data is part of this package. See
+[College Schedule](../features/COLLEGE_SCHEDULE.md) for its verification boundary.
 
 ```bash
 npx wrangler d1 migrations apply kokpit-db --local
