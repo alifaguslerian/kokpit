@@ -12,6 +12,7 @@ export interface CourseInput {
   name: string;
   code?: string | null | undefined;
   lecturer?: string | null | undefined;
+  description?: string | null | undefined;
   accentKey?: string | null | undefined;
 }
 export interface WeekInput {
@@ -102,6 +103,7 @@ export class CollegeService {
       name: input.name.trim(),
       code: textOrNull(input.code),
       lecturer: textOrNull(input.lecturer),
+      description: textOrNull(input.description),
       accentKey: textOrNull(input.accentKey),
       createdAt: now,
       updatedAt: now,
@@ -114,6 +116,7 @@ export class CollegeService {
       ...(input.name !== undefined ? { name: input.name.trim() } : {}),
       ...(input.code !== undefined ? { code: textOrNull(input.code) } : {}),
       ...(input.lecturer !== undefined ? { lecturer: textOrNull(input.lecturer) } : {}),
+      ...(input.description !== undefined ? { description: textOrNull(input.description) } : {}),
       ...(input.accentKey !== undefined ? { accentKey: textOrNull(input.accentKey) } : {}),
       updatedAt: new Date().toISOString(),
     });
