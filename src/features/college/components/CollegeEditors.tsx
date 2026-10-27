@@ -100,6 +100,7 @@ export function CourseEditor({
   const [name, setName] = useState(course?.name ?? '');
   const [code, setCode] = useState(course?.code ?? '');
   const [lecturer, setLecturer] = useState(course?.lecturer ?? '');
+  const [description, setDescription] = useState(course?.description ?? '');
   const create = useCreateCourse();
   const update = useUpdateCourse();
   return (
@@ -112,6 +113,7 @@ export function CourseEditor({
           name: name.trim(),
           code: code.trim() || null,
           lecturer: lecturer.trim() || null,
+          description: description.trim() || null,
         };
         if (course) await update.mutateAsync({ id: course.id, input });
         else await create.mutateAsync({ semesterId, input });
@@ -137,6 +139,13 @@ export function CourseEditor({
         value={lecturer}
         onChange={(event) => setLecturer(event.target.value)}
         maxLength={200}
+      />
+      <Textarea
+        label="Description"
+        value={description}
+        onChange={(event) => setDescription(event.target.value)}
+        maxLength={2000}
+        rows={3}
       />
     </CollegeFormDialog>
   );
