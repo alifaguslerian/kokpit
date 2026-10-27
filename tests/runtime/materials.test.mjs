@@ -111,7 +111,32 @@ test(
         return JSON.parse(text).data;
       };
       const semester = await create('/semesters', { name: 'Isolated runtime semester' });
-      const course = await create(`/semesters/${semester.id}/courses`, { name: 'Runtime course' });
+      const course = await create(`/semesters/${semester.id}/courses`, {
+        name: 'Runtime course',
+        description: 'Native schedule and material verification.',
+      });
+      assert.equal(course.description, 'Native schedule and material verification.');
+      const classInput = { weekday: 6, startMinute: 1430, endMinute: 1440, room: 'Native room' };
+      const classEntry = await create(`/courses/${course.id}/schedule`, classInput);
+      const duplicateClass = await request(`/api/college/courses/${course.id}/schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(classInput),
+      });
+      assert.equal(duplicateClass.status, 409, await duplicateClass.text());
+      const changedClass = await request(`/api/college/schedule/${classEntry.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weekday: 7, room: null }),
+      });
+      assert.equal(changedClass.status, 200, await changedClass.text());
+      const scheduleResponse = await request(`/api/college/semesters/${semester.id}/schedule`);
+      const schedule = await scheduleResponse.json();
+      assert.equal(scheduleResponse.status, 200);
+      assert.equal(schedule.data[0].weekday, 7);
+      assert.equal(schedule.data[0].endMinute, 1440);
+      assert.equal(schedule.week.days.length, 7);
+      assert.equal(schedule.timezone, 'Asia/Jakarta');
       const week = await create(`/courses/${course.id}/weeks`, { weekNumber: 1 });
       const upload = (filename, body, size, type = 'application/pdf') =>
         request(
@@ -200,6 +225,8 @@ test(
       assert.equal(hierarchyRemoved.status, 200, await hierarchyRemoved.text());
       assert.equal((await request(largeResult.data.fileUrl)).status, 404);
       assert.equal((await request(`/api/college/materials/${link.id}`)).status, 404);
+      const remainingSchedule = await request(`/api/college/semesters/${semester.id}/schedule`);
+      assert.deepEqual((await remainingSchedule.json()).data, []);
       const afterRejectedUpload = await request('/api/system/health');
       assert.equal(afterRejectedUpload.status, 200, await afterRejectedUpload.text());
     } catch (error) {
