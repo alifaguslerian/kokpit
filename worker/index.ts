@@ -5,6 +5,7 @@ import { ideasRoutes } from './api/ideas.routes';
 import { quickLinksRoutes } from './api/quick-links.routes';
 import { collegeRoutes } from './api/college.routes';
 import { materialsRoutes, fileRoutes } from './api/materials.routes';
+import { scheduleRoutes } from './api/schedule.routes';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { ownerContext } from './middleware/owner-context';
 
@@ -20,6 +21,7 @@ app.route('/api/ideas', ideasRoutes);
 app.route('/api/quick-links', quickLinksRoutes);
 app.route('/api/college', collegeRoutes);
 app.route('/api/college', materialsRoutes);
+app.route('/api/college', scheduleRoutes);
 app.route('/api/files', fileRoutes);
 
 export default app;
