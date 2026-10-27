@@ -1,10 +1,10 @@
 # Kokpit — Data Model
 
-**Version:** 0.5 · **Status:** 17-table baseline; approved feature additions pending · **Updated:** 2026-10-26
+**Version:** 0.6 · **Status:** 18 tables implemented; remaining approved additions pending · **Updated:** 2026-10-27
 
-Canonical target for private single-user V1: **20 D1 tables**. The implemented baseline
-still has **17 tables**. Three additions and the field changes below are approved
-requirements, not existing schema or applied migrations; see DEC-054 and
+Canonical target for private single-user V1: **20 D1 tables**. The implemented schema
+has **18 tables**: the 17-table baseline plus the 4.5 recurring class table and nullable
+course description. Ideas/News additions remain approved requirements, not applied migrations; see DEC-054 and
 [Approved UI Features](../features/APPROVED_UI_FEATURES.md).
 D1 stores structured metadata; private R2 stores file bytes.
 Runtime boundaries: [Architecture](ARCHITECTURE.md). Operations: [Deployment](DEPLOYMENT.md).
@@ -207,7 +207,7 @@ tags, pins, favorites and cover bytes. A normalized memberships table is unneces
 | `name` | TEXT | yes | Course name |
 | `code` | TEXT | no | Course code |
 | `lecturer` | TEXT | no | Lecturer display name |
-| `description` | TEXT | no | Pending 4.5: optional plain text, maximum 2,000 characters |
+| `description` | TEXT | no | Implemented 4.5: optional plain text, maximum 2,000 characters |
 | `accent_key` | TEXT | no | Optional restrained UI identifier |
 | `position` | INTEGER | yes | Ordering |
 | `created_at` | TEXT | yes | UTC |
@@ -217,7 +217,7 @@ tags, pins, favorites and cover bytes. A normalized memberships table is unneces
 
 **Indexes:** `INDEX courses_semester_position_idx (semester_id, position) INDEX courses_user_semester_idx (user_id, semester_id)`.
 
-### `course_schedule_entries` (pending 4.5)
+### `course_schedule_entries` (implemented 4.5)
 
 | Field | Type | Required | Description |
 |---|---|---:|---|
@@ -282,7 +282,8 @@ reminder, attendance or provider entity is introduced. Overlaps are permitted an
 **Implemented 4.3:** `materials_user_updated_idx (user_id, updated_at DESC, id DESC)`
 supports recent/full semester queries with owner-scoped hierarchy joins. Generated migration
 0001_sloppy_phil_sheldon.sql adds this index only, applied locally on 2026-10-26;
-the initial migration and 17 tables remain unchanged. See [College Materials](../features/COLLEGE_MATERIALS.md).
+the initial migration remained unchanged. Package 4.5 subsequently adds the 18th table.
+See [College Materials](../features/COLLEGE_MATERIALS.md) and [College Schedule](../features/COLLEGE_SCHEDULE.md).
 
 ### `tracks`
 
@@ -533,16 +534,17 @@ Broad soft delete, trash/restore and full revision/audit history are outside V1.
 
 ### Approved additive migration sequence
 
-| Package | Pending change | Compatibility requirement |
+| Package | Change / delivery state | Compatibility requirement |
 |---|---|---|
 | 4.3 (complete) | Added materials_user_updated_idx for recent/full material queries | Applied locally; no record shape/data loss, last_opened_at remains optional. |
-| 4.5 | Add `course_schedule_entries` and nullable `courses.description` | Existing semesters/courses/weeks/materials remain readable and unchanged. |
+| 4.5 (complete) | Added `course_schedule_entries` and nullable `courses.description` | Reviewed 0002 migration applied locally; existing rows preserved, schedule checks/duplicates/cascade tested. |
 | 3.4 (after 4.5) | Add `idea_collections`, optional idea membership/cover metadata and default-false `is_favorite` | Preserve every existing idea, tag and pin; no sample collections or covers. |
 | 6.4 | Add nullable `news_articles.topic_key` and topic index | Classify/backfill existing cached items safely; leave unclassified items readable. |
 | 6.5 | Add `news_saved_articles` with guarded article retention | Existing feed and unsaved cleanup remain valid; test concurrent save/cleanup and disabled sources. |
 
-Target table count after these additions is 20 (17 baseline + 3). No migration is generated,
-applied locally or applied to production by this documentation approval. Verify each intermediate
+Target table count after all additions is 20 (17 baseline + 3); current count is 18.
+The original documentation approval generated no migration; 4.3 and 4.5 later applied their
+additive migrations locally. No production migration ran. Verify each intermediate
 schema in its implementation package, including preservation of existing records and FK behavior.
 
 Follow [AGENTS.md](../../AGENTS.md) and [Deployment](DEPLOYMENT.md):
