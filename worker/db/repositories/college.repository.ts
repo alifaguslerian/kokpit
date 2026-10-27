@@ -14,7 +14,9 @@ type SemesterChanges = Partial<
   Pick<SemesterInsert, 'name' | 'academicYear' | 'termNumber' | 'isActive'>
 > & { updatedAt: string };
 type CourseInsert = Omit<typeof courses.$inferInsert, 'position'>;
-type CourseChanges = Partial<Pick<CourseInsert, 'name' | 'code' | 'lecturer' | 'accentKey'>> & {
+type CourseChanges = Partial<
+  Pick<CourseInsert, 'name' | 'code' | 'lecturer' | 'description' | 'accentKey'>
+> & {
   updatedAt: string;
 };
 type WeekChanges = Partial<Pick<typeof weeks.$inferInsert, 'weekNumber' | 'title' | 'notes'>> & {
@@ -33,6 +35,12 @@ export class CollegeRepository {
     id: string,
     userId: string,
   ) {
+    if (kind !== 'week') {
+      const parentScope = kind === 'semester' ? sql`c.semester_id = ${id}` : sql`c.id = ${id}`;
+      const foreignClasses = await this.db.all(sql`SELECT e.id FROM course_schedule_entries e
+        JOIN courses c ON c.id = e.course_id WHERE ${parentScope} AND e.user_id <> ${userId} LIMIT 1`);
+      if (foreignClasses.length) return true;
+    }
     const query =
       kind === 'semester'
         ? sql`SELECT c.id FROM courses c LEFT JOIN weeks w ON w.course_id = c.id
@@ -116,6 +124,8 @@ export class CollegeRepository {
         and(
           eq(semesters.id, id),
           eq(semesters.userId, userId),
+          sql`NOT EXISTS (SELECT 1 FROM course_schedule_entries e JOIN courses c ON c.id = e.course_id
+            WHERE c.semester_id = ${id} AND e.user_id <> ${userId})`,
           sql`NOT EXISTS (
         SELECT 1 FROM courses c LEFT JOIN weeks w ON w.course_id = c.id
         LEFT JOIN materials m ON m.week_id = w.id
@@ -187,6 +197,7 @@ export class CollegeRepository {
         and(
           eq(courses.id, id),
           eq(courses.userId, userId),
+          sql`NOT EXISTS (SELECT 1 FROM course_schedule_entries e WHERE e.course_id = ${id} AND e.user_id <> ${userId})`,
           this.courseParentOwned(userId),
           sql`NOT EXISTS (
         SELECT 1 FROM weeks w LEFT JOIN materials m ON m.week_id = w.id
