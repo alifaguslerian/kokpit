@@ -17,6 +17,7 @@ export interface Course {
   name: string;
   code: string | null;
   lecturer: string | null;
+  description: string | null;
   accentKey: string | null;
   position: number;
   createdAt: string;
@@ -47,6 +48,7 @@ export interface CreateCourseInput {
   name: string;
   code?: string | null | undefined;
   lecturer?: string | null | undefined;
+  description?: string | null | undefined;
   accentKey?: string | null | undefined;
 }
 
@@ -59,6 +61,36 @@ export interface CreateWeekInput {
 }
 
 export type UpdateWeekInput = Partial<CreateWeekInput>;
+
+export interface ScheduleEntry {
+  id: string;
+  courseId: string;
+  courseName: string;
+  courseCode: string | null;
+  semesterId: string;
+  weekday: number;
+  startMinute: number;
+  endMinute: number;
+  room: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface ScheduleInput {
+  weekday: number;
+  startMinute: number;
+  endMinute: number;
+  room?: string | null;
+}
+export interface ScheduleResponse {
+  data: ScheduleEntry[];
+  timezone: string;
+  week: {
+    start: string;
+    end: string;
+    today: string;
+    days: Array<{ weekday: number; date: string }>;
+  };
+}
 
 export interface Material {
   id: string;
