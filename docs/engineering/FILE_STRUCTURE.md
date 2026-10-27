@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 1.0 | **Status:** V1 structure reference | **Updated:** 2026-10-26
+**Version:** 1.1 | **Status:** V1 structure reference | **Updated:** 2026-10-27
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -14,7 +14,8 @@ Home, College, Ideas and Library have feature implementations. `worker/api/`,
 the College hierarchy APIs (package 4.1). `tests/integration/college-api.test.ts`
 covers College lifecycle, ownership, validation, ordering and rollback behavior.
 The schema and reviewed initial migration include the 17-table baseline. The approved
-20-table target adds later migrations. Package 4.3 adds only the generated recent-material index.
+20-table target adds later migrations. Package 4.3 adds only the generated recent-material index;
+4.5 adds the 18th table and nullable course description through migration 0002.
 `src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms.
 `src/components/layout/BottomNavigation.tsx` owns the shared six-link floating dock
 and navigation items; `AppShell` owns the room backdrop and content clearance.
@@ -32,7 +33,12 @@ MaterialList, MaterialEditors and MaterialFileDialog, reusing the existing Colle
 and private APIs. tests/e2e/materials-regressions.mjs serves isolated Hono/SQLite/R2 fixtures
 over local HTTP to verify actual browser downloads without request interception.
 Material/hierarchy cleanup extends the existing services/repositories, without a new table
-or package. The recurring timetable, playback and content pipelines remain pending.
+or package. Package 4.5 adds schedule.routes.ts, schedule.service.ts, schedule.repository.ts
+and the pure schedule-week.ts calendar helper. Feature-local schedule-api/use-schedule,
+CourseRow, WeeklySchedule, ScheduleManager and ScheduleEditor implement the approved overview;
+schedule-format.ts and schedule.css handle labels and responsive calendar reflow.
+Focused schedule API/migration/week/browser tests extend existing regressions and the native
+runtime test. Playback and content pipelines remain pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their work package needs them; do not pre-create empty modules.
 
