@@ -1,0 +1,18 @@
+.college-schedule-calendar {
+  container-type: inline-size;
+}
+.schedule-grid-wrap {
+  display: none;
+  overflow-x: auto;
+}
+.college-schedule-calendar [aria-current='date'] {
+  color: var(--kokpit-accent);
+}
+@container (min-width: 36rem) {
+  .schedule-grid-wrap {
+    display: block;
+  }
+  .schedule-agenda {
+    display: none;
+  }
+}
