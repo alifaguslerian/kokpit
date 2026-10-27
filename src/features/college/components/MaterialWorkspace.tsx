@@ -76,10 +76,7 @@ function WeekMaterialContent({ weekId }: { weekId: string }) {
 export function RecentMaterials({ semesterId }: { semesterId: string }) {
   const query = useRecentMaterials(semesterId);
   return (
-    <section
-      aria-labelledby="recent-materials-title"
-      className="min-w-0 rounded-lg border border-kokpit-border-default bg-kokpit-surface-1 p-5 sm:p-6"
-    >
+    <section aria-labelledby="recent-materials-title" className="room-panel min-w-0">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="recent-materials-title" className="flex items-center gap-2 text-lg font-semibold">
           <FileText className="h-5 w-5 text-kokpit-accent" aria-hidden="true" />
