@@ -93,7 +93,9 @@ export function useDeleteSemester() {
       queryClient.removeQueries({
         queryKey: queryKeys.college.all,
         predicate: ({ queryKey }) =>
-          ['courses', 'course', 'weeks', 'week', 'materials'].includes(String(queryKey[1])),
+          ['courses', 'course', 'weeks', 'week', 'materials', 'schedule'].includes(
+            String(queryKey[1]),
+          ),
       });
       await invalidate();
     },
@@ -137,7 +139,8 @@ export function useDeleteCourse() {
       queryClient.removeQueries({ queryKey: queryKeys.college.course(id) });
       queryClient.removeQueries({
         queryKey: queryKeys.college.all,
-        predicate: ({ queryKey }) => ['weeks', 'week', 'materials'].includes(String(queryKey[1])),
+        predicate: ({ queryKey }) =>
+          ['weeks', 'week', 'materials', 'schedule'].includes(String(queryKey[1])),
       });
       await invalidate();
     },
