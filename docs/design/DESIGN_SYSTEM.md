@@ -1,11 +1,11 @@
 # Kokpit — Design System
 
-**Version:** 1.4 — Approved Home and feature-page composition
+**Version:** 1.5 — Approved Home and feature-page composition
 **Status:** V1 design direction locked
 **Theme:** Dark Cozy Editorial Workspace
 **Primary platform:** Desktop web
 **Reference:** Approved Home plus five feature pages; [reference gallery and interpretation](UI_REFERENCES.md)
-**Last updated:** 2026-10-25
+**Last updated:** 2026-10-27
 
 This is the source of truth for UI appearance and interaction.
 Product scope belongs in [PRD](../product/PRD.md); execution rules belong in [AGENTS](../../AGENTS.md).
@@ -367,6 +367,12 @@ large statistic panels, and repeated card-inside-card borders.
 | Library | A prominent shortcut grid with recognizable icon, name, and an Add shortcut tile. Expose editing, deletion, ordering, and Home favorites. Optional groups use the documented quick-link grouping. Search, if included, searches shortcuts locally; a right panel is unnecessary without useful shortcut content. Preserve the portal-grid character without a reading tracker or book vault. |
 | Music | A large player/artwork on the left and library/search/playlist region on the right with aligned lower edges. File import, track menus, transport, seek/time, shuffle/repeat and volume are functional; All tracks/Playlists and New playlist lead to actual views. Playback stays mounted above routes. No mixer/grabber/DSP controls. |
 | News | Category filters precede a lead article and supporting feed; Saved for Later and Trending Topics form the lower row. All article instances expose consistent bookmark state and original links. View saved opens the complete saved list; topics filter the feed and disclose their seven-day Kokpit-cache scope. Source imagery or neutral fallback only; no reading goals/charts or fabricated global trend statistics. |
+
+College timetable rows group actual saved start times and show each full time range.
+Overlapping classes remain separate readable links. Keep a minimum readable day-column width;
+use keyboard-accessible panel-local horizontal scrolling when needed, and a day-grouped agenda
+in narrow panels. Dates/current-day emphasis follow the owner's saved timezone. Keep existing
+semantic tokens and Inter for this functional schedule; do not shrink text or hide classes.
 
 Use Inter for functional page titles, controls, metadata, and article/idea previews;
 reserve Cormorant Garamond for occasional expressive headings. Example text, source names,
