@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 0.9 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-26
+**Version:** 1.0 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-27
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -42,12 +42,14 @@ hierarchy APIs through routes, a service and a repository using the existing sch
 Package 4.2 adds lazy College, course and week pages, shared query-backed Home
 context and metadata forms. Package 4.3 adds local private R2, streamed file uploads,
 material metadata/link APIs and owned file delivery. Package 4.4 adds material UI, recent/full lists
-and coordinated R2/metadata deletion. The class timetable, persistent audio,
+and coordinated R2/metadata deletion. Package 4.5 adds owned recurring classes, course
+descriptions and the approved College overview. Persistent audio,
 content jobs and production resources remain pending.
 DEC-054 approves feature-page requirements, including class schedule, Ideas collections/
 favorites/covers and News saves/topics. They use the same stack and domain boundaries;
-they are not implemented by the documentation approval. The Data Model distinguishes
-the existing 17-table baseline from the 20-table target.
+they are not implemented by the documentation approval itself. The schedule is now delivered
+through the same route/service/repository boundaries; other additions remain pending. The Data Model distinguishes
+the original 17-table baseline, the current 18-table schema and the approved 20-table target.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
@@ -174,7 +176,7 @@ Future public accounts would require a separate authentication review; data read
 ## D1, R2 and uploads
 
 D1 stores metadata and relationships. R2 stores audio, artwork, College PDFs/slides/documents/images.
-The [Data Model](DATA_MODEL.md) defines the implemented 17-table baseline and approved
+The [Data Model](DATA_MODEL.md) defines the current 18-table schema and approved
 20-table target. New fields/tables require later additive migrations, not edits to applied SQL.
 
 - Keep R2 private; no unrestricted browser bucket access or public file URLs.
