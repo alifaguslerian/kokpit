@@ -318,7 +318,7 @@ describe('Backend Foundation & API Safety Integration Tests', () => {
   });
 
   describe('D1 Schema Definition Completeness', () => {
-    test('exports all 17 canonical tables from DATA_MODEL.md', () => {
+    test('exports the 17 baseline tables and the approved College schedule table', () => {
       const expectedTables = [
         'users',
         'userSettings',
@@ -328,6 +328,7 @@ describe('Backend Foundation & API Safety Integration Tests', () => {
         'quickLinks',
         'semesters',
         'courses',
+        'courseScheduleEntries',
         'weeks',
         'materials',
         'tracks',
