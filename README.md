@@ -50,12 +50,13 @@ owned GET/HEAD/Range delivery and paginated material queries.
 **Package 4.4 is complete:** week upload/link forms, rename/move/delete, private open/download,
 three recent semester materials and a complete paginated materials view. Confirmed material
 and hierarchy deletion coordinates R2 cleanup with metadata and supports partial-failure retry.
-The next documented package is **4.5: Weekly Schedule & Approved College Overview**.
-The approved feature designs add pending College 4.5 and Ideas 3.4–3.5 work; the order is
-4.5 → 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
-The target schema is now 20 tables, while the implemented baseline still has 17; new tables,
-fields and private cover handling are requirements, not delivered migrations/features.
-The recurring class schedule, real playback, hourly D1 quotes, News ingestion and private production
+**Package 4.5 is complete:** recurring class APIs/editor, saved-owner-timezone week/date
+display, readable overlaps/weekends, optional course descriptions and the approved College
+overview. Milestone 4 is complete locally; next is **3.4: Ideas Collections, Favorites & Private Covers APIs**.
+The order is 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
+The target schema is 20 tables; the implemented schema now has 18. Remaining Ideas/News
+tables, fields and private cover handling are approved pending work.
+Real playback, hourly D1 quotes, News ingestion and private production
 deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
 
 The Worker currently exposes `/api/system/health`, `/api/ideas`, `/api/quick-links`
@@ -152,6 +153,7 @@ These tests do not verify production Cloudflare Access or remote storage.
 | [UI references](docs/design/UI_REFERENCES.md) | Selected approved Home/feature images and their interpretation |
 | [Approved UI features](docs/features/APPROVED_UI_FEATURES.md) | Every visible control, new behavior, API additions and acceptance coverage |
 | [College materials](docs/features/COLLEGE_MATERIALS.md) | Implemented 4.3–4.4 API/UI contracts, limits, private delivery, deletion and verification |
+| [College schedule](docs/features/COLLEGE_SCHEDULE.md) | Implemented 4.5 class timetable, course descriptions, timezone and overview contracts |
 | [Architecture](docs/engineering/ARCHITECTURE.md) | Runtime, services, security, and failure boundaries |
 | [Data model](docs/engineering/DATA_MODEL.md) | Tables, constraints, relationships, and lifecycle |
 | [Content sources](docs/features/CONTENT_SOURCES.md) | Quotes, news sources, ranking, and refresh behavior |
