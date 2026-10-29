@@ -1,4 +1,4 @@
-import { Search, X, Pin } from 'lucide-react';
+import { Search, Pin } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 interface IdeasFilterBarProps {
@@ -11,7 +11,6 @@ interface IdeasFilterBarProps {
   availableTags: string[];
   totalCount: number;
 }
-
 export function IdeasFilterBar({
   searchQuery,
   onSearchChange,
@@ -22,101 +21,91 @@ export function IdeasFilterBar({
   availableTags,
   totalCount,
 }: IdeasFilterBarProps) {
+  const canonical = [
+    { value: null, label: 'All' },
+    { value: 'Idea', label: 'Ideas' },
+    { value: 'Question', label: 'Questions' },
+    { value: 'Random', label: 'Random' },
+  ];
+  const custom = availableTags.filter((tag) => !canonical.some((item) => item.value === tag));
   return (
     <div className="space-y-3">
-      {/* Search & Pinned Row */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Search Input */}
-        <div className="flex-1 max-w-md">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-1">
+          {canonical.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              aria-pressed={selectedTag === item.value}
+              onClick={() => onTagSelect(item.value)}
+              className={cn(
+                'min-h-11 rounded-full px-3 text-sm transition-colors',
+                selectedTag === item.value
+                  ? 'bg-[var(--kokpit-accent)] text-[var(--kokpit-text-inverse)]'
+                  : 'text-[var(--kokpit-text-secondary)] hover:bg-[var(--kokpit-surface-hover)]',
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        <div className="w-full min-w-0 sm:max-w-xs">
           <label
             htmlFor="ideas-search"
-            className="block mb-1 text-xs text-[var(--kokpit-text-secondary)]"
+            className="mb-1 block text-xs text-[var(--kokpit-text-secondary)]"
           >
             Search thoughts
           </label>
           <div className="relative">
-            <Search className="w-4 h-4 text-[var(--kokpit-text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-3.5 size-4 text-[var(--kokpit-text-muted)]"
+            />
             <input
               id="ideas-search"
-              maxLength={200}
               type="search"
+              maxLength={200}
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search thoughts by title, text, or topic..."
-              className="w-full bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-muted)] pl-9 pr-9 py-2 rounded-[var(--radius-md)] border border-[var(--kokpit-border-default)] focus:border-[var(--kokpit-accent)] focus:outline-none font-ui text-sm transition-colors shadow-xs"
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder="Search ideas…"
+              className="min-h-11 w-full rounded-xl border border-[var(--kokpit-border-default)] bg-[var(--kokpit-surface-1)] pl-9 pr-3 text-sm text-[var(--kokpit-text-primary)] placeholder:text-[var(--kokpit-text-muted)]"
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => onSearchChange('')}
-                aria-label="Clear search"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
         </div>
-
-        {/* Filter controls right */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
-          <button
-            type="button"
-            onClick={() => onPinnedOnlyChange(!pinnedOnly)}
-            aria-pressed={pinnedOnly}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-md)] text-xs font-ui border transition-colors cursor-pointer select-none',
-              pinnedOnly
-                ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent)] border-[var(--kokpit-accent)]/50 font-medium'
-                : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-secondary)] border-[var(--kokpit-border-default)] hover:text-[var(--kokpit-text-primary)]',
-            )}
-          >
-            <Pin className={cn('w-3.5 h-3.5', pinnedOnly && 'fill-current')} />
-            <span>Pinned Only</span>
-          </button>
-
-          <span className="font-ui text-xs text-[var(--kokpit-text-muted)] ml-2">
-            {totalCount} {totalCount === 1 ? 'thought' : 'thoughts'}
-          </span>
-        </div>
       </div>
-
-      {/* Tag filter chips */}
-      {availableTags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          aria-pressed={pinnedOnly}
+          onClick={() => onPinnedOnlyChange(!pinnedOnly)}
+          className={cn(
+            'inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--kokpit-border-default)] px-3 text-xs',
+            pinnedOnly
+              ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent-hover)]'
+              : 'text-[var(--kokpit-text-secondary)]',
+          )}
+        >
+          <Pin className="size-3.5" />
+          Pinned Only
+        </button>
+        {custom.map((tag) => (
           <button
+            key={tag}
             type="button"
-            onClick={() => onTagSelect(null)}
+            aria-pressed={selectedTag === tag}
+            onClick={() => onTagSelect(selectedTag === tag ? null : tag)}
             className={cn(
-              'max-w-full break-all text-left px-2.5 py-1 rounded-md text-xs font-ui border transition-all cursor-pointer',
-              selectedTag === null
-                ? 'bg-[var(--kokpit-surface-3)] text-[var(--kokpit-text-primary)] border-[var(--kokpit-border-strong)] font-medium'
-                : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-muted)] border-[var(--kokpit-border-subtle)] hover:text-[var(--kokpit-text-primary)]',
+              'min-h-9 max-w-full break-words rounded-full border border-[var(--kokpit-border-default)] px-3 text-xs [overflow-wrap:anywhere]',
+              selectedTag === tag
+                ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent-hover)]'
+                : 'text-[var(--kokpit-text-secondary)]',
             )}
           >
-            All
+            #{tag}
           </button>
-
-          {availableTags.map((tag) => {
-            const isSelected = selectedTag === tag;
-            return (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => onTagSelect(isSelected ? null : tag)}
-                className={cn(
-                  'max-w-full break-all text-left px-2.5 py-1 rounded-md text-xs font-ui border transition-all cursor-pointer',
-                  isSelected
-                    ? 'bg-[var(--kokpit-accent-bg)] text-[var(--kokpit-accent)] border-[var(--kokpit-accent)]/50 font-medium'
-                    : 'bg-[var(--kokpit-surface-1)] text-[var(--kokpit-text-muted)] border-[var(--kokpit-border-subtle)] hover:text-[var(--kokpit-text-primary)] hover:border-[var(--kokpit-border-default)]',
-                )}
-              >
-                #{tag}
-              </button>
-            );
-          })}
-        </div>
-      )}
+        ))}
+        <span className="ml-auto text-xs text-[var(--kokpit-text-muted)]">{totalCount} loaded</span>
+      </div>
     </div>
   );
 }
