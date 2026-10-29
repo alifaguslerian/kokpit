@@ -1,4 +1,4 @@
-/* global fetch, AbortSignal, TextEncoder, ReadableStream */
+/* global fetch, AbortSignal, TextEncoder, ReadableStream, FormData, Blob */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';
@@ -8,9 +8,10 @@ import { once } from 'node:events';
 import path from 'node:path';
 import process from 'node:process';
 import { setTimeout } from 'node:timers/promises';
+import { Buffer } from 'node:buffer';
 
 test(
-  'native Workers/D1/R2 material upload, private delivery and 50 MB boundary',
+  'native Workers/D1/R2 private materials, Ideas covers and 50 MB boundary',
   { timeout: 180000 },
   async () => {
     const workspace = process.cwd();
@@ -100,6 +101,91 @@ test(
       }
       assert.ok(ready, output);
       assert.match(output, /R2 Bucket/);
+      const postJson = async (route, body) => {
+        const response = await request(route, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const text = await response.text();
+        assert.equal(response.status, 201, text);
+        return JSON.parse(text).data;
+      };
+      const collection = await postJson('/api/idea-collections', { name: 'Isolated cover test' });
+      const otherCollection = await postJson('/api/idea-collections', {
+        name: 'Isolated reorder test',
+      });
+      const collectionOrder = await request('/api/idea-collections/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: [otherCollection.id, collection.id] }),
+      });
+      assert.equal(collectionOrder.status, 200, await collectionOrder.text());
+      const listedCollections = await request('/api/idea-collections?limit=1');
+      const collectionPage = await listedCollections.json();
+      assert.equal(collectionPage.data[0].id, otherCollection.id);
+      assert.equal(collectionPage.nextOffset, 1);
+      const thought = await postJson('/api/ideas', {
+        content: 'Runtime private cover',
+        isFavorite: true,
+        collectionId: collection.id,
+      });
+      const png = Uint8Array.from(
+        Buffer.from(
+          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+          'base64',
+        ),
+      );
+      const form = new FormData();
+      form.set('file', new Blob([png], { type: 'image/png' }), 'cover.png');
+      const cover = await request(`/api/ideas/${thought.id}/cover`, { method: 'PUT', body: form });
+      const coverText = await cover.text();
+      assert.equal(cover.status, 200, coverText);
+      const coverUrl = JSON.parse(coverText).data.coverUrl;
+      const image = await request(coverUrl);
+      assert.equal(image.status, 200, await image.clone().text());
+      assert.equal(image.headers.get('Cache-Control'), 'private, no-store');
+      assert.deepEqual(new Uint8Array(await image.arrayBuffer()), png);
+      const coverLength = 50 * 1024 * 1024;
+      const largePng = new Uint8Array(coverLength);
+      const chunkOffset = png.length - 12;
+      largePng.set(png.subarray(0, chunkOffset));
+      const paddingLength = coverLength - png.length - 12;
+      const view = new DataView(largePng.buffer);
+      view.setUint32(chunkOffset, paddingLength);
+      largePng.set(new TextEncoder().encode('npAD'), chunkOffset + 4);
+      const crcTable = Uint32Array.from({ length: 256 }, (_, value) => {
+        let crc = value;
+        for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+        return crc >>> 0;
+      });
+      let crc = 0xffffffff;
+      for (let offset = chunkOffset + 4; offset < chunkOffset + paddingLength + 8; offset++)
+        crc = (crc >>> 8) ^ crcTable[(crc ^ largePng[offset]) & 255];
+      view.setUint32(chunkOffset + paddingLength + 8, (crc ^ 0xffffffff) >>> 0);
+      largePng.set(png.subarray(chunkOffset), coverLength - 12);
+      const largeCoverForm = new FormData();
+      largeCoverForm.set('file', new Blob([largePng], { type: 'image/png' }), 'boundary-cover.png');
+      const largeCover = await request(`/api/ideas/${thought.id}/cover`, {
+        method: 'PUT',
+        body: largeCoverForm,
+      });
+      const largeCoverText = await largeCover.text();
+      assert.equal(largeCover.status, 200, largeCoverText);
+      const coverHead = await request(JSON.parse(largeCoverText).data.coverUrl, { method: 'HEAD' });
+      assert.equal(coverHead.status, 200);
+      assert.equal(coverHead.headers.get('Content-Length'), String(coverLength));
+      const clearCollection = await request(`/api/idea-collections/${collection.id}`, {
+        method: 'DELETE',
+      });
+      assert.equal(clearCollection.status, 200, await clearCollection.text());
+      const retained = await request(`/api/ideas/${thought.id}`);
+      const retainedThought = (await retained.json()).data;
+      assert.equal(retainedThought.collectionId, null);
+      assert.equal(retainedThought.isFavorite, true);
+      const deleteThought = await request(`/api/ideas/${thought.id}`, { method: 'DELETE' });
+      assert.equal(deleteThought.status, 200, await deleteThought.text());
+      assert.equal((await request(coverUrl)).status, 404);
       const create = async (route, body) => {
         const response = await request('/api/college' + route, {
           method: 'POST',
