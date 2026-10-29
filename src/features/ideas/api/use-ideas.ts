@@ -1,4 +1,10 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useMutationState,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { listIdeas, getIdea, createIdea, updateIdea, deleteIdea, togglePinIdea } from './ideas-api';
 import type { Idea, ListIdeasParams, CreateIdeaInput, UpdateIdeaInput } from '../types';
@@ -34,8 +40,11 @@ export function useCreateIdea() {
 
   return useMutation({
     mutationFn: (input: CreateIdeaInput) => createIdea(input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all }),
+        queryClient.invalidateQueries({ queryKey: ['idea-collections'] }),
+      ]);
     },
   });
 }
@@ -45,8 +54,11 @@ export function useUpdateIdea() {
 
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UpdateIdeaInput }) => updateIdea(id, input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all }),
+        queryClient.invalidateQueries({ queryKey: ['idea-collections'] }),
+      ]);
     },
   });
 }
@@ -55,9 +67,13 @@ export function useDeleteIdea() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['ideas', 'delete'],
     mutationFn: (id: string) => deleteIdea(id),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all }),
+        queryClient.invalidateQueries({ queryKey: ['idea-collections'] }),
+      ]);
     },
   });
 }
@@ -68,8 +84,18 @@ export function useTogglePinIdea() {
   return useMutation({
     mutationFn: ({ id, isPinned }: { id: string; isPinned?: boolean | undefined }) =>
       togglePinIdea(id, isPinned),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.ideas.all });
     },
   });
+}
+
+export function useUnavailableIdeaIds() {
+  return useMutationState({
+    filters: { mutationKey: ['ideas', 'delete'] },
+    select: (mutation) =>
+      mutation.state.status === 'pending' || mutation.state.status === 'success'
+        ? (mutation.state.variables as string)
+        : null,
+  }).filter((id): id is string => id !== null);
 }
