@@ -1,6 +1,6 @@
 # Kokpit — Deployment
 
-**Version:** 0.7 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-27
+**Version:** 0.8 · **Status:** V1 Deployment Draft · **Updated:** 2026-10-28
 
 Operational runbook for one Cloudflare Worker + Static Assets, private Access gate,
 D1 metadata, private R2 files, Cron jobs and Workers AI content.
@@ -12,12 +12,13 @@ D1 metadata, private R2 files, Cron jobs and Workers AI content.
 > using the existing schema and D1 binding. The configured remote D1 ID is a placeholder.
 > Package 4.3 configures local private R2 and material APIs; 4.4 adds their UI. Package 4.5
 > adds recurring class schedules, descriptions and a locally applied additive migration.
-> Access, scheduled content,
+> Packages 3.4–3.5 add local Ideas collections/favorites/private covers and their UI,
+> with reviewed migration 0003. Access, scheduled content,
 > remote R2 creation and production deployment remain future work.
 
 DEC-054 was a documentation/requirement approval, not a deployment. Package 4.5 subsequently
-grew the implemented local schema from 17 to 18 tables. The remaining additive migrations
-in Data Model (3.4, 6.4–6.5) target 20. Do not rewrite applied migration history or create
+grew the implemented local schema from 17 to 18 tables; 3.4 now brings it to 19.
+The remaining additive migrations in Data Model (6.4–6.5) target 20. Do not rewrite applied migration history or create
 remote resources merely because a requirement is approved.
 Existing private R2 also serves optional Ideas covers; no public image bucket or new binding
 is needed. Include those keys and new metadata in backup/recovery and deletion smoke checks.
@@ -154,10 +155,19 @@ Use version-controlled migrations; do not edit production tables manually or rew
 
 Package 4.5 generated, reviewed and locally applied `0002_closed_mister_sinister.sql`:
 it creates `course_schedule_entries` and adds nullable `courses.description`. Existing
-course/week/material records are preserved; the local schema has 18 tables. Compatibility
+course/week/material records are preserved; that package produced an 18-table schema. Compatibility
 tests apply the older migrations first and verify the new checks, uniqueness and cascades.
 No remote migration or owner demo data is part of this package. See
 [College Schedule](../features/COLLEGE_SCHEDULE.md) for its verification boundary.
+
+Packages 3.4–3.5 locally applied reviewed `0003_spicy_odin.sql`, using additive statements
+to preserve existing Ideas and tags. Existing private R2 serves covers without new bindings
+or remote resource creation. Before production launch, verify private cover upload/open,
+replace/remove/idea deletion, collection SET NULL, bounded pagination/reorder and failure
+recovery under the actual Access gate. Persistent simultaneous compensation failures need
+operational inspection of the exact affected keys; see
+[Ideas collections and covers](../features/IDEAS_COLLECTIONS_AND_COVERS.md). No remote
+migration or deployment was performed by this package.
 
 ```bash
 npx wrangler d1 migrations apply kokpit-db --local
