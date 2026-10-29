@@ -1,9 +1,11 @@
 import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { X, Pin, Plus } from 'lucide-react';
+import { X, Pin, Plus, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { cn } from '@/lib/cn';
 import { useUpdateIdea } from '../api/use-ideas';
+import { useIdeaCollections } from '../api/use-idea-collections';
+import { IdeaCoverEditor } from './IdeaCoverEditor';
 import type { Idea } from '../types';
 
 interface IdeaEditModalProps {
@@ -25,6 +27,11 @@ function IdeaEditForm({ idea, onClose }: IdeaEditFormProps) {
   const [tags, setTags] = useState<string[]>([...idea.tags]);
   const [tagInput, setTagInput] = useState('');
   const [isPinned, setIsPinned] = useState(idea.isPinned);
+  const [isFavorite, setIsFavorite] = useState(idea.isFavorite);
+  const [collectionId, setCollectionId] = useState(idea.collectionId ?? '');
+  const [coverBusy, setCoverBusy] = useState(false);
+  const coverPending = useRef(false);
+  const collections = useIdeaCollections();
 
   const updateIdeaMutation = useUpdateIdea();
 
@@ -50,7 +57,7 @@ function IdeaEditForm({ idea, onClose }: IdeaEditFormProps) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const trimmedContent = content.trim();
-    if (!trimmedContent || submitting.current) return;
+    if (!trimmedContent || submitting.current || coverPending.current) return;
     submitting.current = true;
     setErrorMessage('');
     try {
@@ -59,7 +66,9 @@ function IdeaEditForm({ idea, onClose }: IdeaEditFormProps) {
         input: {
           title: title.trim() ? title.trim() : null,
           content: trimmedContent,
-          isPinned,
+          ...(isPinned !== idea.isPinned ? { isPinned } : {}),
+          ...(isFavorite !== idea.isFavorite ? { isFavorite } : {}),
+          collectionId: collectionId || null,
           tags,
         },
       });
@@ -75,7 +84,7 @@ function IdeaEditForm({ idea, onClose }: IdeaEditFormProps) {
     <Dialog
       isOpen
       onClose={() => {
-        if (!submitting.current) onClose();
+        if (!submitting.current && !coverPending.current) onClose();
       }}
       labelledBy="edit-idea-title"
     >
@@ -88,7 +97,7 @@ function IdeaEditForm({ idea, onClose }: IdeaEditFormProps) {
         </h2>
         <button
           type="button"
-          disabled={updateIdeaMutation.isPending}
+          disabled={updateIdeaMutation.isPending || coverBusy}
           onClick={onClose}
           aria-label="Close dialog"
           className="p-1 rounded text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] hover:bg-white/[0.04] transition-colors cursor-pointer"
@@ -103,7 +112,10 @@ function IdeaEditForm({ idea, onClose }: IdeaEditFormProps) {
             {errorMessage}
           </p>
         )}
-        <fieldset disabled={updateIdeaMutation.isPending} className="min-w-0 space-y-3.5">
+        <fieldset
+          disabled={updateIdeaMutation.isPending || coverBusy}
+          className="min-w-0 space-y-3.5"
+        >
           <div>
             <label
               htmlFor="edit-idea-title-input"
@@ -190,7 +202,54 @@ function IdeaEditForm({ idea, onClose }: IdeaEditFormProps) {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <label htmlFor="idea-collection" className="block text-sm">
+              Collection
+            </label>
+            <select
+              id="idea-collection"
+              value={collectionId}
+              onChange={(event) => setCollectionId(event.target.value)}
+              disabled={collections.isLoading || collections.isError}
+              className="min-h-11 w-full rounded-xl border border-[var(--kokpit-border-default)] bg-[var(--kokpit-surface-2)] px-3 text-sm"
+            >
+              <option value="">No collection</option>
+              {collections.data?.map((collection) => (
+                <option key={collection.id} value={collection.id}>
+                  {collection.name}
+                </option>
+              ))}
+            </select>
+            {collections.isError && (
+              <p role="alert" className="text-sm">
+                Could not load collections.{' '}
+                <button
+                  type="button"
+                  onClick={() => void collections.refetch()}
+                  className="underline"
+                >
+                  Retry collections
+                </button>
+              </p>
+            )}
+          </div>
+          <IdeaCoverEditor
+            idea={idea}
+            onBusy={(busy) => {
+              coverPending.current = busy;
+              setCoverBusy(busy);
+            }}
+          />
           <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--kokpit-border-subtle)]">
+            <button
+              type="button"
+              onClick={() => setIsFavorite((previous) => !previous)}
+              aria-pressed={isFavorite}
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm text-[var(--kokpit-accent)]"
+            >
+              <Star className={cn('size-4', isFavorite && 'fill-current')} />
+              {isFavorite ? 'Favorite' : 'Mark as favorite'}
+            </button>
             <button
               type="button"
               onClick={() => setIsPinned((prev) => !prev)}
