@@ -1,6 +1,6 @@
 # Kokpit — Implementation Plan
 
-**Version:** 1.1 | **Status:** Approved V1 implementation plan | **Updated:** 2026-10-27
+**Version:** 1.2 | **Status:** Approved V1 implementation plan | **Updated:** 2026-10-28
 
 Implement the documented V1 in milestones and reviewable work packages. This plan controls order
 and acceptance; [AGENTS](../../AGENTS.md) controls agent behavior. Read the
@@ -11,11 +11,11 @@ and [Deployment](../engineering/DEPLOYMENT.md) for the relevant task before codi
 
 ## Progress and execution
 
-Baseline packages **1.1–3.3** and College packages **4.1–4.5** are complete locally.
-Milestone 4 is complete; the next implementation package is
-**3.4 Ideas Collections, Favorites & Private Covers APIs**.
+Packages **1.1–3.5** and College packages **4.1–4.5** are complete locally.
+Milestones 3 and 4 are complete locally; the next implementation package is
+**5.1 Tracks, Upload & Private Streaming**.
 The owner approved all latest feature-page images on 2026-10-25 and requested functional
-controls plus aligned specifications (DEC-054). Packages 3.4–3.5 remain pending;
+controls plus aligned specifications (DEC-054). Packages 3.4–3.5 are now delivered;
 News additions join the already-pending 6.4–6.5. This documentation approval does not start
 implementation or change completed baseline evidence. Execution order is:
 **4.3 → 4.4 → 4.5 → 3.4 → 3.5 → 5.1–5.3 → 6.1–6.5 → Milestones 7–8**.
@@ -166,7 +166,7 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | --- | --- | --- | --- |
 | 1 | Foundation | 1.1–1.7 | Complete |
 | 2 | App Shell & Home | 2.1–2.3 | Complete |
-| 3 | Ideas & Library | 3.1–3.5 | Baseline 3.1–3.3 complete; approved additions 3.4–3.5 pending after 4.5 |
+| 3 | Ideas & Library | 3.1–3.5 | Complete locally, including approved additions 3.4–3.5 |
 | 4 | College | 4.1–4.5 | In progress |
 | 5 | Music | 5.1–5.3 | Pending |
 | 6 | Quotes & News | 6.1–6.5 | Pending |
@@ -190,8 +190,8 @@ to interpret old references; do not redo completed work or silently reinterpret 
 | 3.1 | Ideas Backend | 5.1–5.3 | Complete |
 | 3.2 | Ideas UI, Home Capture & Verification | 5.4–5.7 | Complete |
 | 3.3 | Library & Quick Links | 6.1–6.5 | Complete |
-| 3.4 | Ideas Collections, Favorites & Private Covers APIs | New DEC-054 package | Pending after 4.5 |
-| 3.5 | Approved Ideas & Library Pages, Integration & Verification | New DEC-054 package | Pending after 3.4 |
+| 3.4 | Ideas Collections, Favorites & Private Covers APIs | New DEC-054 package | Complete locally |
+| 3.5 | Approved Ideas & Library Pages, Integration & Verification | New DEC-054 package | Complete locally |
 | 4.1 | Semester, Course & Week APIs | 7.1–7.3 | Complete |
 | 4.2 | College Pages, Home Preview & Verification | 7.4–7.8 | Complete |
 | 4.3 | Private Storage & Material APIs | 8.1–8.6 | Complete |
@@ -1009,24 +1009,24 @@ Test:
 
 ### 3.4 Ideas Collections, Favorites & Private Covers APIs
 
-**Status:** Pending after 4.5 | **Legacy Phase checklist:** None; DEC-054 addition
+**Status:** Complete locally (2026-10-28) | **Legacy Phase checklist:** None; DEC-054 addition
 
 **Goal:** Extend existing Ideas APIs without breaking capture/search/tags/pins or old records.
 This package executes after College 4.5 so private R2 infrastructure is available.
 
-- [ ] Add reviewed additive migration: idea_collections, optional collection FK, default-false
+- [x] Add reviewed additive migration: idea_collections, optional collection FK, default-false
   is_favorite and nullable cover metadata. Apply locally and verify existing records survive.
-- [ ] Collection list/create/rename/delete and atomic complete reorder; normalize per-owner
+- [x] Collection list/create/rename/delete and atomic complete reorder; normalize per-owner
   name uniqueness. Reject foreign IDs and duplicate/missing reorder IDs without partial writes.
-- [ ] Add optional single collection assignment and desired-state favorite updates to Ideas.
+- [x] Add optional single collection assignment and desired-state favorite updates to Ideas.
   Keep pins independent; preserve existing q/tag/pinned/limit/offset clients and response shape.
-- [ ] Support intersecting collection/favorite/search/tag filters and stable ID tie-breakers.
+- [x] Support intersecting collection/favorite/search/tag filters and stable ID tie-breakers.
   Collection delete clears membership and preserves ideas, tags, covers, pins and favorites.
-- [ ] Upload/replace/remove private JPEG/PNG/WebP cover in the existing edit flow, validate
+- [x] Upload/replace/remove private JPEG/PNG/WebP cover in the existing edit flow, validate
   actual type/size and bounded dimensions, and deliver through owned private routes.
-- [ ] Cover failure/replace/delete coordinates R2/D1 rollback and cleanup; deleting an idea
+- [x] Cover failure/replace/delete coordinates R2/D1 rollback and cleanup; deleting an idea
   cleans its cover safely. Never send private content to AI or an external image source.
-- [ ] Test upgrade compatibility, ownership/legacy inconsistent ancestry, filters/pagination,
+- [x] Test upgrade compatibility, ownership/legacy inconsistent ancestry, filters/pagination,
   favorite/pin independence, collection delete/reorder rollback, cover privacy/type/size/failures.
 
 **Acceptance:** New state survives reload; old ideas remain usable with no collection/cover
@@ -1035,24 +1035,32 @@ Run relevant unit/API checks, lint, strict typecheck and build; update Data Mode
 
 ### 3.5 Approved Ideas & Library Pages, Integration & Verification
 
-**Status:** Pending after 3.4 | **Legacy Phase checklist:** None; DEC-054 addition
+**Status:** Complete locally (2026-10-28) | **Legacy Phase checklist:** None; DEC-054 addition
 
-- [ ] Match approved Ideas v2: paper composer, readable ordered card grid, tag/search controls,
+- [x] Match approved Ideas v2: paper composer, readable ordered card grid, tag/search controls,
   collection preview/manager, independent pin/star controls and favorite preview/full view.
-- [ ] New/View all/select/edit/delete/reorder/assignment actions must work; full lists are
+- [x] New/View all/select/edit/delete/reorder/assignment actions must work; full lists are
   reachable beyond four collection or three favorite preview items and pagination limits.
-- [ ] Optional cover editing stays outside quick capture; image failure falls back to readable
+- [x] Optional cover editing stays outside quick capture; image failure falls back to readable
   text. Preserve composer drafts, error recovery and newer editors during late requests.
-- [ ] Match approved Library appearance while retaining real shortcuts, groups, favorites,
+- [x] Match approved Library appearance while retaining real shortcuts, groups, favorites,
   one-click opening, edit/delete forms and full-list ordering semantics under filters.
-- [ ] Every drag/menu/star/pencil/Add tile has an accessible real action; keyboard reorder
+- [x] Every drag/menu/star/pencil/Add tile has an accessible real action; keyboard reorder
   is required. Do not introduce a new link entity, default personal records or a reading shelf.
-- [ ] Check desktop/mobile, focus/reading order, loading/empty/filtered/error states, mutation
+- [x] Check desktop/mobile, focus/reading order, loading/empty/filtered/error states, mutation
   synchronization, route/history, long text, R2 cover access and existing Home capture/link regressions.
 
 **Acceptance:** Every approved Ideas/Library control works with real data; Home stays a
 lightweight preview; audio provider lifetime is unaffected. Run relevant browser/unit/API tests,
 lint, strict typecheck, format and build; compare captures to the selected references.
+
+**Delivery:** Reviewed additive migration 0003 is locally applied; the current schema has
+19 tables. Collections, independent favorites, owned covers and the approved Ideas/Library
+pages are implemented. Validation passed: 206 unit/API/migration tests, 83 browser regressions,
+one isolated native Workers/D1/R2 test (including a 50 MiB cover), lint, strict typecheck,
+format and build. See [Ideas collections and covers](../features/IDEAS_COLLECTIONS_AND_COVERS.md)
+for API, recovery and validation limits. No production migration/deployment is included.
+Stop at this boundary; 5.1 requires owner authorization.
 
 ## Milestone 4: College
 
@@ -1406,11 +1414,11 @@ the approved two-column College overview are implemented. Desktop uses readable 
 columns with panel-local scrolling when needed; narrow panels use a day agenda. Existing
 material/R2 deletion safeguards precede class cascades. Reviewed additive migration
 `0002_closed_mister_sinister.sql` is applied locally, preserving earlier rows and migration
-history; the schema now has 18 tables. Validation passed: 173 unit/API/migration tests,
+history; that package produced 18 tables. Validation passed: 173 unit/API/migration tests,
 67 browser regressions, one isolated native Workers/D1/R2 runtime test, lint, strict
 typecheck, format and build. See [College Schedule](../features/COLLEGE_SCHEDULE.md)
 for contracts and verification. No production migration, Access verification or deployment
-is included. Stop here until the owner authorizes 3.4.
+is included. The owner subsequently authorized 3.4–3.5; their delivery is recorded above.
 
 ## Milestone 5: Music
 
