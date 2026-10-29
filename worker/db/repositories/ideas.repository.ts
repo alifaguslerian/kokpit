@@ -1,7 +1,32 @@
-import { eq, and, desc, like, or, inArray, sql } from 'drizzle-orm';
+import { eq, and, desc, inArray, sql, isNull } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
 import type { Database } from '../client';
 import { ideas, ideaTags, ideaTagLinks } from '../schema';
+
+export function ownedIdeaScope(userId: string) {
+  return and(
+    eq(ideas.userId, userId),
+    sql`(${ideas.collectionId} IS NULL OR EXISTS (SELECT 1 FROM idea_collections c WHERE c.id = ${ideas.collectionId} AND c.user_id = ${userId}))`,
+  );
+}
+export type IdeaRecord = typeof ideas.$inferSelect;
+function ideaResponse(row: IdeaRecord, tags: string[]): IdeaWithTags {
+  return {
+    id: row.id,
+    userId: row.userId,
+    title: row.title,
+    content: row.content,
+    isPinned: Boolean(row.isPinned),
+    isFavorite: Boolean(row.isFavorite),
+    collectionId: row.collectionId,
+    coverUrl: row.coverR2Key
+      ? `/api/ideas/${encodeURIComponent(row.id)}/cover?v=${encodeURIComponent(row.coverR2Key.split('/').at(-1)!)}`
+      : null,
+    tags,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
 
 export interface IdeaWithTags {
   id: string;
@@ -9,6 +34,9 @@ export interface IdeaWithTags {
   title: string | null;
   content: string;
   isPinned: boolean;
+  isFavorite: boolean;
+  collectionId: string | null;
+  coverUrl: string | null;
   tags: string[];
   createdAt: string;
   updatedAt: string;
@@ -18,6 +46,9 @@ export interface ListIdeasFilters {
   q?: string | undefined;
   tag?: string | undefined;
   pinned?: boolean | undefined;
+  favorite?: boolean | undefined;
+  collectionId?: string | undefined;
+  sort?: 'updated' | undefined;
   limit?: number | undefined;
   offset?: number | undefined;
 }
@@ -28,6 +59,8 @@ export interface CreateIdeaData {
   title: string | null;
   content: string;
   isPinned: boolean;
+  isFavorite?: boolean | undefined;
+  collectionId?: string | null | undefined;
   tags?: string[] | undefined;
   createdAt: string;
   updatedAt: string;
@@ -37,6 +70,8 @@ export interface UpdateIdeaData {
   title?: string | null | undefined;
   content?: string | undefined;
   isPinned?: boolean | undefined;
+  isFavorite?: boolean | undefined;
+  collectionId?: string | null | undefined;
   tags?: string[] | undefined;
   updatedAt: string;
 }
@@ -45,11 +80,17 @@ export class IdeasRepository {
   constructor(private readonly db: Database) {}
 
   async list(userId: string, filters?: ListIdeasFilters): Promise<IdeaWithTags[]> {
-    const conditions = [eq(ideas.userId, userId)];
+    const conditions = [ownedIdeaScope(userId)];
+    if (filters?.favorite !== undefined)
+      conditions.push(eq(ideas.isFavorite, filters.favorite ? 1 : 0));
+    if (filters?.collectionId) conditions.push(eq(ideas.collectionId, filters.collectionId));
 
     if (filters?.q && filters.q.trim()) {
-      const searchTerm = `%${filters.q.trim()}%`;
-      conditions.push(or(like(ideas.title, searchTerm), like(ideas.content, searchTerm))!);
+      const searchTerm = filters.q.trim();
+      // Literal substring search avoids wildcard surprises and D1's short LIKE-pattern limit.
+      conditions.push(
+        sql`(instr(lower(COALESCE(${ideas.title}, '')), lower(${searchTerm})) > 0 OR instr(lower(${ideas.content}), lower(${searchTerm})) > 0)`,
+      );
     }
 
     if (filters?.pinned !== undefined) {
@@ -79,7 +120,11 @@ export class IdeasRepository {
       .select()
       .from(ideas)
       .where(and(...conditions))
-      .orderBy(desc(ideas.isPinned), desc(ideas.createdAt), desc(ideas.id))
+      .orderBy(
+        ...(filters?.sort === 'updated'
+          ? [desc(ideas.updatedAt), desc(ideas.id)]
+          : [desc(ideas.isPinned), desc(ideas.createdAt), desc(ideas.id)]),
+      )
       .limit(limit)
       .offset(offset);
 
@@ -90,23 +135,14 @@ export class IdeasRepository {
     const ideaIds = rows.map((r) => r.id);
     const tagMap = await this.getTagsForIdeaIds(ideaIds, userId);
 
-    return rows.map((row) => ({
-      id: row.id,
-      userId: row.userId,
-      title: row.title,
-      content: row.content,
-      isPinned: Boolean(row.isPinned),
-      tags: tagMap.get(row.id) || [],
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }));
+    return rows.map((row) => ideaResponse(row, tagMap.get(row.id) || []));
   }
 
   async getById(id: string, userId: string): Promise<IdeaWithTags | null> {
     const [row] = await this.db
       .select()
       .from(ideas)
-      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)))
+      .where(and(eq(ideas.id, id), ownedIdeaScope(userId)))
       .limit(1);
 
     if (!row) {
@@ -115,16 +151,7 @@ export class IdeasRepository {
 
     const tagMap = await this.getTagsForIdeaIds([id], userId);
 
-    return {
-      id: row.id,
-      userId: row.userId,
-      title: row.title,
-      content: row.content,
-      isPinned: Boolean(row.isPinned),
-      tags: tagMap.get(id) || [],
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    };
+    return ideaResponse(row, tagMap.get(id) || []);
   }
 
   async create(data: CreateIdeaData): Promise<IdeaWithTags> {
@@ -134,6 +161,8 @@ export class IdeasRepository {
       title: data.title,
       content: data.content,
       isPinned: data.isPinned ? 1 : 0,
+      isFavorite: data.isFavorite ? 1 : 0,
+      collectionId: data.collectionId ?? null,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     });
@@ -144,16 +173,7 @@ export class IdeasRepository {
       ...this.tagStatements(data.id, data.userId, tags, data.createdAt),
     ]);
 
-    return {
-      id: data.id,
-      userId: data.userId,
-      title: data.title,
-      content: data.content,
-      isPinned: data.isPinned,
-      tags,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
+    return (await this.getById(data.id, data.userId))!;
   }
 
   async update(id: string, userId: string, data: UpdateIdeaData): Promise<IdeaWithTags | null> {
@@ -177,14 +197,15 @@ export class IdeasRepository {
     if (data.isPinned !== undefined) {
       updateValues.isPinned = data.isPinned ? 1 : 0;
     }
+    if (data.isFavorite !== undefined) updateValues.isFavorite = data.isFavorite ? 1 : 0;
+    if (data.collectionId !== undefined) updateValues.collectionId = data.collectionId;
 
     const update = this.db
       .update(ideas)
       .set(updateValues)
-      .where(and(eq(ideas.id, id), eq(ideas.userId, userId)));
+      .where(and(eq(ideas.id, id), ownedIdeaScope(userId)));
 
     const statements: [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]] = [update];
-    let finalTags = existing.tags;
     if (data.tags !== undefined) {
       statements.push(
         this.db
@@ -200,20 +221,10 @@ export class IdeasRepository {
           ),
       );
       statements.push(...this.tagStatements(id, userId, data.tags, data.updatedAt));
-      finalTags = data.tags;
     }
     await this.db.batch(statements);
 
-    return {
-      id,
-      userId,
-      title: data.title !== undefined ? data.title : existing.title,
-      content: data.content !== undefined ? data.content : existing.content,
-      isPinned: data.isPinned !== undefined ? data.isPinned : existing.isPinned,
-      tags: finalTags,
-      createdAt: existing.createdAt,
-      updatedAt: data.updatedAt,
-    };
+    return this.getById(id, userId);
   }
 
   async delete(id: string, userId: string): Promise<boolean> {
@@ -222,22 +233,20 @@ export class IdeasRepository {
       return false;
     }
 
-    await this.db.batch([
+    const scope = and(eq(ideas.id, id), ownedIdeaScope(userId), isNull(ideas.coverR2Key));
+    const [, deleted] = await this.db.batch([
       this.db
         .delete(ideaTagLinks)
         .where(
           and(
             eq(ideaTagLinks.ideaId, id),
-            inArray(
-              ideaTagLinks.ideaId,
-              this.db.select({ id: ideas.id }).from(ideas).where(eq(ideas.userId, userId)),
-            ),
+            inArray(ideaTagLinks.ideaId, this.db.select({ id: ideas.id }).from(ideas).where(scope)),
           ),
         ),
-      this.db.delete(ideas).where(and(eq(ideas.id, id), eq(ideas.userId, userId))),
+      this.db.delete(ideas).where(scope).returning({ id: ideas.id }),
     ]);
 
-    return true;
+    return deleted.length > 0;
   }
 
   private async getTagsForIdeaIds(
