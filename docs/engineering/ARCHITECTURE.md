@@ -1,6 +1,6 @@
 # Kokpit — Architecture
 
-**Version:** 1.0 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-27
+**Version:** 1.1 · **Status:** V1 architecture and approved pending extensions · **Updated:** 2026-10-28
 
 Private single-user workspace, one repository, one logical Cloudflare deployment.
 This document owns system boundaries; it does not redefine product or visual requirements.
@@ -48,8 +48,10 @@ content jobs and production resources remain pending.
 DEC-054 approves feature-page requirements, including class schedule, Ideas collections/
 favorites/covers and News saves/topics. They use the same stack and domain boundaries;
 they are not implemented by the documentation approval itself. The schedule is now delivered
-through the same route/service/repository boundaries; other additions remain pending. The Data Model distinguishes
-the original 17-table baseline, the current 18-table schema and the approved 20-table target.
+through the same route/service/repository boundaries. Packages 3.4–3.5 now implement Ideas
+collections/favorites/private covers and the approved Ideas/Library pages; News additions
+remain pending. The Data Model distinguishes the original 17-table baseline, current
+19-table schema and approved 20-table target.
 Production frontend and `/api/*` share an origin and deploy together.
 Use Workers Static Assets, not legacy Workers Sites.
 
@@ -94,8 +96,8 @@ Conceptual page routes (exact supporting route names are implementation details)
 College may nest semester/course/week paths; Music may nest playlist paths.
 Current College routes are `/college`, `/college/courses/:courseId` and
 `/college/weeks/:weekId`; `?semester=<id>` preserves the overview selection.
-Package 4.4 adds `?view=materials` to the semester overview; pending News/Ideas views
-use validated feature-local query parameters from Approved UI Features. These additions
+Package 4.4 adds `?view=materials` to the semester overview; Ideas now implements feature-local
+collection/favorite/search/tag/pin query parameters. Pending News views follow Approved UI Features. These additions
 do not create more primary destinations or an alternate global navigation system.
 Lazy-load deeper feature routes where useful. Home reads lightweight summaries from their
 own modules; it must not import complete College management or Music library functionality.
@@ -176,7 +178,7 @@ Future public accounts would require a separate authentication review; data read
 ## D1, R2 and uploads
 
 D1 stores metadata and relationships. R2 stores audio, artwork, College PDFs/slides/documents/images.
-The [Data Model](DATA_MODEL.md) defines the current 18-table schema and approved
+The [Data Model](DATA_MODEL.md) defines the current 19-table schema and approved
 20-table target. New fields/tables require later additive migrations, not edits to applied SQL.
 
 - Keep R2 private; no unrestricted browser bucket access or public file URLs.
@@ -208,6 +210,11 @@ Ideas covers reuse the private R2 provider and owner-checked byte delivery. Stor
 metadata in D1; validate JPEG/PNG/WebP bytes, size and bounded thumbnail dimensions. Cover
 replace/remove/delete uses the same rollback and partial-cleanup discipline as material files.
 No private cover URL, object key or idea content goes to quote/news AI or an image provider.
+Packages 3.4–3.5 implement these boundaries with a bounded streamed multipart reader,
+image-container/dimension validation, compare-and-set cover metadata and native private
+GET/HEAD delivery. Collection reorder uses one SQL statement with bounded JSON bindings.
+See [Ideas collections and covers](../features/IDEAS_COLLECTIONS_AND_COVERS.md) for partial
+failure recovery and verification limits; no durable cleanup queue is introduced.
 
 ## Approved feature extensions
 
