@@ -56,7 +56,7 @@ async function fixture(run, { width = 1366, height = 900 } = {}) {
     const override = overrides.get(`${request.method()} ${url.pathname}`);
     if (override && (await override(route))) return;
     const response = await app.request(
-      url.pathname + url.search,
+      request.url(),
       {
         method: request.method(),
         headers: request.headers(),
@@ -418,6 +418,7 @@ test('failed pin, favorite and delete actions report errors and leave content in
     await page.getByRole('button', { name: 'Pin thought to top', exact: true }).click();
     await page.getByRole('alert').first().waitFor();
     assert.equal((await api(`/api/ideas/${idea.id}`)).body.data.isPinned, false);
+    await page.getByLabel('Thought actions', { exact: true }).click();
     await page.getByRole('button', { name: 'Delete thought', exact: true }).click();
     await page.getByRole('button', { name: 'Delete?', exact: true }).click();
     await page
@@ -430,6 +431,7 @@ test('failed pin, favorite and delete actions report errors and leave content in
     await page.getByRole('button', { name: 'Mark as favorite', exact: true }).click();
     await page.getByRole('alert').first().waitFor();
     assert.equal((await api(`/api/quick-links/${link.id}`)).body.data.isFavorite, false);
+    await page.getByLabel('Shortcut actions', { exact: true }).click();
     await page.getByRole('button', { name: 'Delete shortcut', exact: true }).click();
     await page.getByRole('button', { name: 'Delete?', exact: true }).click();
     await page
