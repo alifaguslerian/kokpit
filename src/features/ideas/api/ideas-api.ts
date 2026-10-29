@@ -6,6 +6,9 @@ export async function listIdeas(params?: ListIdeasParams): Promise<Idea[]> {
   if (params?.q) queryParams.q = params.q;
   if (params?.tag) queryParams.tag = params.tag;
   if (params?.pinned !== undefined) queryParams.pinned = params.pinned;
+  if (params?.favorite !== undefined) queryParams.favorite = params.favorite;
+  if (params?.collectionId) queryParams.collectionId = params.collectionId;
+  if (params?.sort) queryParams.sort = params.sort;
   if (params?.limit !== undefined) queryParams.limit = params.limit;
   if (params?.offset !== undefined) queryParams.offset = params.offset;
 
