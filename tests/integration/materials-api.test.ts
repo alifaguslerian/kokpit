@@ -473,7 +473,7 @@ test('the additive recent-material index is applied without changing the baselin
   const tables = await ctx.DB.prepare(
     "SELECT COUNT(*) AS total FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
   ).first<{ total: number }>();
-  assert.equal(tables?.total, 18);
+  assert.equal(tables?.total, 19);
 });
 
 test('oversize declarations reject with 413 before inconsistent Content-Length metadata', async () => {
