@@ -4,21 +4,27 @@ import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/cn';
 import { useCreateIdea } from '../api/use-ideas';
 
-const SUGGESTED_TAGS = ['Idea', 'Question', 'To-do', 'College', 'Personal', 'Music'];
+const SUGGESTED_TAGS = ['Idea', 'Question', 'To-do', 'Random', 'College', 'Personal', 'Music'];
 
 interface IdeaComposerProps {
   onSuccess?: () => void;
   className?: string;
   autoFocus?: boolean;
+  paper?: boolean;
 }
 
-export function IdeaComposer({ onSuccess, className, autoFocus = false }: IdeaComposerProps) {
+export function IdeaComposer({
+  onSuccess,
+  className,
+  autoFocus = false,
+  paper = false,
+}: IdeaComposerProps) {
   const formId = useId();
   const submitting = useRef(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
-  const [showTitleInput, setShowTitleInput] = useState(false);
+  const [showTitleInput, setShowTitleInput] = useState(paper);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [customTagInput, setCustomTagInput] = useState('');
   const [showCustomTagInput, setShowCustomTagInput] = useState(false);
@@ -73,7 +79,7 @@ export function IdeaComposer({ onSuccess, className, autoFocus = false }: IdeaCo
       });
       setContent('');
       setTitle('');
-      setShowTitleInput(false);
+      setShowTitleInput(paper);
       setSelectedTags([]);
       setCustomTagInput('');
       setShowCustomTagInput(false);
@@ -97,9 +103,12 @@ export function IdeaComposer({ onSuccess, className, autoFocus = false }: IdeaCo
     <div
       className={cn(
         'bg-[var(--kokpit-surface-1)] border border-[var(--kokpit-border-default)] rounded-[var(--radius-lg)] p-4 sm:p-5 shadow-[var(--shadow-card)] transition-all duration-[var(--motion-default)] hover:border-[var(--kokpit-border-strong)]',
+        paper &&
+          'paper-panel bg-[var(--kokpit-paper)]! [&_input]:text-[var(--kokpit-paper-ink)]! [&_textarea]:bg-transparent! [&_textarea]:border-[var(--kokpit-paper-rule)]! [&_input]:border-[var(--kokpit-paper-rule)]! [&_textarea]:text-[var(--kokpit-paper-ink)]! [&_textarea]:placeholder:text-[var(--kokpit-paper-muted)]! [&_input]:placeholder:text-[var(--kokpit-paper-muted)]! [&_label]:text-[var(--kokpit-paper-ink)]! [&_button:not([type=submit])]:text-[var(--kokpit-paper-ink)]! [&_button:not([type=submit])]:bg-transparent! [&_button:not([type=submit])]:border-[var(--kokpit-paper-rule)]! [&_button[aria-pressed=true]]:bg-[var(--kokpit-paper-ink)]! [&_button[aria-pressed=true]]:text-[var(--kokpit-paper)]! [&_button[type=submit]]:bg-[var(--kokpit-paper-ink)]! [&_button[type=submit]]:text-[var(--kokpit-paper)]! [&_span]:text-inherit [&_kbd]:bg-transparent! [&_kbd]:text-[var(--kokpit-paper-muted)]! [&_p]:text-[var(--kokpit-paper-ink)]!',
         className,
       )}
     >
+      {paper && <h2 className="mb-3 font-ui text-lg font-medium">Quick thought</h2>}
       <form onSubmit={(e) => void handleSubmit(e)}>
         {errorMessage && (
           <p role="alert" className="mb-3 text-sm text-[var(--kokpit-text-primary)]">
@@ -126,18 +135,20 @@ export function IdeaComposer({ onSuccess, className, autoFocus = false }: IdeaCo
                   maxLength={200}
                   className="min-w-0 flex-1 bg-transparent border-b border-[var(--kokpit-border-subtle)] focus:border-[var(--kokpit-accent)] font-ui text-lg text-[var(--kokpit-text-primary)] placeholder-[var(--kokpit-text-muted)] pb-1.5 focus:outline-none transition-colors"
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTitle('');
-                    setShowTitleInput(false);
-                  }}
-                  title="Remove title"
-                  aria-label="Remove title"
-                  className="p-1 text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                {!paper && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTitle('');
+                      setShowTitleInput(false);
+                    }}
+                    title="Remove title"
+                    aria-label="Remove title"
+                    className="p-1 text-[var(--kokpit-text-muted)] hover:text-[var(--kokpit-text-primary)] transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </>
           ) : null}
