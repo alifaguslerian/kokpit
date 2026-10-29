@@ -318,11 +318,12 @@ describe('Backend Foundation & API Safety Integration Tests', () => {
   });
 
   describe('D1 Schema Definition Completeness', () => {
-    test('exports the 17 baseline tables and the approved College schedule table', () => {
+    test('exports the baseline tables and approved College schedule and Ideas collection tables', () => {
       const expectedTables = [
         'users',
         'userSettings',
         'ideas',
+        'ideaCollections',
         'ideaTags',
         'ideaTagLinks',
         'quickLinks',
