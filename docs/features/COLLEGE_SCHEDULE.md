@@ -1,6 +1,6 @@
 # College schedule and overview
 
-**Version:** 1.0 | **Status:** Package 4.5 implemented locally | **Updated:** 2026-10-27
+**Version:** 1.1 | **Status:** Package 4.5 implemented locally | **Updated:** 2026-10-28
 
 College now has recurring classes and optional course descriptions. The approved overview
 keeps owned semester selection/activation, course rows at left, and Weekly Schedule plus
@@ -78,7 +78,8 @@ remaining course list after its removed row/dialog unmounts.
 Generated migration 0002_closed_mister_sinister.sql creates course_schedule_entries with
 range checks, unique interval/indexes and owner/course cascading FKs, then adds nullable
 courses.description. Reviewed and applied locally; existing rows preserved and applied
-history unchanged. Current schema: 18 tables; approved future Ideas/News additions target 20.
+history unchanged. Package 4.5 produced 18 tables; subsequent package 3.4 brings the current
+schema to 19. The approved future News save table completes the 20-table target.
 
 Course/semester deletion runs existing R2-aware material cleanup first. Only successful
 parent deletion cascades classes. Preflight and final SQL guards reject foreign class rows,
@@ -104,7 +105,9 @@ This local transport issue does not establish production behavior.
 
 Fixtures are isolated. Captures remain under ignored .wrangler/screenshots/college-45.
 Local verification does not establish production Access or remote D1/R2 behavior.
-No production resources or bindings changed. The next package is 3.4.
+No production resources or bindings changed. The next package at the 4.5 boundary was 3.4;
+3.4–3.5 have since been delivered, with their contracts in
+[Ideas collections and covers](IDEAS_COLLECTIONS_AND_COVERS.md). The next package is 5.1.
 
 References: [approved College](../design/concepts/2026-10-25/01-college-v2.png),
 [approved feature contract](APPROVED_UI_FEATURES.md), [material lifecycle](COLLEGE_MATERIALS.md),
