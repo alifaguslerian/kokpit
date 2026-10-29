@@ -52,18 +52,24 @@ three recent semester materials and a complete paginated materials view. Confirm
 and hierarchy deletion coordinates R2 cleanup with metadata and supports partial-failure retry.
 **Package 4.5 is complete:** recurring class APIs/editor, saved-owner-timezone week/date
 display, readable overlaps/weekends, optional course descriptions and the approved College
-overview. Milestone 4 is complete locally; next is **3.4: Ideas Collections, Favorites & Private Covers APIs**.
-The order is 3.4 → 3.5, then Milestones 5–8. News saves/topics join 6.4–6.5.
-The target schema is 20 tables; the implemented schema now has 18. Remaining Ideas/News
-tables, fields and private cover handling are approved pending work.
+overview. Milestone 4 is complete locally.
+**Packages 3.4–3.5 are complete locally:** optional Ideas collections, independent favorites,
+private cover upload/replace/remove and the approved Ideas/Library pages. Collection managers
+and favorite grids expose complete lists; combined URL filters preserve browser history.
+The target schema is 20 tables; the implemented schema now has 19. Remaining News fields
+and its saved-article table are approved pending work. Next is **5.1: Tracks, Upload & Private Streaming**;
+continue Milestones 5–8 in order. News saves/topics join 6.4–6.5.
 Real playback, hourly D1 quotes, News ingestion and private production
 deployment remain pending. Cloudflare Access is part of that deployment, not a custom login.
 
-The Worker currently exposes `/api/system/health`, `/api/ideas`, `/api/quick-links`
+The Worker currently exposes `/api/system/health`, `/api/ideas` (including private covers),
+`/api/idea-collections`, `/api/quick-links`
 and `/api/college` (including materials) plus `/api/files/:id`. The
 [College materials contract](docs/features/COLLEGE_MATERIALS.md) documents the upload protocol,
 type/size validation, privacy, pagination and recovery. The [package 4.1 contract](docs/planning/IMPLEMENTATION_PLAN.md#41-semester-course--week-apis)
 documents College routes and response shapes; final deletion guards still protect inaccessible descendants and concurrent file additions.
+The [Ideas collections/cover contract](docs/features/IDEAS_COLLECTIONS_AND_COVERS.md) documents
+the additive migration, bounded API lists, cover validation and failure-recovery limits.
 See the [pre-College audit fixes](docs/planning/AUDIT_FIXES.md) for regression coverage
 and validation limits.
 See the [implementation plan](docs/planning/IMPLEMENTATION_PLAN.md) for the remaining work.
