@@ -165,7 +165,7 @@ async function fixture(run, viewport = { width: 1366, height: 900 }) {
     const override = overrides.get(`${request.method()} ${url.pathname}`);
     if (override && (await override(route))) return;
     const response = await app.request(
-      url.pathname + url.search,
+      request.url(),
       {
         method: request.method(),
         headers: request.headers(),
@@ -628,7 +628,7 @@ test('College keeps its header stable through loading, failed read, and empty re
   });
 });
 
-test('Ideas is a readable single stream and a keyboard pin persists through search and filtering', async () => {
+test('Ideas uses an ordered card grid and a keyboard pin persists through search and filtering', async () => {
   await fixture(
     async ({ page, api, create, go, screenshot }) => {
       const first = await create('/api/ideas', {
@@ -664,22 +664,20 @@ test('Ideas is a readable single stream and a keyboard pin persists through sear
         }),
       );
       assert.ok(
-        secondBox.y >= firstBox.y + firstBox.height,
-        'Saved thoughts should read vertically rather than across columns',
+        Math.abs(secondBox.y - firstBox.y) <= 2 && secondBox.x > firstBox.x,
+        'Saved thoughts follow DOM order across the approved desktop grid',
       );
-      assert.ok(Math.abs(secondBox.x - firstBox.x) <= 2);
+      assert.ok(secondBox.x >= firstBox.x + 200);
       assert.equal(await cards.count(), 2);
       await page.getByRole('button', { name: 'Pinned Only', exact: true }).click();
       await stream
         .getByRole('heading', { name: 'Another note', exact: true })
         .waitFor({ state: 'hidden' });
+      await editButtons.first().waitFor();
       assert.equal(await editButtons.count(), 1);
       await page.getByLabel('Search thoughts', { exact: true }).fill('Reading note');
       await stream.getByRole('heading', { name: 'Reading note', exact: true }).waitFor();
-      assert.equal(
-        await item.getByRole('button', { name: 'Unpin thought', exact: true }).isVisible(),
-        true,
-      );
+      await item.getByRole('button', { name: 'Unpin thought', exact: true }).waitFor();
       await page.reload();
       await stream.getByRole('button', { name: 'Unpin thought', exact: true }).waitFor();
       await assertFits(page);
@@ -708,7 +706,7 @@ test('Library portals keep a vertical primary link and accessible actions with l
       await go('/library');
       const primary = page.locator('a[href="https://example.com/portal"]').first();
       const heading = primary.getByRole('heading', { name: longName, exact: true });
-      const icon = primary.locator('svg').first();
+      const icon = primary.locator(':scope > div').first();
       const iconBox = await icon.boundingBox();
       const headingBox = await heading.boundingBox();
       assert.ok(
