@@ -1,6 +1,6 @@
 # Kokpit — File Structure
 
-**Version:** 1.1 | **Status:** V1 structure reference | **Updated:** 2026-10-27
+**Version:** 1.2 | **Status:** V1 structure reference | **Updated:** 2026-10-28
 
 This document defines where code belongs. Product behavior, runtime design, and
 persisted entities remain in [PRD](../product/PRD.md),
@@ -8,7 +8,7 @@ persisted entities remain in [PRD](../product/PRD.md),
 
 ## Current scaffold and growth
 
-Baseline packages 1.1–3.3 are implemented. `src/app/` owns the routed shell/providers;
+Packages 1.1–3.5 and 4.1–4.5 are implemented locally. `src/app/` owns the routed shell/providers;
 Home, College, Ideas and Library have feature implementations. `worker/api/`,
 `worker/services/` and `worker/db/repositories/` contain Ideas, Quick Links and
 the College hierarchy APIs (package 4.1). `tests/integration/college-api.test.ts`
@@ -16,6 +16,8 @@ covers College lifecycle, ownership, validation, ordering and rollback behavior.
 The schema and reviewed initial migration include the 17-table baseline. The approved
 20-table target adds later migrations. Package 4.3 adds only the generated recent-material index;
 4.5 adds the 18th table and nullable course description through migration 0002.
+Package 3.4 adds the 19th table, Ideas collections, and favorite/membership/cover fields
+through additive migration 0003. The remaining new News save table stays pending.
 `src/components/ui/Dialog.tsx` supplies native modal behavior shared by forms.
 `src/components/layout/BottomNavigation.tsx` owns the shared six-link floating dock
 and navigation items; `AppShell` owns the room backdrop and content clearance.
@@ -38,7 +40,12 @@ and the pure schedule-week.ts calendar helper. Feature-local schedule-api/use-sc
 CourseRow, WeeklySchedule, ScheduleManager and ScheduleEditor implement the approved overview;
 schedule-format.ts and schedule.css handle labels and responsive calendar reflow.
 Focused schedule API/migration/week/browser tests extend existing regressions and the native
-runtime test. Playback and content pipelines remain pending.
+runtime test. Packages 3.4–3.5 add idea-collections.routes/service/repository, the focused
+idea-covers service/repository, idea-cover/image-upload utilities and shared same-origin
+middleware. Existing Ideas routes/service/repository retain capture/search/tags/pins.
+Feature-local CollectionManager/IdeaCoverEditor and use-idea-collections extend the Ideas
+page; Library retains its API/model. Idea extension/migration/image/browser tests and the
+native storage test exercise these additions. Playback and content pipelines remain pending.
 The following tree is a target reference, not an inventory of implemented files.
 Create folders and files as their work package needs them; do not pre-create empty modules.
 
