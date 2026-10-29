@@ -1,10 +1,11 @@
 # Kokpit — Data Model
 
-**Version:** 0.6 · **Status:** 18 tables implemented; remaining approved additions pending · **Updated:** 2026-10-27
+**Version:** 0.7 · **Status:** 19 tables implemented; remaining News additions pending · **Updated:** 2026-10-28
 
 Canonical target for private single-user V1: **20 D1 tables**. The implemented schema
-has **18 tables**: the 17-table baseline plus the 4.5 recurring class table and nullable
-course description. Ideas/News additions remain approved requirements, not applied migrations; see DEC-054 and
+has **19 tables**: the 17-table baseline plus recurring classes and Ideas collections.
+Nullable course descriptions and Ideas membership/favorite/cover fields are also implemented.
+News additions remain approved pending migrations; see DEC-054 and
 [Approved UI Features](../features/APPROVED_UI_FEATURES.md).
 D1 stores structured metadata; private R2 stores file bytes.
 Runtime boundaries: [Architecture](ARCHITECTURE.md). Operations: [Deployment](DEPLOYMENT.md).
@@ -101,11 +102,11 @@ the cascade convention. No initial migration may be rewritten to make the target
 | `title` | TEXT | no | Optional idea title |
 | `content` | TEXT | yes | Idea body |
 | `is_pinned` | INTEGER | yes | `0` or `1` |
-| `is_favorite` | INTEGER | yes | Pending 3.4: independent favorite flag, default `0` |
-| `collection_id` | TEXT | no | Pending 3.4: one optional owned collection; FK uses `ON DELETE SET NULL` |
-| `cover_r2_key` | TEXT | no | Pending 3.4: backend-generated private cover key |
-| `cover_mime_type` | TEXT | no | Pending 3.4: validated JPEG/PNG/WebP MIME |
-| `cover_size_bytes` | INTEGER | no | Pending 3.4: actual validated positive cover byte count |
+| `is_favorite` | INTEGER | yes | Implemented 3.4: independent favorite flag, default `0` |
+| `collection_id` | TEXT | no | Implemented 3.4: one optional owned collection; FK uses `ON DELETE SET NULL` |
+| `cover_r2_key` | TEXT | no | Implemented 3.4: backend-generated private cover key |
+| `cover_mime_type` | TEXT | no | Implemented 3.4: validated JPEG/PNG/WebP MIME |
+| `cover_size_bytes` | INTEGER | no | Implemented 3.4: actual validated positive cover byte count |
 | `created_at` | TEXT | yes | UTC |
 | `updated_at` | TEXT | yes | UTC |
 
@@ -113,14 +114,14 @@ the cascade convention. No initial migration may be rewritten to make the target
 
 **Indexes:** `INDEX ideas_user_created_idx (user_id, created_at DESC) INDEX ideas_user_pinned_idx (user_id, is_pinned, created_at DESC)`.
 
-**Pending 3.4 constraints/indexes:** `FOREIGN KEY (collection_id) REFERENCES idea_collections(id) ON DELETE SET NULL`;
+**Implemented 3.4 constraints/indexes:** `FOREIGN KEY (collection_id) REFERENCES idea_collections(id) ON DELETE SET NULL`;
 `CHECK (is_favorite IN (0, 1))`; all three cover metadata fields are null together or valid together.
-Add `ideas_user_favorite_idx (user_id, is_favorite, updated_at DESC, id DESC)` and
+Includes `ideas_user_favorite_idx (user_id, is_favorite, updated_at DESC, id DESC)` and
 `ideas_user_collection_idx (user_id, collection_id, is_pinned, created_at DESC, id DESC)`.
 Services and reads verify the related collection owner as well as the idea owner, including
 inconsistent legacy rows. Existing ideas migrate to no favorite, no collection and no cover.
 
-### `idea_collections` (pending 3.4)
+### `idea_collections` (implemented 3.4)
 
 | Field | Type | Required | Description |
 |---|---|---:|---|
@@ -136,6 +137,8 @@ inconsistent legacy rows. Existing ideas migrate to no favorite, no collection a
 `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`.
 `name_key` uses Unicode NFKC normalization, trim and lowercase; reject an empty result.
 **Indexes:** `idea_collections_user_position_idx (user_id, position, id)`.
+Position is nonnegative. Migration 0003 is additive and locally applied; reviewed inline
+column checks avoid rebuilding the Ideas table or dropping its tag relationships.
 One idea has at most one collection. Deleting it clears membership and retains ideas,
 tags, pins, favorites and cover bytes. A normalized memberships table is unnecessary for this V1 contract.
 
@@ -538,12 +541,12 @@ Broad soft delete, trash/restore and full revision/audit history are outside V1.
 |---|---|---|
 | 4.3 (complete) | Added materials_user_updated_idx for recent/full material queries | Applied locally; no record shape/data loss, last_opened_at remains optional. |
 | 4.5 (complete) | Added `course_schedule_entries` and nullable `courses.description` | Reviewed 0002 migration applied locally; existing rows preserved, schedule checks/duplicates/cascade tested. |
-| 3.4 (after 4.5) | Add `idea_collections`, optional idea membership/cover metadata and default-false `is_favorite` | Preserve every existing idea, tag and pin; no sample collections or covers. |
+| 3.4 (complete locally) | Added `idea_collections`, optional idea membership/cover metadata and default-false `is_favorite` through reviewed 0003 | Preserves existing ideas/tags/pins; default no collection/cover/favorite; no sample data. |
 | 6.4 | Add nullable `news_articles.topic_key` and topic index | Classify/backfill existing cached items safely; leave unclassified items readable. |
 | 6.5 | Add `news_saved_articles` with guarded article retention | Existing feed and unsaved cleanup remain valid; test concurrent save/cleanup and disabled sources. |
 
-Target table count after all additions is 20 (17 baseline + 3); current count is 18.
-The original documentation approval generated no migration; 4.3 and 4.5 later applied their
+Target table count after all additions is 20 (17 baseline + 3); current count is 19.
+The original documentation approval generated no migration; 4.3, 4.5 and 3.4 later applied their
 additive migrations locally. No production migration ran. Verify each intermediate
 schema in its implementation package, including preservation of existing records and FK behavior.
 
@@ -552,3 +555,6 @@ Drizzle schema → generated migration → SQL review → local apply → tests 
 Keep migrations version-controlled and never rewrite applied history or manually change production schema.
 Material changes also update this document and require compatibility review.
 Unexpected entities or destructive changes require owner review before implementation.
+
+The [Ideas collections/cover contract](../features/IDEAS_COLLECTIONS_AND_COVERS.md) documents
+private cover compare-and-set writes, cleanup retries and unresolved provider-failure limits.
