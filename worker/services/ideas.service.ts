@@ -1,14 +1,18 @@
-import { NotFoundError, BadRequestError } from '../utils/errors';
+import { AppError, NotFoundError, BadRequestError } from '../utils/errors';
 import type {
   IdeasRepository,
   IdeaWithTags,
   ListIdeasFilters,
 } from '../db/repositories/ideas.repository';
+import type { IdeaCollectionsRepository } from '../db/repositories/idea-collections.repository';
+import type { IdeaCoversService } from './idea-covers.service';
 
 export interface CreateIdeaInput {
   title?: string | null | undefined;
   content: string;
   isPinned?: boolean | undefined;
+  isFavorite?: boolean | undefined;
+  collectionId?: string | null | undefined;
   tags?: string[] | undefined;
 }
 
@@ -16,13 +20,25 @@ export interface UpdateIdeaInput {
   title?: string | null | undefined;
   content?: string | undefined;
   isPinned?: boolean | undefined;
+  isFavorite?: boolean | undefined;
+  collectionId?: string | null | undefined;
   tags?: string[] | undefined;
 }
 
 export class IdeasService {
-  constructor(private readonly repository: IdeasRepository) {}
+  constructor(
+    private readonly repository: IdeasRepository,
+    private readonly collections?: IdeaCollectionsRepository,
+    private readonly covers?: IdeaCoversService,
+  ) {}
+
+  private async validateCollection(id: string | null | undefined, userId: string) {
+    if (id && !(await this.collections?.find(id, userId)))
+      throw new NotFoundError('Collection not found.');
+  }
 
   async listIdeas(userId: string, filters?: ListIdeasFilters): Promise<IdeaWithTags[]> {
+    await this.validateCollection(filters?.collectionId, userId);
     return this.repository.list(userId, filters);
   }
 
@@ -35,6 +51,7 @@ export class IdeasService {
   }
 
   async createIdea(userId: string, input: CreateIdeaInput): Promise<IdeaWithTags> {
+    await this.validateCollection(input.collectionId, userId);
     const trimmedContent = input.content?.trim();
     if (!trimmedContent) {
       throw new BadRequestError('Content cannot be empty.');
@@ -53,6 +70,8 @@ export class IdeasService {
       title: normalizedTitle,
       content: trimmedContent,
       isPinned,
+      isFavorite: Boolean(input.isFavorite),
+      collectionId: input.collectionId ?? null,
       tags,
       createdAt: now,
       updatedAt: now,
@@ -62,6 +81,7 @@ export class IdeasService {
   async updateIdea(id: string, userId: string, input: UpdateIdeaInput): Promise<IdeaWithTags> {
     // Verify existence & ownership
     await this.getIdeaById(id, userId);
+    await this.validateCollection(input.collectionId, userId);
 
     let contentUpdate: string | undefined;
     if (input.content !== undefined) {
@@ -88,6 +108,8 @@ export class IdeasService {
       title: titleUpdate,
       content: contentUpdate,
       isPinned: input.isPinned,
+      isFavorite: input.isFavorite,
+      collectionId: input.collectionId,
       tags: tagsUpdate,
       updatedAt: now,
     });
@@ -102,9 +124,16 @@ export class IdeasService {
   async deleteIdea(id: string, userId: string): Promise<void> {
     // Verify existence & ownership
     await this.getIdeaById(id, userId);
+    if (this.covers) await this.covers.remove(id, userId);
 
     const success = await this.repository.delete(id, userId);
     if (!success) {
+      if (await this.repository.getById(id, userId))
+        throw new AppError(
+          'CONFLICT',
+          'This idea changed during cleanup. Reload it and retry deletion.',
+          409,
+        );
       throw new NotFoundError('Idea not found.');
     }
   }
