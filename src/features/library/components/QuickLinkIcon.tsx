@@ -24,7 +24,7 @@ export function QuickLinkIcon({
   const sizeClasses = {
     sm: 'w-3.5 h-3.5',
     md: 'w-4 h-4',
-    lg: 'w-6 h-6',
+    lg: 'w-12 h-12',
   };
 
   if ((iconType === 'favicon' || iconType === 'custom') && iconValue && failedImage !== iconValue) {
@@ -69,7 +69,7 @@ export function QuickLinkIcon({
       <span
         className={cn(
           'font-ui font-bold select-none leading-none flex items-center justify-center',
-          size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-sm',
+          size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-4xl' : 'text-sm',
           className,
         )}
       >
@@ -215,7 +215,7 @@ export function QuickLinkIcon({
     <span
       className={cn(
         'font-ui font-semibold text-[var(--kokpit-text-secondary)] select-none flex items-center justify-center',
-        size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm',
+        size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-4xl' : 'text-sm',
         className,
       )}
     >
