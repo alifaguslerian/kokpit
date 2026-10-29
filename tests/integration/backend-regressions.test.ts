@@ -275,7 +275,7 @@ test('idea pagination uses a stable ID tie breaker when creation timestamps matc
   for (const id of ['idea-b', 'idea-d', 'idea-a', 'idea-c']) {
     await db
       .prepare(
-        "INSERT INTO ideas VALUES (?, 'user-owner-1', NULL, 'Thought', 0, '2026-10-23T00:00:00.000Z', '2026-10-23T00:00:00.000Z')",
+        "INSERT INTO ideas (id, user_id, title, content, is_pinned, created_at, updated_at) VALUES (?, 'user-owner-1', NULL, 'Thought', 0, '2026-10-23T00:00:00.000Z', '2026-10-23T00:00:00.000Z')",
       )
       .bind(id)
       .run();
